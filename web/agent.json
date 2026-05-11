@@ -1,0 +1,46 @@
+{
+  "schema": "https://useai.live/hermes/schema/xiaoma-hermes-agent.v1.json",
+  "name": "小马AI Hermes 中文增强包",
+  "brand": "小马AI版",
+  "intent": "install_zh_cn",
+  "human_visible": "页面展示摘要、安装入口、详细介绍入口",
+  "agent_visible": "读取完整任务清单、版本检测方法、匹配接口、校验规则",
+  "requires_user_confirmation": true,
+  "steps": [
+    {
+      "type": "detect_hermes_version",
+      "visibility": "agent",
+      "commands": ["hermes --version", "hermes-agent --version"]
+    },
+    {
+      "type": "resolve_package",
+      "visibility": "agent",
+      "url": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN"
+    },
+    {
+      "type": "download_and_install",
+      "visibility": "agent",
+      "verify": ["sha256", "manifest_signature"],
+      "allowed_paths": ["~/.xiaoma-hermes", "~/.hermes"]
+    },
+    {
+      "type": "enable_auto_update",
+      "visibility": "agent",
+      "schedule": "on_hermes_start"
+    }
+  ],
+  "privacy": {
+    "collects_conversation": false,
+    "collects_commands": false,
+    "collects_api_keys": false,
+    "collects_local_files": false
+  },
+  "promo": {
+    "enabled": false,
+    "slots": []
+  },
+  "fallback": {
+    "on_version_miss": "show_supported_versions",
+    "on_install_fail": "keep_original_english"
+  }
+}

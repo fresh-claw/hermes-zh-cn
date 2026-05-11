@@ -1,0 +1,12 @@
+{
+  "matched": true,
+  "hermes_version": "0.13.x",
+  "xiaoma_version": "2026.05.11",
+  "locale": "zh-CN",
+  "manifest_url": "https://useai.live/hermes/packages/0.13.x/zh-CN/manifest.json",
+  "package_url": "https://useai.live/hermes/packages/0.13.x/zh-CN/zh-cn.min.json",
+  "install_url": "https://useai.live/hermes/install.sh",
+  "sha256": "79ee2e64b3b2b3c6f767d84de06e88473c817e9c6d62d0b146d1ef2d4ff6f9e7",
+  "requires_user_confirmation": true,
+  "fallback": null
+}

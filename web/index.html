@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小马AI Hermes 中文增强包</title>
+    <meta
+      name="description"
+      content="小马AI Hermes 中文增强包：让 Hermes Agent 自动识别版本并安装匹配的中文内容。"
+    />
+    <meta name="xiaoma-agent-manifest" content="/agent.json" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
+      {
+        "schema": "https://useai.live/hermes/schema/xiaoma-hermes-agent.v1.json",
+        "name": "小马AI Hermes 中文增强包",
+        "brand": "小马AI版",
+        "intent": "install_zh_cn",
+        "human_visible": "页面展示摘要、安装入口、详细介绍入口",
+        "agent_visible": "读取完整任务清单、版本检测方法、匹配接口、校验规则",
+        "requires_user_confirmation": true,
+        "steps": [
+          {
+            "type": "detect_hermes_version",
+            "visibility": "agent",
+            "commands": ["hermes --version", "hermes-agent --version"]
+          },
+          {
+            "type": "resolve_package",
+            "visibility": "agent",
+            "url": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN"
+          },
+          {
+            "type": "download_and_install",
+            "visibility": "agent",
+            "verify": ["sha256", "manifest_signature"],
+            "allowed_paths": ["~/.xiaoma-hermes", "~/.hermes"]
+          },
+          {
+            "type": "enable_auto_update",
+            "visibility": "agent",
+            "schedule": "on_hermes_start"
+          }
+        ],
+        "privacy": {
+          "collects_conversation": false,
+          "collects_commands": false,
+          "collects_api_keys": false,
+          "collects_local_files": false
+        },
+        "promo": {
+          "enabled": false,
+          "slots": []
+        },
+        "fallback": {
+          "on_version_miss": "show_supported_versions",
+          "on_install_fail": "keep_original_english"
+        }
+      }
+    </script>
+
+    <main class="shell">
+      <header class="topbar" aria-label="主导航">
+        <a class="brand" href="#top" aria-label="小马AI Hermes 中文增强包">
+          <span>HERMES</span>
+          <span>中文增强版</span>
+        </a>
+        <nav class="nav" aria-label="页面导航">
+          <a href="./details.html">详细介绍</a>
+        </nav>
+        <div class="tools" aria-label="页面工具">
+          <a href="https://useai.live/hermes">小马AI</a>
+        </div>
+      </header>
+
+      <section class="hero grid" id="top">
+        <div class="hero-inner">
+          <p class="kicker">XIAOMA AI VERSION · ZH-CN PACK</p>
+          <h1>Hermes<br />中文增强版</h1>
+          <p class="lede">
+            一句话让 Hermes 更新为中文。
+          </p>
+
+          <div class="steps" id="install">
+            <article>
+              <div>
+                <small>1. 发送以下对话给 Hermes</small>
+                <button type="button" data-copy="请访问 useai.live/hermes 安装汉化">复制</button>
+              </div>
+              <code>请访问 useai.live/<wbr />hermes 安装汉化</code>
+            </article>
+            <article>
+              <div>
+                <small>2. 使用命令行安装</small>
+                <button type="button" data-copy="curl -fsSL https://useai.live/hermes/install.sh | bash">复制</button>
+              </div>
+              <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo grid" aria-labelledby="demo-title">
+        <div class="cell terminal-cell">
+          <h2 id="demo-title">SEE IT IN ACTION</h2>
+          <div class="terminal terminal-demo" role="img" aria-label="Hermes 自动读取小马AI中文增强包演示">
+            <div class="terminal-top">
+              <span></span><span></span><span></span>
+              <b>HERMES</b>
+            </div>
+            <div class="terminal-body tui-body">
+              <div class="tui-row tui-user">
+                <span class="tui-label">YOU</span>
+                <p class="typing-line"><span class="prompt">›</span> <span id="typed-command" class="typed-command"></span><span class="typing-cursor"></span></p>
+              </div>
+              <div class="tui-row tui-agent">
+                <span class="tui-label">HERMES</span>
+                <p>正在读取 useai.live/hermes 的安装说明。</p>
+              </div>
+              <div class="terminal-output" aria-live="polite">
+                <p>web_extract useai.live/hermes</p>
+                <p>execute hermes --version</p>
+                <p>resolve zh-CN package for v0.13.x</p>
+                <p>verify sha256</p>
+                <p>install ~/.xiaoma-hermes/current</p>
+                <p class="success">小马AI中文增强已启用。</p>
+                <p>下次启动 Hermes 时会自动检查更新。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cell image-cell">
+          <div class="engraving"></div>
+          <div class="link-icons" aria-label="相关链接">
+            <a href="https://nousresearch.com/hermes-agent/" aria-label="Hermes 原版官网">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 5 7v7c0 3.8 2.9 5.8 7 7 4.1-1.2 7-3.2 7-7V7l-7-4Z" />
+                <path d="M8.5 12h7M12 8.5v7" />
+              </svg>
+              <span>原版官网</span>
+              <small>nousresearch.com/hermes-agent</small>
+            </a>
+            <a href="https://github.com/NousResearch/hermes-agent" aria-label="Hermes GitHub">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 19c-4 1.2-4-2-5.5-2.5M15 21v-3.5c0-1 .2-1.7-.5-2.4 2.4-.3 5-1.2 5-5.3 0-1.2-.4-2.1-1.1-2.9.1-.3.5-1.5-.1-2.9 0 0-.9-.3-3 1.1a10 10 0 0 0-5.5 0C7.7 3.7 6.8 4 6.8 4c-.6 1.4-.2 2.6-.1 2.9a4 4 0 0 0-1.1 2.9c0 4.1 2.6 5 5 5.3-.4.4-.6.9-.6 1.7V21" />
+              </svg>
+              <span>原版仓库</span>
+              <small>github.com/NousResearch/hermes-agent</small>
+            </a>
+            <a href="https://github.com/fresh-claw/hermes-zh-cn" aria-label="小马AI汉化仓库">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 4h7l3 3v13H7V4Z" />
+                <path d="M14 4v4h4M9.5 12h5M9.5 15h5" />
+              </svg>
+              <span>汉化仓库</span>
+              <small>github.com/fresh-claw/hermes-zh-cn</small>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer grid">
+        <div class="cell">
+          <small>小马AI Hermes 中文增强包</small>
+        </div>
+        <div class="cell">
+          <a href="https://useai.live/hermes">useai.live/hermes</a>
+        </div>
+      </footer>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

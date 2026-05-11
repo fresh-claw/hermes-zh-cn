@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
+BASE_URL="${BASE_URL%/}"
+INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
+BIN_DIR="$INSTALL_HOME/bin"
+
+current_version() {
+  if [ -f "$INSTALL_HOME/current/VERSION" ]; then
+    cat "$INSTALL_HOME/current/VERSION"
+  else
+    printf 'none'
+  fi
+}
+
+remote_version() {
+  python3 - "$BASE_URL/latest.json" <<'PY'
+import json
+import sys
+from urllib.request import urlopen
+
+with urlopen(sys.argv[1], timeout=20) as response:
+    data = json.load(response)
+print(data.get("latest", "unknown"))
+PY
+}
+
+run_install() {
+  local tmp
+  tmp="$(mktemp 2>/dev/null || mktemp -t xiaoma-hermes)"
+  trap 'rm -f "$tmp"' RETURN
+  curl -fsSL "$BASE_URL/install.sh" -o "$tmp"
+  XIAOMA_HERMES_BASE_URL="$BASE_URL" \
+  XIAOMA_HERMES_SKIP_PATH=1 \
+  XIAOMA_HERMES_SKIP_WRAPPER=1 \
+  XIAOMA_HERMES_QUIET="${XIAOMA_HERMES_QUIET:-0}" \
+  bash "$tmp"
+}
+
+cmd="${1:-status}"
+case "$cmd" in
+  status)
+    printf '小马AI Hermes 中文增强\n'
+    printf '本地版本：%s\n' "$(current_version)"
+    printf '安装目录：%s\n' "$INSTALL_HOME"
+    if [ -f "$INSTALL_HOME/real_hermes" ]; then
+      printf '原版 Hermes：%s\n' "$(cat "$INSTALL_HOME/real_hermes")"
+    fi
+    ;;
+  update)
+    quiet=0
+    if [ "${2:-}" = "--quiet" ]; then
+      quiet=1
+    fi
+    local_version="$(current_version)"
+    latest_version="$(remote_version 2>/dev/null || printf 'unknown')"
+    if [ "$latest_version" = "unknown" ] || [ "$latest_version" = "$local_version" ]; then
+      [ "$quiet" = "1" ] || printf '当前已是最新中文内容：%s\n' "$local_version"
+      exit 0
+    fi
+    [ "$quiet" = "1" ] || printf '发现中文内容更新：%s -> %s\n' "$local_version" "$latest_version"
+    XIAOMA_HERMES_QUIET="$quiet" run_install
+    ;;
+  launch)
+    "$BIN_DIR/xiaoma-hermes" update --quiet >/dev/null 2>&1 || true
+    if [ -f "$INSTALL_HOME/real_hermes" ] && [ -x "$(cat "$INSTALL_HOME/real_hermes")" ]; then
+      exec "$(cat "$INSTALL_HOME/real_hermes")" "${@:2}"
+    fi
+    exec hermes "${@:2}"
+    ;;
+  *)
+    printf '用法：xiaoma-hermes status | update | launch\n' >&2
+    exit 2
+    ;;
+esac
+

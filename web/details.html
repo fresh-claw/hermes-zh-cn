@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小马AI Hermes 中文增强包 · 详细介绍</title>
+    <meta
+      name="description"
+      content="小马AI Hermes 中文增强包详细介绍：版本、翻译文件、GitHub 同步方式。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell detail-page">
+      <header class="topbar" aria-label="主导航">
+        <a class="brand" href="./index.html" aria-label="返回小马AI Hermes 中文增强包">
+          <span>HERMES</span>
+          <span>中文增强版</span>
+        </a>
+        <nav class="nav" aria-label="页面导航">
+          <a href="./index.html">安装入口</a>
+        </nav>
+        <div class="tools" aria-label="页面工具">
+          <a href="https://useai.live/hermes">小马AI</a>
+        </div>
+      </header>
+
+      <section class="hero detail-hero grid">
+        <div class="hero-inner">
+          <p class="kicker">DETAILS · VERSION · FILES</p>
+          <h1>详细介绍</h1>
+          <p class="lede">这里展示当前版本、文件范围和同步方式。</p>
+        </div>
+      </section>
+
+      <section class="features detail-grid grid" aria-labelledby="version-title">
+        <div class="cell section-title">
+          <h2 id="version-title">当前版本</h2>
+        </div>
+        <article class="feature">
+          <h3>中文包版本</h3>
+          <p>2026.05.11</p>
+        </article>
+        <article class="feature">
+          <h3>适配 Hermes</h3>
+          <p>0.13.x；未匹配时保持 Hermes 原版显示。</p>
+        </article>
+        <article class="feature">
+          <h3>更新方式</h3>
+          <p>启动前读取 latest.json，有更新时下载新的中文增强包。</p>
+        </article>
+      </section>
+
+      <section class="version grid" aria-labelledby="files-title">
+        <div class="cell section-title">
+          <h2 id="files-title">翻译内容文件</h2>
+        </div>
+        <div class="cell resolver file-list">
+          <div class="resolver-head">
+            <span>PACKAGE FILES</span>
+            <strong>zh-CN</strong>
+          </div>
+          <ul>
+            <li><b>agent.json</b><span>给 Hermes 读取的任务清单、版本判断和安装边界。</span></li>
+            <li><b>latest.json</b><span>当前中文包版本、兼容范围和下载入口。</span></li>
+            <li><b>install.sh</b><span>安装器：检测版本、校验文件、启用中文、安装更新辅助脚本。</span></li>
+            <li><b>xiaoma-hermes</b><span>状态查看、更新检查和启动前更新。</span></li>
+            <li><b>manifest.json</b><span>中文包版本、SHA256 和文件清单。</span></li>
+            <li><b>zh-cn.min.json</b><span>中文增强内容、安装动作和 Hermes 技能说明。</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="version grid" aria-labelledby="github-title">
+        <div class="cell section-title">
+          <h2 id="github-title">GitHub 同步</h2>
+        </div>
+        <div class="cell resolver">
+          <div class="resolver-head">
+            <span>CONTENT SOURCE</span>
+            <strong>GitHub → useai.live</strong>
+          </div>
+          <pre>{
+  "source": "https://github.com/fresh-claw/hermes-zh-cn",
+  "site": "https://useai.live/hermes",
+  "flow": "GitHub 更新中文源文件，网站发布压缩后的分发文件",
+  "promo": "第一版关闭"
+}</pre>
+        </div>
+      </section>
+
+      <footer class="footer grid">
+        <div class="cell">
+          <small>小马AI Hermes 中文增强包</small>
+        </div>
+        <div class="cell">
+          <a href="https://github.com/fresh-claw/hermes-zh-cn" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </footer>
+    </main>
+  </body>
+</html>

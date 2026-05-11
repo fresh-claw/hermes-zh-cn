@@ -1,0 +1,16 @@
+{
+  "locale": "zh-CN",
+  "brand": "小马AI版",
+  "latest": "2026.05.11",
+  "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
+  "github": "https://github.com/fresh-claw/hermes-zh-cn",
+  "packages": [
+    {
+      "hermes": "0.13.x",
+      "version": "2026.05.11",
+      "manifest": "packages/0.13.x/zh-CN/manifest.json",
+      "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
+      "sha256": "79ee2e64b3b2b3c6f767d84de06e88473c817e9c6d62d0b146d1ef2d4ff6f9e7"
+    }
+  ]
+}
