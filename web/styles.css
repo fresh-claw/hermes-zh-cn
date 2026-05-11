@@ -230,6 +230,29 @@ pre {
   white-space: normal;
 }
 
+.agent-brief {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  color: var(--muted);
+  text-align: left;
+  text-transform: none;
+}
+
+.agent-brief strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.agent-brief p {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
 .cell {
   min-height: 120px;
   border-right: 1px solid var(--line);
@@ -424,7 +447,7 @@ pre {
     linear-gradient(130deg, rgba(13, 7, 24, 0.3), rgba(109, 79, 194, 0.45));
 }
 
-.link-icons {
+.link-list {
   position: absolute;
   left: 40px;
   top: 40px;
@@ -435,7 +458,7 @@ pre {
   width: min(500px, calc(100% - 80px));
 }
 
-.link-icons a {
+.link-list a {
   min-height: 0;
   border: 0;
   background: transparent;
@@ -449,23 +472,19 @@ pre {
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.link-icons a:hover {
+.link-list a:hover {
   background: transparent;
   color: var(--ink);
   transform: translateX(4px);
 }
 
-.link-icons svg {
-  display: none;
-}
-
-.link-icons span {
+.link-list span {
   color: var(--ink);
   font-size: 1rem;
   letter-spacing: 0.18em;
 }
 
-.link-icons small {
+.link-list small {
   width: 100%;
   font-family: "Courier New", Courier, monospace;
   font-size: 0.72rem;
@@ -697,7 +716,7 @@ pre {
     min-height: 260px;
   }
 
-  .link-icons {
+  .link-list {
     left: 16px;
     top: 16px;
     width: calc(100% - 32px);

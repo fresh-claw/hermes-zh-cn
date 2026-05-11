@@ -21,22 +21,32 @@ const commandText = "请访问 useai.live/hermes 安装汉化";
 
 if (commandTarget) {
   let index = 0;
+  let deleting = false;
 
   const typeNext = () => {
     commandTarget.textContent = commandText.slice(0, index);
-    index += 1;
 
-    if (index <= commandText.length) {
-      window.setTimeout(typeNext, 90);
+    if (!deleting && index < commandText.length) {
+      index += 1;
+      window.setTimeout(typeNext, 74);
       return;
     }
 
-    window.setTimeout(() => {
-      index = 0;
-      commandTarget.textContent = "";
-      window.setTimeout(typeNext, 420);
-    }, 2200);
+    if (!deleting) {
+      deleting = true;
+      window.setTimeout(typeNext, 850);
+      return;
+    }
+
+    if (index > 0) {
+      index -= 1;
+      window.setTimeout(typeNext, 24);
+      return;
+    }
+
+    deleting = false;
+    window.setTimeout(typeNext, 360);
   };
 
-  window.setTimeout(typeNext, 420);
+  window.setTimeout(typeNext, 280);
 }
