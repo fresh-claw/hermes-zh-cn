@@ -8,6 +8,7 @@ bash -n "$ROOT/web/tools/xiaoma-hermes"
 
 python3 -m json.tool "$ROOT/web/agent.json" >/dev/null
 python3 -m json.tool "$ROOT/web/latest.json" >/dev/null
+python3 -m json.tool "$ROOT/web/api/resolve" >/dev/null
 python3 -m json.tool "$ROOT/web/api/resolve.sample.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.13.x/zh-CN/manifest.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.13.x/zh-CN/zh-cn.min.json" >/dev/null
@@ -40,4 +41,3 @@ if "name: xiaoma-hermes-zh" not in skill:
 PY
 
 printf 'release ok\n'
-
