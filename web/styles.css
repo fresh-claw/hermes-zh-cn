@@ -231,36 +231,43 @@ pre {
 }
 
 .agent-brief {
-  margin-top: 18px;
-  border-top: 1px solid var(--line);
-  padding-top: 14px;
-  color: var(--muted);
-  text-align: left;
   text-transform: none;
 }
 
-.agent-brief strong {
-  display: block;
+.agent-brief .cell {
+  min-height: 0;
+}
+
+.agent-brief-title {
+  display: flex;
+  align-items: flex-start;
+}
+
+.agent-brief-title h2 {
+  margin: 0;
   color: var(--ink);
-  font-size: 0.82rem;
+  font-family: Arial, "PingFang SC", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .agent-brief ol {
-  margin: 8px 0 0;
-  padding-left: 18px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
 }
 
 .agent-brief li {
-  margin: 0 0 5px;
-  font-size: 0.84rem;
-  line-height: 1.55;
+  margin: 0 0 7px;
+  font-size: 0.88rem;
+  line-height: 1.62;
 }
 
 .agent-brief code {
   color: var(--ink);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   word-break: break-all;
 }
 
