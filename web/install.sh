@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.11.4"
+PACKAGE_VERSION="2026.05.11.5"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
 BIN_DIR="$INSTALL_HOME/bin"
@@ -90,7 +90,7 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-H4sIAPOlAWoAA+1be1cURxb37/kUtR0jsMd5vwhZPMtmOZGNURZ0d3PUMzQzNUyvPd2d7h4VkT34QEF5ZaP4AHV9EImroImLgjy+S0L3DH/5FfZWVffQPTMgySqJZ6c8Z3q66t6qW/f+7q1bd0Thk8f4Lqz5d7y7FggE4tEoos8YewZCEfa0GgpGQ9AZiwRjARQIhmKB0A4UfYcyFVtO03kVRBFO5TalA7J0epNxax/F53vSFNv+AV8w7Dv5TmCwdfuHYtFYGOwfjoRjVftvRyvaX8RdfLL7F7a/7f+RQKRq/21ppfY/lfF+sv8to2DL9g8H4pFokNg/Hqvaf1taZfvDZ1LyZQXJ93dNlv7XNUAfsUhkQ/vH48GwZf9QEAI/2D8eiQd3oMDb2OCb2v+5/Xs4LZnBWZ5r4DK6rmgNfn9Ow7zgE4Xj2J/BahawwUj8JwVezvJe1um1kOM7HqQg4XZzWazDPD2cxGcxzOcmp5ACok6Vl1IwajwdXfv2cVNLfnAAekU5yYuEieIPOo5jVRNg1gYuBMeCLxD1BYO+CAyw6RJJOavwOgwz3MJATtF0FfNZMpQVyBA5RSIBPtQZj4bS0UCoPhRNJes7Q7FQMBQKRNJ8/UeBVOSjKDDzKS2BJb5TxCBbmhc13AudSR1E0LiGwz2c3q0Q8ZKylBa6EhrWgYksxDbDhEJsFMEoSgmaIvLdPpGXunKgJnQqAxwws9gJegOWf/h9lnYZl6+bz4plbI2U7RjuBo7SMaIlXswxrcELbF6jGjPGZvNXptFeJpQxc90cn8/P9K0ufb368ok5fnHt1g2z70z+6tDarXuvFyfMaw/BCMZXS6uvHqy+HDZGCbd5bS4/8dwcmTLhc/zpWv9wfmkGeFdfzf3Yd5br3V1UCZghmUnoOSGhyTk1ScSCrgxRG8dEMGYGC/f78xMzxtJVv20/UfB38pKEVZ9CrLc5pXZMkMA+XYKEt0KuC4q2FbpsUklY2t+IWs1JCdC1pBOKowBfsF5OYfZzAdzPRjT/zh4Lu71+p1GYlm2jmJOPzEuXwFDGpWlz+pEx3/9j3xnz8b3Cykhh9gn5PjqWf7AA38EERv9UGTBeLw4xOY0b06uLN40HYJklY2zEWLgC1mN2LtydWn15psRcggSRTBQToFJRtGzlgiMd0Pyl3utv/6xl3z5fNuXcVGHmW3tHhdlXxui47dVMAOPebWNxwRjqz988z6QlO6OAMv45VFieBwwWZp+b10c2EDKnpHgdJ06ovKJg1SVtifIFyTKsS+ewzmJf/tVA/t+zoBvQme0TVPHG4LB5v8+8M1UiLZOQigQW15IykamHk9NpISnwIgE2yKPK4H0IHllFJ6t2gaQn+G6kibyWQSpWRIFKk5VTWPQzmQSpC8QUFT+wpQURI9imLiQRyKSRUxjIywIHAyjBHtsyWf6TDHiChpGlJ57EKfqi5qyYVYygIIkmi/CCSHgGdfIk3NKg6WVBVICoZ89Elcy0joig9N1ejSIDdeWEFC9RPydHp55T0MFDLYg5P6LRgAgryXoimYFNkIh6mGkBgSNhFeZOIV7SToCAMIkuyyJS+RNIzulKjsTVptYWBCFPQ7KK6MGA4EhSEVGYxh3tJeuqoEmNGAXc2GfJ7gMdp7odR4vLrC++Y2GRmHU3ZWPb9MHZloTw0kXw8uS+MTntwsSFfmNmfh0Qbs6cqkJkICsufQ1ggjXM67PmZB8QO9nXGal2fAAewAY5N0BxzEmJeNRzGS1WVVn1WRb05SQtpyiyqlMeiCLm5GMi5H8uGw+eFZ5PQaxeXVohIZ/ZFRn9i7AsIJnNZp86PlkVIIQSBHMkAA0uGwNPixFpYSz/rzMs6pEJV27lr94wRu7kr9wxry9DLDLm5/KvbhgXF/KX5kw7QDG/5YgXyMQc7jMULCXKOjkJqNUIfBJZXj2Wkk8Q9/R6vUckkiw0oNJoc0RKYS2pCgpBcwOyLWoLW+KwIAU5sgZeFL45Yz47WxJqyJc7U/nJy04uc2DcfDZoDI0X928rESY7IlHRjkgfbLoyoQDLs6WN0a/W+s780DdZmH1RmFlZuzaDyhIpxCRjC//QdwuEYBLDWVCUg8q8+nKBrQRiQdiyjuLBh4W7Q6svLxsD16zgTw/t14s3iSgdHR2dEHqOSIBLEXnTWvs+tHFOZzsNxKrTiPHBBHTTHyC2UuHheWPgBunywr6HQVSjf6CwMgZDqCMDztYBqu04kaQPpVvPyFIYebOIpIM+4tZ0wNq612vBuQPlnwyaI/cIfC3xJ1xH2cyQOTDmRDmziCWChfSOJK8jn88Hwlsrd6DCw/vm7TFgMyafoj+1H9gPM69N9hEVU5e2gHttzt5DxWPE1UMDdE7rsEQwvjlr3p4EaY3+aeYAxB9GnoKJiNnpUUbWZ7kU7OXCDXJ4ly1EFfPGI7eEypEndpDjf37OefCvrsyYV+aR64BjKR5B0d0BlrsRLJ2fA3I4uRluzZEB89Y5outbd52gsnZcHm1AqMJcP2gR0Gsvx6gKy+cgy2GIdVp0g+CUf/Uw/+qJ7axnbehR/JMX91k91F8UjWx7crp4hsMMJKOtdJIzuWDywsok5ADs1Ri9Du7HxGRIMMbAq/pWXz4qSm174XoQJ4nyd3fNyUE2RMIF4HH5awDA2r1bxoPxYqy3NlL45kJ+YrwwdM6YeM58qDCzDEm0rTOWUqOOCil/EW4UPpWOM/NSX+HcUjF3osRM9mJmQ8UsLPcbl74tnL/J1MDcaKEkFx0dW12eKDEPnazwYtZYPm/PX4K0jkqZvMPjKyTupaNWnk4jwkaIdSiU5ovr4YgmnFbwnZ0vzN6C2Unq8BnuRoBN48XU6tKkYxLKBZKb03eN25eNidvGg2FgATqj/wWcdMbDy8yewJx//Hj15SDcm9hoYeUK0BOximqkFH2gRnJlenYVQoE5Mm3MrzhgABa/PFX0yOGL+YWHDBSrCxdKtstc07gwXBmQFPbG8PdwN1u7OEzSWposFBP8IxLX6/lZ9//K9R+41gpprOlvpfzzpvoP7Syr/8Sq9Z/taD0ehKyCDapcsSEEVtEGuas2ZMQu3CC7ckM6S2o0qFikIYPFyg4qKe2QwbIiDvoJVRwyAbskNKDD8IJQD/2EbnZvpEI6CpuUhY5rGT4UjRGKeDgeS6djQRxOhaKRSDQYTUcjnZDs4FgsWh9IghwfRdKdqVBnfTodjOFYKBIIpFOpznAsFg/g2Pqcnd06FQU2EC52KjlVkTWqsLIk9ozl7ZemIXDBqx2fHbGeo/P0wudRul0r8bY2up5+I5Z/s14rCUeHj3oIrytSlP7+9yup/4ejwWr9fztaZfv/4vX/QDRSjf/b0d77+j/DbbX+X63/V+v/1fp/tf5frf9X6//V+n+1/l+t/1fr/9X6f7X+X63/V+v/m7TK9Z9fvP4fiFX//+e2tO2p/9tFmveg/p/EYRwKB5M4HYgn+Ug4xeNAnPxBSjwV4fn6cADzkWC4PhWO4/pUZ4Svj/Fxgt0AH0imYzj9ntX/SZr2Tv/4a8dP+vufeDBO/D8UjFf//mtbGrO/y/Hf+hpvsD/5la0Y/+Ef+f0nFq3G/21pH/wG7oYqvfhg6Ti9CHpI/dqLczJSBAWneUH0eP7Q1N6cONS2r5Hb2fO3lqYDnzcl9ja3fd7cnrBHGrwb3jV7ORe//f1DPwy07G8/2LRvX2Lvgc+byycnvQ3eneRRcoMic7bsT/yxpQ24nJOQrXAej1WbSVinTW0dDZFCGh2GmzEqYbGI/X9pbmtvObCfQ0c/RnoGSzR8kovmG+iBDkO4peSKKkh6GtVIsoRroCctQMD1qDgr67hEmuKVGea3leIXed1OvDj0u9/VtH5R4xGypPpD79X2d61b86Qh+CO464tCp0/FX+aAD1nD0CsrsAHPCUHP2G+1wOTj1a7jh4NHdyNdyGI5pzdG6hCvkSqhIksabqCbIGVC1Mgu8qLMp2rt4ToP3V8tIfB1Yb2WY/Jyu+Hslo5JpLBTV+dp/YJuOiclrDKDtWNWzdOzCnyHTzBdbfaYjrMKCu3xp/Bxv5QTRXT6NLJ6vbq7MlRHVK2rvIJq1CwzJEzD1aC25oOH2vbDoKP24VDqerGDQ17Z4gLqylBuXOfk0JEysvbPWloTrU0H9zYGNxr9a1tTa2tzW0WCPx9qaT5YDnXa3eAN9LIliSPacoIqk9kUYQk2eFlBAuCf5DUMFDDCIYFAlY3UuVC4efmqxkXLCifsjvx68eaHGhDAArUlrlTHuVdw/Fri4HL6C2PYwPcg2xMTVune5XeOJUburF9XXZKVu6ZzOktS8MBN1rd9GQz6yd4EDBw81F4miMNRt8BMvdZ629x5SVoK3mt7bSu8ejzMjk7302rJiNN962ixO6Hjk3otlpJySpC6GrmcnvbWE/8jU2CYgU3FHJX2ufzUAyqxKBsRV6xKr5u3Nr1eoQa9F4vUrxcHekQST9anr6GlbZyq2Q1pZl1dLyDtkX2vHYSlsOheTKTF+kSlRUvXLNbUy6fRjgmK8gb2wovvCysXKa8d3ioQmpOP2N7W1WIrTpVlnatzq4VhsYj6HkZ/uIbQ1hzt5UgItBDgxODHH8OD/XrA/PTLnID1xsA6QMHJQw1eCAKwO6+XDpeikfEEnfPSuGo7aOOGPstitZPOfS6VRmHbAS3E1NRxTkHds1GJbWiho4R9A6KdLmlLd0eYrG0DbdCaqhgKNv2hxREb3GtYc+OTgo4CTsW9YbXRr/IjT8t/CaLrIO8eVHm18m3TtSofA9bqjrNyHSkin5OSGYYUOJNYvuNO1jkLTsgCC3JYMLRnV5BsR1dzLDfBJ2mYsSTY17T/00NNnzY3nspsPUCjXbsI1ckthd8S0+KTOLk1PvCC3zeEel3xm3JbVXnXOFXVb93nHikLfk88s1I1H522lXbaUjGx4p5dIU8RJCF7ZqzxyZ9XWau2aqu2avt1t/8C61FMGgBKAAA=
+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
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -296,6 +296,7 @@ apply_tui_source_patch() {
   python3 - "$real_hermes" "$INSTALL_HOME" "$PACKAGE_VERSION" "$INSTALL_HOME/current/PATCH_STATUS" <<'PY_PATCH'
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -389,6 +390,80 @@ if root is None:
 
 backup_root = install_home / "backups" / package_version / root.name
 
+banner_display_helpers = '''def _display_toolset_name(toolset_name: str) -> str:
+    """Normalize internal/legacy toolset identifiers for banner display."""
+    if not toolset_name:
+        return "未知"
+    normalized = (
+        toolset_name[:-6]
+        if toolset_name.endswith("_tools")
+        else toolset_name
+    )
+    mapping = {
+        "browser": "浏览器",
+        "browser-cdp": "浏览器 CDP",
+        "clarify": "澄清",
+        "code_execution": "代码执行",
+        "cronjob": "定时任务",
+        "delegation": "任务委派",
+        "discord": "Discord",
+        "discord_admin": "Discord 管理",
+        "terminal": "终端",
+        "web": "网页",
+        "file": "文件",
+        "memory": "记忆",
+        "skills": "技能",
+        "todo": "待办",
+        "session_search": "会话搜索",
+        "image_gen": "图像生成",
+        "vision": "视觉",
+        "computer_use": "电脑操作",
+        "feishu_doc": "飞书文档",
+        "feishu_drive": "飞书云文档",
+        "google_meet": "Google Meet",
+        "homeassistant": "Home Assistant",
+        "messaging": "消息",
+        "moa": "多模型协作",
+        "spotify": "Spotify",
+        "tts": "语音",
+        "video": "视频",
+        "other": "其他",
+        "builtin": "内置",
+        "core": "核心",
+    }
+    if normalized.startswith("mcp-"):
+        return "MCP " + normalized[4:]
+    if normalized.startswith("hermes-"):
+        return "Hermes " + normalized[7:].replace("-", " ")
+    return mapping.get(normalized, normalized.replace("_", " " ).replace("-", " "))
+
+
+def _display_skill_category_name(category: str) -> str:
+    if not category:
+        return "通用"
+    mapping = {
+        "autonomous-ai-agents": "自主智能体",
+        "creative": "创作",
+        "data-science": "数据科学",
+        "devops": "运维",
+        "email": "邮件",
+        "gaming": "游戏",
+        "general": "通用",
+        "github": "GitHub",
+        "mcp": "MCP",
+        "media": "媒体",
+        "mlops": "机器学习工程",
+        "note-taking": "笔记",
+        "productivity": "效率",
+        "red-teaming": "安全测试",
+        "research": "研究",
+        "smart-home": "智能家居",
+        "social-media": "社交媒体",
+        "software-development": "软件开发",
+    }
+    return mapping.get(category, category.replace("_", " " ).replace("-", " "))
+'''
+
 basic_replacements = {
     "hermes_cli/banner.py": [
         ('left_lines.append(f"[dim {session_color}]Session: {session_id}[/]")', 'left_lines.append(f"[dim {session_color}]会话：{session_id}[/]")'),
@@ -466,6 +541,19 @@ for rel, replacements in basic_replacements.items():
     updated = original
     for old, new in replacements:
         updated = updated.replace(old, new)
+    if rel == "hermes_cli/banner.py":
+        updated = re.sub(
+            r'def _display_toolset_name\(toolset_name: str\) -> str:\n.*?(?=\n\ndef build_welcome_banner)',
+            banner_display_helpers.rstrip(),
+            updated,
+            count=1,
+            flags=re.S,
+        )
+        updated = updated.replace(
+            'right_lines.append(f"[dim {dim}]{category}:[/] [{text}]{skills_str}[/]")',
+            'right_lines.append(f"[dim {dim}]{_display_skill_category_name(category)}:[/] [{text}]{skills_str}[/]")',
+        )
+
     if updated != original:
         backup_file(path, rel)
         path.write_text(updated, encoding="utf-8")

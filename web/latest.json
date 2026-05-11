@@ -1,7 +1,7 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.05.11.4",
+  "latest": "2026.05.11.5",
   "install": "https://useai.live/hermes/install.sh",
   "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
@@ -13,17 +13,17 @@
   "packages": [
     {
       "hermes": "0.13.x",
-      "version": "2026.05.11.4",
+      "version": "2026.05.11.5",
       "manifest": "packages/0.13.x/zh-CN/manifest.json",
       "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
-      "sha256": "ce3e231cef07ca43dae0713437d4aa830ea4138d37e8db4a86a752000a0cf6ef"
+      "sha256": "a9e61fd544e5044660174a08e6eefea326d6e3814a1ebced6a551c340c8f0ec6"
     },
     {
       "hermes": "legacy",
-      "version": "2026.05.11.4",
+      "version": "2026.05.11.5",
       "manifest": "packages/legacy/zh-CN/manifest.json",
       "package": "packages/legacy/zh-CN/zh-cn.min.json",
-      "sha256": "7376ff61e3d2544515f54beade66580c2b794fbd2b8ff16e62400fddb36670e6"
+      "sha256": "16c530a58fc5220885be12de08a2ae361ece2160c0e0eb1e4fc2f1a7408abeed"
     }
   ]
 }
