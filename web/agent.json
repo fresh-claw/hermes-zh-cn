@@ -22,6 +22,13 @@
       "note": "直接执行安装命令；不要先读取远端 JSON 或本地包文件。"
     },
     {
+      "type": "install_official_hermes_when_missing",
+      "visibility": "agent_and_human",
+      "condition": "installer cannot find local Hermes",
+      "command": "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash",
+      "note": "这一步由 useai.live/hermes/install.sh 自动执行；不需要用户另输命令。"
+    },
+    {
       "type": "installer_detects_version",
       "visibility": "agent",
       "timeout_seconds": 4,
@@ -31,6 +38,10 @@
       "type": "install_package_and_patch_tui",
       "visibility": "agent",
       "allowed_paths": [
+        "/usr/local/lib/hermes-agent",
+        "/usr/local/bin/hermes",
+        "~/.local/bin/hermes",
+        "~/.hermes/hermes-agent",
         "~/.xiaoma-hermes",
         "~/.hermes/skills/xiaoma-hermes-zh",
         "~/.hermes/config.yaml",
@@ -70,7 +81,9 @@
       "技能中心",
       "思考过程",
       "正在初始化爱马仕机器人",
-      "正在调用 API"
+      "正在调用 API",
+      "PATCH_STATUS state=applied",
+      "快捷指令说明显示中文"
     ]
   },
   "privacy": {
@@ -86,5 +99,10 @@
   "fallback": {
     "on_version_miss": "legacy package",
     "on_install_fail": "keep_original_hermes"
+  },
+  "official_hermes_install": {
+    "when": "local hermes command/source not found",
+    "url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
+    "command": "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
   }
 }

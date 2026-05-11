@@ -39,11 +39,11 @@
         </div>
         <article class="feature">
           <h3>中文包版本</h3>
-          <p>2026.05.11.8</p>
+          <p>2026.05.12.1</p>
         </article>
         <article class="feature">
           <h3>适配 Hermes</h3>
-          <p>0.13.x；版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。</p>
+          <p>0.13.x；未安装 Hermes 时先自动安装官方 Hermes，版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。</p>
         </article>
         <article class="feature">
           <h3>更新方式</h3>
@@ -63,7 +63,7 @@
           <ul>
             <li><b>agent.json</b><span>给 Hermes 读取的任务清单、版本判断和安装边界。</span></li>
             <li><b>latest.json</b><span>当前中文包版本、兼容范围和下载入口。</span></li>
-            <li><b>install.sh</b><span>自包含安装器：检测版本、校验文件、启用中文、应用启动界面与分类补丁、安装更新辅助脚本。</span></li>
+            <li><b>install.sh</b><span>自包含安装器：未安装 Hermes 时先装官方 Hermes，再检测版本、校验文件、启用中文、应用启动界面、快捷指令与分类补丁、安装更新辅助脚本。</span></li>
             <li><b>xiaoma-hermes</b><span>状态查看、更新检查和启动前更新。</span></li>
             <li><b>manifest.json</b><span>中文包版本、SHA256 和文件清单。</span></li>
             <li><b>zh-cn.min.json</b><span>中文增强内容、安装动作和 Hermes 技能说明。</span></li>

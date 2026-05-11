@@ -3,7 +3,8 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.11.8"
+PACKAGE_VERSION="2026.05.12.1"
+OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
 BIN_DIR="$INSTALL_HOME/bin"
@@ -88,6 +89,53 @@ print(detected or "legacy")
 PY_DETECT
 }
 
+find_real_hermes() {
+  if [ -n "${XIAOMA_HERMES_REAL_HERMES:-}" ]; then
+    printf '%s\n' "$XIAOMA_HERMES_REAL_HERMES"
+    return
+  fi
+  local found=""
+  found="$(command -v hermes 2>/dev/null || true)"
+  if [ -n "$found" ] && [ "$found" != "$BIN_DIR/hermes" ]; then
+    printf '%s\n' "$found"
+    return
+  fi
+  if [ -f "$INSTALL_HOME/real_hermes" ]; then
+    cat "$INSTALL_HOME/real_hermes"
+    return
+  fi
+  if [ -x "$HOME/.hermes/hermes-agent/hermes" ]; then
+    printf '%s\n' "$HOME/.hermes/hermes-agent/hermes"
+    return
+  fi
+  if [ -x "/usr/local/bin/hermes" ]; then
+    printf '%s\n' "/usr/local/bin/hermes"
+    return
+  fi
+  printf '\n'
+}
+
+ensure_official_hermes() {
+  if [ -n "${XIAOMA_HERMES_SOURCE_ROOT:-}" ]; then
+    return
+  fi
+  if [ -n "$(find_real_hermes)" ]; then
+    return
+  fi
+  if [ "${XIAOMA_HERMES_SKIP_OFFICIAL_INSTALL:-0}" = "1" ]; then
+    return
+  fi
+
+  need_cmd curl
+  say "未检测到 Hermes，正在先安装官方 Hermes Agent。"
+  curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash
+
+  if [ -z "$(find_real_hermes)" ]; then
+    printf '官方 Hermes 安装后仍未检测到 hermes 命令，请打开新终端后重试。\\n' >&2
+    exit 1
+  fi
+}
+
 extract_payload() {
   local archive="$TMP_DIR/payload.tar.gz"
   local target="$TMP_DIR/payload"
@@ -96,7 +144,107 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-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
+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
+Cy+8fmvX/wMhvHUZAGgBAA==
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -236,28 +384,6 @@ except Exception:
 PY_SET
 }
 
-find_real_hermes() {
-  if [ -n "${XIAOMA_HERMES_REAL_HERMES:-}" ]; then
-    printf '%s\n' "$XIAOMA_HERMES_REAL_HERMES"
-    return
-  fi
-  local found=""
-  found="$(command -v hermes 2>/dev/null || true)"
-  if [ -n "$found" ] && [ "$found" != "$BIN_DIR/hermes" ]; then
-    printf '%s\n' "$found"
-    return
-  fi
-  if [ -f "$INSTALL_HOME/real_hermes" ]; then
-    cat "$INSTALL_HOME/real_hermes"
-    return
-  fi
-  if [ -x "$HOME/.hermes/hermes-agent/hermes" ]; then
-    printf '%s\n' "$HOME/.hermes/hermes-agent/hermes"
-    return
-  fi
-  printf '\n'
-}
-
 install_helper() {
   local payload_root="$1"
   mkdir -p "$BIN_DIR"
@@ -286,7 +412,7 @@ fi
 if [ -f "\$HOME/.hermes/hermes-agent/hermes" ]; then
   exec python3 "\$HOME/.hermes/hermes-agent/hermes" "\$@"
 fi
-printf '未找到原版 Hermes，请先安装 Hermes Agent。\\n' >&2
+printf '未找到原版 Hermes，请重新执行：curl -fsSL https://useai.live/hermes/install.sh | bash\\n' >&2
 exit 127
 EOF_WRAPPER
   chmod +x "$BIN_DIR/hermes"
@@ -370,6 +496,26 @@ if real_hermes:
         add_from_python(first_line[2:].strip().split()[0])
 
 add_candidate(home / ".hermes" / "hermes-agent")
+add_candidate(Path("/usr/local/lib/hermes-agent"))
+add_candidate(Path("/opt/hermes-agent"))
+add_candidate(Path("/usr/local/hermes-agent"))
+
+for exe_name in ("hermes", "hermes-agent"):
+    found = shutil.which(exe_name)
+    if found:
+        exe = Path(found)
+        try:
+            resolved = exe.resolve()
+        except Exception:
+            resolved = exe
+        for parent in [resolved.parent, *resolved.parents]:
+            add_candidate(parent)
+        try:
+            first_line = resolved.read_text(encoding="utf-8", errors="ignore").splitlines()[0]
+        except Exception:
+            first_line = ""
+        if first_line.startswith("#!"):
+            add_from_python(first_line[2:].strip().split()[0])
 
 try:
     import hermes_cli
@@ -388,6 +534,7 @@ if root is None:
         "state": "not_found",
         "version": package_version,
         "real_hermes": real_hermes,
+        "candidates": [str(c) for c in candidates[:40]],
         "message": "未找到 Hermes 源码目录，启动界面补丁未应用。",
     }
     status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -594,13 +741,10 @@ def _zh_command_args_hint(cmd: CommandDef) -> str:
 
 '''
 
-zh_banner_logo = """[bold #FFD700] █████╗  ██╗   ██╗ ███╗   ███╗ █████╗  ███████╗ ██╗  ██╗[/]
-[bold #FFD700]██╔══██╗ ██║   ██║ ████╗ ████║██╔══██╗ ██╔════╝ ██║  ██║[/]
-[#FFBF00]███████║ ██║   ██║ ██╔████╔██║███████║ ███████╗ ███████║[/]
-[#FFBF00]██╔══██║ ██║   ██║ ██║╚██╔╝██║██╔══██║ ╚════██║ ██╔══██║[/]
-[#CD7F32]██║  ██║ ╚██████╔╝ ██║ ╚═╝ ██║██║  ██║ ███████║ ██║  ██║[/]
-[#CD7F32]╚═╝  ╚═╝  ╚═════╝  ╚═╝     ╚═╝╚═╝  ╚═╝ ╚══════╝ ╚═╝  ╚═╝[/]
-[#FFF8DC]                爱  马  仕  机  器  人[/]"""
+zh_banner_logo = """[bold #FFD700]┏━━━━┓ ┏━━━━┓ ┏━━━━┓ ┏━━━━┓ ┏━━━━┓ ┏━━━━┓[/]
+[bold #FFD700]┃ 爱 ┃ ┃ 马 ┃ ┃ 仕 ┃ ┃ 机 ┃ ┃ 器 ┃ ┃ 人 ┃[/]
+[#FFBF00]┗━━━━┛ ┗━━━━┛ ┗━━━━┛ ┗━━━━┛ ┗━━━━┛ ┗━━━━┛[/]
+[#CD7F32]          XIAOMA AI · HERMES ZH-CN PACK[/]"""
 
 zh_horse_head = """[#CD7F32]          /\\_        [/]
 [#CD7F32]      ___/  \\\\__     [/]
@@ -1858,8 +2002,31 @@ status = {
     "missing": sorted(set(missing)),
     "backup": str(backup_root),
 }
+
+validation = []
+def check_contains(rel, needles):
+    path = root / rel
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    for needle in needles:
+        if needle not in text:
+            validation.append(f"{rel} 缺少 {needle}")
+
+check_contains("hermes_cli/banner.py", ["爱马仕机器人", "可用工具"])
+check_contains("hermes_cli/commands.py", ["_ZH_COMMAND_DESCRIPTIONS", "用法："])
+check_contains("cli.py", ["爱马仕机器人", "允许一次"])
+check_contains("ui-tui/src/components/branding.tsx", ["爱马仕机器人", "可用工具"])
+
+status["validation"] = validation
+if validation:
+    status["state"] = "partial"
 status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-if patched:
+if validation:
+    print("TUI补丁：自检发现未完成项")
+    for item in validation:
+        print(f"- {item}")
+elif patched:
     print(f"TUI补丁：已应用 {len(set(patched))} 个文件")
 else:
     print("TUI补丁：已是最新")
@@ -1899,6 +2066,7 @@ main() {
   record_metric install
 
   mkdir -p "$INSTALL_HOME" "$RELEASES_DIR" "$HERMES_HOME_DIR"
+  ensure_official_hermes
 
   local hermes_version compat payload_root package_dir manifest_file package_file release_dir
   hermes_version="$(detect_hermes_version)"
