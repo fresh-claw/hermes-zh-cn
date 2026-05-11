@@ -178,6 +178,22 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.install-stat {
+  margin: 16px auto 0;
+  color: rgba(255, 240, 220, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.install-stat strong {
+  color: var(--ink);
+  font-family: Arial, "PingFang SC", sans-serif;
+  font-size: 1.12rem;
+  letter-spacing: 0;
+}
+
 .steps {
   display: flex;
   flex-direction: column;

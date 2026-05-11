@@ -35,7 +35,13 @@
         "~/.hermes/skills/xiaoma-hermes-zh",
         "~/.hermes/config.yaml",
         "Hermes安装目录/hermes_cli/*.py",
-        "Hermes安装目录/run_agent.py"
+        "Hermes安装目录/cli.py",
+        "Hermes安装目录/run_agent.py",
+        "Hermes安装目录/agent/*.py",
+        "Hermes安装目录/gateway/run.py",
+        "Hermes安装目录/tui_gateway/server.py",
+        "Hermes安装目录/ui-tui/src/**/*.ts",
+        "Hermes安装目录/ui-tui/src/**/*.tsx"
       ],
       "backup": "~/.xiaoma-hermes/backups/"
     },
@@ -57,12 +63,14 @@
     "avoid": "不要把本地 JSON 通过管道交给解释器。",
     "expected": [
       "TUI补丁：已应用",
-      "浏览器",
-      "澄清",
-      "通用",
-      "欢迎使用 Hermes Agent",
+      "爱马仕机器人",
       "可用工具",
-      "可用技能"
+      "可用技能",
+      "可用命令",
+      "技能中心",
+      "思考过程",
+      "正在初始化爱马仕机器人",
+      "正在调用 API"
     ]
   },
   "privacy": {

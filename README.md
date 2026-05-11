@@ -3,7 +3,7 @@
 让用户在 Hermes 对话中发送一句话：
 
 ```text
-请访问 useai.live/hermes 安装汉化
+请访问 useai.live/hermes 安装汉化补丁
 ```
 
 Hermes 读取页面说明后，直接执行安装命令。安装器会在本机检测版本，失败或超时时使用 legacy 兼容包。安装后会把 Hermes 静态界面语言设置为 `zh`，加入小马AI中文增强说明和启动更新辅助脚本，并备份后修改启动界面文案文件与分类显示。
@@ -48,4 +48,4 @@ XIAOMA_HERMES_BASE_URL=http://127.0.0.1:4173 bash web/install.sh
 
 ## English
 
-This repository provides the Xiaoma AI Chinese enhancement pack for Hermes Agent. It uses the official `display.language=zh` setting, adds a Chinese helper skill, checks for updated localization files from `useai.live/hermes`, and applies a backed-up source patch for Hermes startup TUI strings and category labels that are not wired to the official language setting yet.
+This repository provides the Xiaoma AI Chinese enhancement pack for Hermes Agent. It uses the official `display.language=zh` setting, adds a Chinese helper skill, checks for updated localization files from `useai.live/hermes`, and applies a backed-up source patch for Hermes startup text, slash command descriptions, runtime progress messages, tool labels, and TUI strings that are not wired to the official language setting yet.
