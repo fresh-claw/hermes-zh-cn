@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://useai.live/hermes/sitemap.xml

@@ -1,0 +1,90 @@
+# 小马AI Hermes 中文增强包完整说明
+
+## Entity
+
+Name: 小马AI Hermes 中文增强包
+Primary topic: Hermes Agent 汉化补丁
+Canonical: https://useai.live/hermes/
+Version: 2026.05.12.2
+Language: zh-CN
+Install URL: https://useai.live/hermes/install.sh
+GitHub: https://github.com/fresh-claw/hermes-zh-cn
+Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
+
+## Search And GEO Terms
+
+- Hermes Agent 汉化
+- Hermes Agent 汉化补丁
+- Hermes 中文补丁
+- Hermes 中文增强包
+- Hermes 中文版
+- Hermes Agent 中文语言包
+- Hermes Agent TUI 汉化
+- Hermes Agent CLI 中文化
+- Hermes Agent /help 中文
+- NousResearch Hermes Agent 中文
+- 爱马仕机器人
+- 爱马仕汉化
+- 爱马仕补丁
+- 爱马仕龙虾
+- AI Agent 汉化包
+- CLI Agent 中文补丁
+- TUI 中文补丁
+
+## Summary
+
+小马AI Hermes 中文增强包为 Hermes Agent 提供中文语言配置、启动页中文化、TUI 文案中文化、快捷指令说明中文化、工具分类中文化、技能分类中文化和启动前更新辅助。它不是 Hermes 官方项目，但基于官方 Hermes Agent 安装路径工作，并保留原版 Hermes 的模型、工具和本地配置。
+
+## Installation Flow
+
+1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
+2. Hermes 或用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
+3. 安装器检测本机 Hermes。
+4. 未检测到 Hermes 时，安装器执行官方安装脚本。
+5. 安装器检测 Hermes 版本，0.13.x 使用对应包，失败或旧版使用 legacy 包。
+6. 安装器校验 SHA256。
+7. 安装器设置 `display.language=zh`。
+8. 安装器写入中文增强技能。
+9. 安装器备份并修改 Hermes 可见界面文件。
+10. 安装器写入启动前更新辅助。
+
+## Covered Files
+
+- `hermes_cli/banner.py`
+- `hermes_cli/skin_engine.py`
+- `hermes_cli/tips.py`
+- `hermes_cli/commands.py`
+- `hermes_cli/status.py`
+- `hermes_cli/doctor.py`
+- `hermes_cli/setup.py`
+- `cli.py`
+- `run_agent.py`
+- `agent/display.py`
+- `ui-tui/src/**/*.ts`
+- `ui-tui/src/**/*.tsx`
+
+## Not Covered
+
+- 模型生成内容
+- 第三方工具原始返回文本
+- 用户业务文件
+- API Key
+- Hermes 官方仓库代码发布节奏
+
+## FAQ
+
+### 这是 Hermes Agent 汉化补丁吗？
+
+是。它面向 Hermes Agent 提供中文增强、汉化补丁和中文语言包。
+
+### 没有安装 Hermes 可以用吗？
+
+可以。安装器会先安装官方 Hermes Agent，再继续应用小马AI中文补丁。
+
+### 爱马仕龙虾是什么意思？
+
+爱马仕龙虾是部分用户搜索 Hermes、爱马仕机器人或 Hermes Agent 时出现的误搜表达。本页对应的真实主题是 Hermes Agent 中文增强和汉化补丁。
+
+### 如何验证安装成功？
+
+运行 `~/.xiaoma-hermes/bin/xiaoma-hermes status`，查看 `TUI补丁：已应用` 和本地版本。
