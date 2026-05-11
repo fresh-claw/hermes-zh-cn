@@ -28,13 +28,16 @@
       "fallback": "legacy"
     },
     {
-      "type": "install_package",
+      "type": "install_package_and_patch_tui",
       "visibility": "agent",
       "allowed_paths": [
         "~/.xiaoma-hermes",
         "~/.hermes/skills/xiaoma-hermes-zh",
-        "~/.hermes/config.yaml"
-      ]
+        "~/.hermes/config.yaml",
+        "Hermes安装目录/hermes_cli/*.py",
+        "Hermes安装目录/run_agent.py"
+      ],
+      "backup": "~/.xiaoma-hermes/backups/"
     },
     {
       "type": "enable_auto_update",
@@ -51,7 +54,13 @@
   ],
   "verification": {
     "preferred_command": "~/.xiaoma-hermes/bin/xiaoma-hermes status",
-    "avoid": "不要把本地 JSON 通过管道交给解释器。"
+    "avoid": "不要把本地 JSON 通过管道交给解释器。",
+    "expected": [
+      "TUI补丁：已应用",
+      "欢迎使用 Hermes Agent",
+      "可用工具",
+      "可用技能"
+    ]
   },
   "privacy": {
     "collects_conversation": false,

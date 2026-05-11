@@ -47,6 +47,26 @@ case "$cmd" in
     if [ -f "$INSTALL_HOME/real_hermes" ]; then
       printf '原版 Hermes：%s\n' "$(cat "$INSTALL_HOME/real_hermes")"
     fi
+    if [ -f "$INSTALL_HOME/current/PATCH_STATUS" ]; then
+      python3 - "$INSTALL_HOME/current/PATCH_STATUS" <<'PY_STATUS'
+import json
+import sys
+from pathlib import Path
+
+status = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+state = status.get("state", "unknown")
+if state == "applied":
+    print(f"TUI补丁：已应用（{len(status.get('patched', []))} 个文件）")
+elif state == "already_applied":
+    print("TUI补丁：已是最新")
+elif state == "skipped":
+    print("TUI补丁：已跳过")
+else:
+    print("TUI补丁：未应用")
+if status.get("root"):
+    print(f"Hermes目录：{status['root']}")
+PY_STATUS
+    fi
     ;;
   update)
     quiet=0

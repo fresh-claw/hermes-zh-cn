@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.11.2"
+PACKAGE_VERSION="2026.05.11.4"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
 BIN_DIR="$INSTALL_HOME/bin"
@@ -90,7 +90,7 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-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
+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
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -286,6 +286,229 @@ EOF_WRAPPER
   chmod +x "$BIN_DIR/hermes"
 }
 
+apply_tui_source_patch() {
+  if [ "${XIAOMA_HERMES_SKIP_TUI_PATCH:-0}" = "1" ]; then
+    printf '{"state":"skipped"}\n' > "$INSTALL_HOME/current/PATCH_STATUS"
+    return
+  fi
+
+  local real_hermes="$1"
+  python3 - "$real_hermes" "$INSTALL_HOME" "$PACKAGE_VERSION" "$INSTALL_HOME/current/PATCH_STATUS" <<'PY_PATCH'
+import json
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+real_hermes = sys.argv[1].strip()
+install_home = Path(sys.argv[2]).expanduser()
+package_version = sys.argv[3]
+status_path = Path(sys.argv[4]).expanduser()
+home = Path.home()
+seen = set()
+candidates = []
+
+
+def add_candidate(path):
+    if not path:
+        return
+    try:
+        root = Path(path).expanduser().resolve()
+    except Exception:
+        return
+    if root in seen:
+        return
+    seen.add(root)
+    candidates.append(root)
+
+
+def add_from_python(python_bin):
+    if not python_bin:
+        return
+    try:
+        result = subprocess.run(
+            [
+                python_bin,
+                "-c",
+                "import pathlib, hermes_cli; print(pathlib.Path(hermes_cli.__file__).resolve().parent.parent)",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=3,
+        )
+    except Exception:
+        return
+    if result.returncode == 0 and result.stdout.strip():
+        add_candidate(result.stdout.strip())
+
+
+env_root = os.environ.get("XIAOMA_HERMES_SOURCE_ROOT", "").strip()
+add_candidate(env_root)
+
+if real_hermes:
+    hermes_path = Path(real_hermes).expanduser()
+    try:
+        resolved = hermes_path.resolve()
+    except Exception:
+        resolved = hermes_path
+    for parent in [resolved.parent, *resolved.parents]:
+        add_candidate(parent)
+    try:
+        first_line = resolved.read_text(encoding="utf-8", errors="ignore").splitlines()[0]
+    except Exception:
+        first_line = ""
+    if first_line.startswith("#!"):
+        add_from_python(first_line[2:].strip().split()[0])
+
+add_candidate(home / ".hermes" / "hermes-agent")
+
+try:
+    import hermes_cli
+    add_candidate(Path(hermes_cli.__file__).resolve().parent.parent)
+except Exception:
+    pass
+
+root = None
+for candidate in candidates:
+    if (candidate / "hermes_cli").is_dir():
+        root = candidate
+        break
+
+if root is None:
+    status = {
+        "state": "not_found",
+        "version": package_version,
+        "real_hermes": real_hermes,
+        "message": "未找到 Hermes 源码目录，启动界面补丁未应用。",
+    }
+    status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(status["message"])
+    raise SystemExit(0)
+
+backup_root = install_home / "backups" / package_version / root.name
+
+basic_replacements = {
+    "hermes_cli/banner.py": [
+        ('left_lines.append(f"[dim {session_color}]Session: {session_id}[/]")', 'left_lines.append(f"[dim {session_color}]会话：{session_id}[/]")'),
+        ('right_lines = [f"[bold {accent}]Available Tools[/]"]', 'right_lines = [f"[bold {accent}]可用工具[/]"]'),
+        ('right_lines.append(f"[dim {dim}](and {remaining_toolsets} more toolsets...)[/]")', 'right_lines.append(f"[dim {dim}]（另有 {remaining_toolsets} 个工具集...）[/]")'),
+        ('right_lines.append(f"[bold {accent}]MCP Servers[/]")', 'right_lines.append(f"[bold {accent}]MCP 服务[/]")'),
+        ('f"[dim {dim}]—[/] [{text}]{srv[\'tools\']} tool(s)[/]"', 'f"[dim {dim}]—[/] [{text}]{srv[\'tools\']} 个工具[/]"'),
+        ('f"[red]— failed[/]"', 'f"[red]— 失败[/]"'),
+        ('right_lines.append(f"[bold {accent}]Available Skills[/]")', 'right_lines.append(f"[bold {accent}]可用技能[/]")'),
+        ('skills_str = ", ".join(display_names) + f" +{len(skill_names) - 8} more"', 'skills_str = ", ".join(display_names) + f" +{len(skill_names) - 8} 项"'),
+        ('right_lines.append(f"[dim {dim}]No skills installed[/]")', 'right_lines.append(f"[dim {dim}]未安装技能[/]")'),
+        ('summary_parts = [f"{len(tools)} tools", f"{total_skills} skills"]', 'summary_parts = [f"{len(tools)} 个工具", f"{total_skills} 个技能"]'),
+        ('summary_parts.append(f"{mcp_connected} MCP servers")', 'summary_parts.append(f"{mcp_connected} 个 MCP 服务")'),
+        ('summary_parts.append("/help for commands")', 'summary_parts.append("/help 查看命令")'),
+    ],
+    "hermes_cli/skin_engine.py": [
+        ("Welcome to Hermes Agent! Type your message or /help for commands.", "欢迎使用 Hermes Agent！输入消息，或输入 /help 查看命令。"),
+        ("Welcome to Ares Agent! Type your message or /help for commands.", "欢迎使用 Ares Agent！输入消息，或输入 /help 查看命令。"),
+        ("Welcome to Poseidon Agent! Type your message or /help for commands.", "欢迎使用 Poseidon Agent！输入消息，或输入 /help 查看命令。"),
+        ("Welcome to Sisyphus Agent! Type your message or /help for commands.", "欢迎使用 Sisyphus Agent！输入消息，或输入 /help 查看命令。"),
+        ("Welcome to Charizard Agent! Type your message or /help for commands.", "欢迎使用 Charizard Agent！输入消息，或输入 /help 查看命令。"),
+        ("Goodbye! ⚕", "再见！⚕"),
+        ("(^_^)? Available Commands", "(^_^)? 可用命令"),
+    ],
+    "hermes_cli/mcp_config.py": [
+        ('print(color("  MCP Servers:", Colors.CYAN + Colors.BOLD))', 'print(color("  MCP 服务:", Colors.CYAN + Colors.BOLD))'),
+    ],
+    "run_agent.py": [
+        ('print("📋 Available Tools & Toolsets:")', 'print("📋 可用工具与工具集：")'),
+    ],
+}
+
+zh_tips = '''TIPS = [
+    "输入 /help 查看命令。",
+    "/model 可在会话中切换模型。",
+    "/skin 可切换终端主题。",
+    "/config 可查看当前配置。",
+    "/usage 可查看用量、费用和会话时长。",
+    "/tools disable browser 可临时关闭浏览器工具。",
+    "/resume 可继续之前命名的会话。",
+    "/queue 可把下一条消息加入队列。",
+    "/paste 可读取剪贴板图片并加入下一条消息。",
+    "Ctrl+C 可中断当前任务；连续两次可强制退出。",
+    "Ctrl+Z 可将 Hermes 暂停到后台；在终端运行 fg 可恢复。",
+    "Alt+Enter 可输入多行消息。",
+    "Tab 可接受自动建议或补全斜杠命令。",
+    "@file:path/to/file.py 可把文件内容加入消息。",
+    "@diff 可把未提交改动加入消息。",
+    "@url:https://example.com 可读取网页内容。",
+    "hermes -c 可继续最近会话。",
+    "hermes chat -q \\"问题\\" 可执行一次性提问。",
+    "设置 display.compact: true 可让输出更紧凑。",
+    "技能会自动出现在斜杠命令列表中。",
+]
+'''
+
+patched = []
+unchanged = []
+missing = []
+
+
+def backup_file(path, rel):
+    backup_path = backup_root / rel
+    backup_path.parent.mkdir(parents=True, exist_ok=True)
+    if not backup_path.exists():
+        shutil.copy2(path, backup_path)
+
+
+for rel, replacements in basic_replacements.items():
+    path = root / rel
+    if not path.exists():
+        missing.append(rel)
+        continue
+    original = path.read_text(encoding="utf-8", errors="ignore")
+    updated = original
+    for old, new in replacements:
+        updated = updated.replace(old, new)
+    if updated != original:
+        backup_file(path, rel)
+        path.write_text(updated, encoding="utf-8")
+        patched.append(rel)
+    else:
+        unchanged.append(rel)
+
+tips_rel = "hermes_cli/tips.py"
+tips_path = root / tips_rel
+if tips_path.exists():
+    original = tips_path.read_text(encoding="utf-8", errors="ignore")
+    start = original.find("TIPS = [")
+    end = original.find("\n]\n", start)
+    if start >= 0 and end > start:
+        updated = original[:start] + zh_tips + original[end + 3 :]
+        if updated != original:
+            backup_file(tips_path, tips_rel)
+            tips_path.write_text(updated, encoding="utf-8")
+            patched.append(tips_rel)
+        else:
+            unchanged.append(tips_rel)
+    else:
+        missing.append(tips_rel)
+else:
+    missing.append(tips_rel)
+
+status = {
+    "state": "applied" if patched else "already_applied",
+    "version": package_version,
+    "root": str(root),
+    "patched": sorted(set(patched)),
+    "unchanged": sorted(set(unchanged)),
+    "missing": sorted(set(missing)),
+    "backup": str(backup_root),
+}
+status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+if patched:
+    print(f"TUI补丁：已应用 {len(set(patched))} 个文件")
+else:
+    print("TUI补丁：已是最新")
+PY_PATCH
+}
+
 ensure_path_hint() {
   if [ "${XIAOMA_HERMES_SKIP_PATH:-0}" = "1" ]; then
     return
@@ -342,6 +565,7 @@ main() {
   run_official_config_set
   install_helper "$payload_root"
   install_wrapper
+  apply_tui_source_patch "$(find_real_hermes)"
   ensure_path_hint
 
   say "小马AI Hermes 中文增强已安装"

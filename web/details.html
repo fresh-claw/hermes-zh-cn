@@ -39,7 +39,7 @@
         </div>
         <article class="feature">
           <h3>中文包版本</h3>
-          <p>2026.05.11.2</p>
+          <p>2026.05.11.4</p>
         </article>
         <article class="feature">
           <h3>适配 Hermes</h3>
@@ -47,7 +47,7 @@
         </article>
         <article class="feature">
           <h3>更新方式</h3>
-          <p>启动前读取 latest.json，有更新时执行同一个安装器。</p>
+          <p>启动前读取 latest.json，有更新时执行同一个安装器并重新应用界面补丁。</p>
         </article>
       </section>
 
@@ -63,7 +63,7 @@
           <ul>
             <li><b>agent.json</b><span>给 Hermes 读取的任务清单、版本判断和安装边界。</span></li>
             <li><b>latest.json</b><span>当前中文包版本、兼容范围和下载入口。</span></li>
-            <li><b>install.sh</b><span>自包含安装器：检测版本、校验文件、启用中文、安装更新辅助脚本。</span></li>
+            <li><b>install.sh</b><span>自包含安装器：检测版本、校验文件、启用中文、应用启动界面补丁、安装更新辅助脚本。</span></li>
             <li><b>xiaoma-hermes</b><span>状态查看、更新检查和启动前更新。</span></li>
             <li><b>manifest.json</b><span>中文包版本、SHA256 和文件清单。</span></li>
             <li><b>zh-cn.min.json</b><span>中文增强内容、安装动作和 Hermes 技能说明。</span></li>
@@ -83,7 +83,7 @@
           <pre>{
   "source": "https://github.com/fresh-claw/hermes-zh-cn",
   "site": "https://useai.live/hermes",
-  "flow": "GitHub 更新中文源文件，网站发布自包含安装器和分发文件",
+  "flow": "GitHub 更新中文源文件，网站发布自包含安装器、补丁和分发文件",
   "promo": "第一版关闭"
 }</pre>
         </div>
@@ -99,10 +99,10 @@
             <strong>官方语言接口 + 小马AI增强</strong>
           </div>
           <pre>{
-  "已覆盖": ["display.language=zh", "中文增强技能", "启动前更新", "旧版兼容安装"],
-  "未完全覆盖": ["模型回复", "工具原始输出", "部分 TUI 过程提示", "异常栈"],
+  "已覆盖": ["display.language=zh", "中文增强技能", "启动前更新", "旧版兼容安装", "启动界面补丁"],
+  "未覆盖": ["模型回复", "工具原始输出", "第三方工具返回文本", "异常栈"],
   "原因": "Hermes 原版并未把全部 TUI 文案接入语言配置",
-  "完整方案": "后续提供源码补丁或小马AI维护版"
+  "处理方式": "安装器备份后修改启动界面文案文件；升级 Hermes 后可重新运行安装命令"
 }</pre>
         </div>
       </section>

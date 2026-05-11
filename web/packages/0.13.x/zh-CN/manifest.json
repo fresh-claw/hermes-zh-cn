@@ -3,13 +3,13 @@
   "brand": "小马AI版",
   "locale": "zh-CN",
   "hermes_compat": "0.13.x",
-  "version": "2026.05.11.2",
+  "version": "2026.05.11.4",
   "upstream_commit": "404640a2b752f502825dc8b26212204fa890d495",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "2b2db61bf4eaa90b4ee0875ddcaa7b7d0b64783988d82ddb04ecc50e0a6650d5",
-      "bytes": 3546,
+      "sha256": "ce3e231cef07ca43dae0713437d4aa830ea4138d37e8db4a86a752000a0cf6ef",
+      "bytes": 4043,
       "purpose": "中文增强包、安装动作、Hermes 技能说明"
     }
   ],
