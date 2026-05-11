@@ -247,10 +247,21 @@ pre {
   text-transform: uppercase;
 }
 
-.agent-brief p {
+.agent-brief ol {
   margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.agent-brief li {
+  margin: 0 0 5px;
   font-size: 0.84rem;
-  line-height: 1.7;
+  line-height: 1.55;
+}
+
+.agent-brief code {
+  color: var(--ink);
+  font-size: 0.78rem;
+  word-break: break-all;
 }
 
 .cell {
