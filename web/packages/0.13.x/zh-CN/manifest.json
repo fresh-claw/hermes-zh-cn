@@ -3,14 +3,15 @@
   "brand": "小马AI版",
   "locale": "zh-CN",
   "hermes_compat": "0.13.x",
-  "version": "2026.05.12.2",
+  "version": "2026.05.12.3",
   "upstream_commit": "404640a2b752f502825dc8b26212204fa890d495",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "c8ce9cc425f78df4f6120d3999e3eb1f0a275eb190da4fc9e528dcb2aec4b0d8",
+      "sha256": "7da2ceb42dcd67a609f88bfbf0cb9006b3537efc43f2a9c144b486db3954fc1e",
       "bytes": 8427,
-      "purpose": "中文增强包、安装动作、Hermes 技能说明、启动/TUI/命令/状态页补丁"
+      "purpose": "中文增强包、安装动作、Hermes 技能说明、启动/TUI/命令/状态页补丁",
+      "size": 8548
     }
   ],
   "promo": {

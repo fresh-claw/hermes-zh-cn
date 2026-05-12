@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.12.2"
+PACKAGE_VERSION="2026.05.12.3"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -144,107 +144,95 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-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
+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
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -748,21 +736,21 @@ zh_banner_logo = """[bold #FFD700]██████╗  ██████╗  
 [#CD7F32]██║     ██║     ██║     ██║     ██║     ██║   [/]
 [#8B5A2B]╚═╝     ╚═╝     ╚═╝     ╚═╝     ╚═╝     ╚═╝   [/]"""
 
-zh_horse_head = """[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⣀⣀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⣇⠸⣿⣿⠇⣸⣿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⢀⣠⣴⣶⠿⠋⣩⡿⣿⡿⠻⣿⡇⢠⡄⢸⣿⠟⢿⣿⢿⣍⠙⠿⣶⣦⣄⡀⠀[/]
-[#FFBF00]⠀⠀⠉⠉⠁⠶⠟⠋⠀⠉⠀⢀⣈⣁⡈⢁⣈⣁⡀⠀⠉⠀⠙⠻⠶⠈⠉⠉⠀⠀[/]
-[#FFD700]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⡿⠛⢁⡈⠛⢿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFD700]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣿⣦⣤⣈⠁⢠⣴⣿⠿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠻⢿⣿⣦⡉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#FFBF00]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⣦⣈⠛⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣴⠦⠈⠙⠿⣦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣤⡈⠁⢤⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠷⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠑⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⢰⡆⠈⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠈⣡⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
-[#B8860B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]"""
+zh_horse_head = """[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣶⣶⣶⣦⣄⠀⠀⠀⠀⠀⠀[/]
+[#CD7F32]⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⠿⠛⠛⠿⣿⣿⣦⠀⠀⠀⠀⠀[/]
+[#FFBF00]⠀⠀⠀⠀⠀⢠⣿⣿⠋⠀⠀⠀⠀⠀⠈⢿⣿⣧⠀⠀⠀⠀[/]
+[#FFBF00]⠀⠀⠀⠀⢠⣿⣿⠃⠀⣠⣶⣶⣦⡀⠀⠈⣿⣿⡄⠀⠀⠀[/]
+[#FFD700]⠀⠀⠀⠀⣾⣿⡏⠀⢰⣿⣿⣿⣿⣷⠀⠀⣿⣿⡇⠀⠀⠀[/]
+[#FFD700]⠀⠀⠀⢸⣿⣿⠀⠀⠘⣿⣿⣿⣿⠟⠀⢀⣿⣿⠃⠀⠀⠀[/]
+[#FFBF00]⠀⠀⠀⣼⣿⡿⠀⠀⠀⠈⠉⠉⠀⠀⠀⣼⣿⡟⠀⠀⠀⠀[/]
+[#FFBF00]⠀⠀⠀⣿⣿⠃⠀⣠⣶⣶⣶⣶⣦⣄⣾⣿⠟⠀⠀⠀⠀⠀[/]
+[#CD7F32]⠀⠀⢸⣿⡟⠀⣼⣿⠟⠉⠉⠻⣿⣿⠟⠁⠀⠀⠀⠀⠀⠀[/]
+[#CD7F32]⠀⠀⣾⣿⠁⢰⣿⡏⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀[/]
+[#B8860B]⠀⢰⣿⡏⠀⢸⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+[#B8860B]⠀⢸⣿⡇⠀⠘⣿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+[#B8860B]⠀⠘⣿⣷⡀⠀⠈⠻⣿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+[#B8860B]⠀⠀⠹⣿⣿⣦⣄⠀⠈⠙⠿⣿⣿⣿⣶⣤⡀⠀⠀⠀⠀⠀[/]
+[#B8860B]⠀⠀⠀⠈⠛⠿⣿⣿⣶⣤⣀⠀⠈⠙⠛⠋⠀⠀⠀⠀⠀⠀[/]"""
 
 zh_banner_logo_plain = [line.split("]", 1)[1].rsplit("[/", 1)[0] for line in zh_banner_logo.splitlines()]
 zh_horse_head_plain = [line.split("]", 1)[1].rsplit("[/", 1)[0] for line in zh_horse_head.splitlines()]
@@ -1998,6 +1986,51 @@ if tips_path.exists():
 else:
     missing.append(tips_rel)
 
+tui_build = {"state": "not_needed"}
+tui_dir = root / "ui-tui"
+if tui_dir.exists() and (
+    "ui-tui/src/banner.ts" in patched
+    or "ui-tui/src/theme.ts" in patched
+    or "ui-tui/src/components/branding.tsx" in patched
+):
+    npm = shutil.which("npm")
+    if npm:
+        try:
+            node_modules = tui_dir / "node_modules"
+            if not node_modules.exists():
+                install_result = subprocess.run(
+                    [npm, "install", "--silent", "--no-fund", "--no-audit", "--progress=false"],
+                    cwd=tui_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=180,
+                )
+                if install_result.returncode != 0:
+                    combined = ((install_result.stdout or "") + "\n" + (install_result.stderr or "")).strip()
+                    raise RuntimeError("\n".join(combined.splitlines()[-20:]) or "npm install failed")
+            result = subprocess.run(
+                [npm, "run", "build"],
+                cwd=tui_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=180,
+            )
+        except Exception as exc:
+            tui_build = {"state": "failed", "message": str(exc)}
+        else:
+            if result.returncode == 0:
+                tui_build = {"state": "built"}
+            else:
+                combined = ((result.stdout or "") + "\n" + (result.stderr or "")).strip()
+                tui_build = {
+                    "state": "failed",
+                    "message": "\n".join(combined.splitlines()[-20:]),
+                }
+    else:
+        tui_build = {"state": "skipped", "message": "npm not found"}
+
 status = {
     "state": "applied" if patched else "already_applied",
     "version": package_version,
@@ -2006,6 +2039,7 @@ status = {
     "unchanged": sorted(set(unchanged)),
     "missing": sorted(set(missing)),
     "backup": str(backup_root),
+    "tui_build": tui_build,
 }
 
 validation = []
@@ -2014,14 +2048,22 @@ def check_contains(rel, needles):
     if not path.exists():
         return
     text = path.read_text(encoding="utf-8", errors="ignore")
+    lower_text = text.lower()
     for needle in needles:
-        if needle not in text:
+        escaped = needle.encode("unicode_escape").decode("ascii").lower()
+        if needle not in text and escaped not in lower_text:
             validation.append(f"{rel} 缺少 {needle}")
 
-check_contains("hermes_cli/banner.py", ["爱马仕机器人", "可用工具", "⢀⣀⡀"])
+check_contains("hermes_cli/banner.py", ["爱马仕机器人", "可用工具", "⣿⣿⠿⠛⠛⠿⣿⣿"])
 check_contains("hermes_cli/commands.py", ["_ZH_COMMAND_DESCRIPTIONS", "用法："])
 check_contains("cli.py", ["爱马仕机器人", "允许一次"])
+check_contains("ui-tui/src/theme.ts", ["name: '爱马仕机器人'", "icon: '♞'"])
+check_contains("ui-tui/src/banner.ts", ["██爱██", "⣿⣿⠿⠛⠛⠿⣿⣿"])
 check_contains("ui-tui/src/components/branding.tsx", ["爱马仕机器人", "可用工具"])
+if (root / "ui-tui" / "dist").exists():
+    check_contains("ui-tui/dist/theme.js", ["name: '爱马仕机器人'", "icon: '♞'"])
+    check_contains("ui-tui/dist/banner.js", ["██爱██", "⣿⣿⠿⠛⠛⠿⣿⣿"])
+    check_contains("ui-tui/dist/components/branding.js", ["爱马仕机器人", "可用工具"])
 
 status["validation"] = validation
 if validation:

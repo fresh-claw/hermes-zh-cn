@@ -5,7 +5,7 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Agent 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.05.12.2
+Version: 2026.05.12.3
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
