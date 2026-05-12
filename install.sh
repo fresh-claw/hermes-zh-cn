@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.12.5"
+PACKAGE_VERSION="2026.05.12.6"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -144,95 +144,98 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-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
+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
+AHgAAA==
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -413,7 +416,7 @@ apply_tui_source_patch() {
   fi
 
   local real_hermes="$1"
-  python3 - "$real_hermes" "$INSTALL_HOME" "$PACKAGE_VERSION" "$INSTALL_HOME/current/PATCH_STATUS" <<'PY_PATCH'
+  python3 - "$real_hermes" "$INSTALL_HOME" "$PACKAGE_VERSION" "$INSTALL_HOME/current/PATCH_STATUS" "$HERMES_HOME_DIR" <<'PY_PATCH'
 import json
 import os
 import re
@@ -426,6 +429,7 @@ real_hermes = sys.argv[1].strip()
 install_home = Path(sys.argv[2]).expanduser()
 package_version = sys.argv[3]
 status_path = Path(sys.argv[4]).expanduser()
+hermes_home = Path(sys.argv[5]).expanduser()
 home = Path.home()
 seen = set()
 candidates = []
@@ -755,6 +759,99 @@ zh_horse_head = """[#CD7F32]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⣀⣀⠀�
 
 zh_banner_logo_plain = [line.split("]", 1)[1].rsplit("[/", 1)[0] for line in zh_banner_logo.splitlines()]
 zh_horse_head_plain = [line.split("]", 1)[1].rsplit("[/", 1)[0] for line in zh_horse_head.splitlines()]
+
+xiaoma_skin_state = {"state": "skipped"}
+
+def yaml_block(value: str, indent: str = "  ") -> str:
+    return "\n".join(indent + line for line in value.splitlines())
+
+
+def update_display_config(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^display\s*:", line):
+            start = i
+            break
+
+    wanted = {"language": "zh", "skin": "xiaoma-zh"}
+    if start is None:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.extend(["display:", "  language: zh", "  skin: xiaoma-zh"])
+        path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        return
+
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].strip() and not lines[j].startswith((" ", "\t", "#")):
+            end = j
+            break
+
+    if "{" in lines[start] and "}" in lines[start]:
+        lines[start:end] = ["display:", "  language: zh", "  skin: xiaoma-zh"]
+        path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        return
+
+    found = set()
+    j = start + 1
+    while j < end:
+        m = re.match(r"^(\s*)(language|skin)\s*:", lines[j])
+        if m:
+            indent = m.group(1) or "  "
+            key = m.group(2)
+            lines[j] = f"{indent}{key}: {wanted[key]}"
+            found.add(key)
+        j += 1
+
+    insert_at = start + 1
+    for key in ("language", "skin"):
+        if key not in found:
+            lines.insert(insert_at, f"  {key}: {wanted[key]}")
+            insert_at += 1
+            end += 1
+
+    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+if os.environ.get("XIAOMA_HERMES_SKIP_CONFIG", "0") != "1":
+    try:
+        skin_dir = hermes_home / "skins"
+        skin_dir.mkdir(parents=True, exist_ok=True)
+        skin_path = skin_dir / "xiaoma-zh.yaml"
+        skin_text = f"""name: xiaoma-zh
+description: 小马AI Hermes 中文增强
+colors:
+  banner_border: "#CD7F32"
+  banner_title: "#FFD700"
+  banner_accent: "#FFBF00"
+  banner_dim: "#B8860B"
+  banner_text: "#FFF8DC"
+  ui_accent: "#FFBF00"
+  ui_label: "#DAA520"
+  prompt: "#FFF8DC"
+  input_rule: "#CD7F32"
+branding:
+  agent_name: 爱马仕机器人
+  prompt_symbol: "›"
+  help_header: 爱马仕机器人命令
+  goodbye: 已退出爱马仕机器人。
+banner_logo: |
+{yaml_block(zh_banner_logo)}
+banner_hero: |
+{yaml_block(zh_horse_head)}
+"""
+        skin_path.write_text(skin_text, encoding="utf-8")
+        update_display_config(hermes_home / "config.yaml")
+        xiaoma_skin_state = {
+            "state": "applied",
+            "path": str(skin_path),
+            "config": str(hermes_home / "config.yaml"),
+        }
+    except Exception as exc:
+        xiaoma_skin_state = {"state": "failed", "message": str(exc)}
 
 basic_replacements = {
     "hermes_cli/banner.py": [
@@ -1880,18 +1977,16 @@ for rel, replacements in basic_replacements.items():
         updated = updated.replace(old, new)
     if rel == "hermes_cli/banner.py":
         updated = re.sub(
-            r'HERMES_AGENT_LOGO = """.*?"""',
+            r'''(?ms)^HERMES_AGENT_LOGO\s*=\s*(?:"""[\s\S]*?"""|''' + "'''[\\s\\S]*?'''" + r'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')''',
             lambda _m: "HERMES_AGENT_LOGO = " + repr(zh_banner_logo),
             updated,
             count=1,
-            flags=re.S,
         )
         updated = re.sub(
-            r'HERMES_CADUCEUS = """.*?"""',
+            r'''(?ms)^HERMES_CADUCEUS\s*=\s*(?:"""[\s\S]*?"""|''' + "'''[\\s\\S]*?'''" + r'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')''',
             lambda _m: "HERMES_CADUCEUS = " + repr(zh_horse_head),
             updated,
             count=1,
-            flags=re.S,
         )
         updated = re.sub(
             r'def _display_toolset_name\(toolset_name: str\) -> str:\n.*?(?=\n\ndef build_welcome_banner)',
@@ -1906,18 +2001,16 @@ for rel, replacements in basic_replacements.items():
         )
     if rel == "cli.py":
         updated = re.sub(
-            r'HERMES_AGENT_LOGO = """.*?"""',
+            r'''(?ms)^HERMES_AGENT_LOGO\s*=\s*(?:"""[\s\S]*?"""|''' + "'''[\\s\\S]*?'''" + r'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')''',
             lambda _m: "HERMES_AGENT_LOGO = " + repr(zh_banner_logo),
             updated,
             count=1,
-            flags=re.S,
         )
         updated = re.sub(
-            r'HERMES_CADUCEUS = """.*?"""',
+            r'''(?ms)^HERMES_CADUCEUS\s*=\s*(?:"""[\s\S]*?"""|''' + "'''[\\s\\S]*?'''" + r'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')''',
             lambda _m: "HERMES_CADUCEUS = " + repr(zh_horse_head),
             updated,
             count=1,
-            flags=re.S,
         )
     if rel == "ui-tui/src/banner.ts":
         updated = re.sub(
@@ -1932,7 +2025,7 @@ for rel, replacements in basic_replacements.items():
             updated,
             count=1,
         )
-        updated = updated.replace("export const LOGO_WIDTH = 98", "export const LOGO_WIDTH = 54")
+        updated = updated.replace("export const LOGO_WIDTH = 98", "export const LOGO_WIDTH = 76")
         updated = updated.replace("export const CADUCEUS_WIDTH = 30", "export const CADUCEUS_WIDTH = 28")
     if rel == "hermes_cli/commands.py":
         if "_ZH_COMMAND_DESCRIPTIONS" not in updated:
@@ -2108,6 +2201,7 @@ status = {
     "unchanged": sorted(set(unchanged)),
     "missing": sorted(set(missing)),
     "backup": str(backup_root),
+    "skin": xiaoma_skin_state,
     "tui_build": tui_build,
 }
 
@@ -2133,6 +2227,25 @@ if (root / "ui-tui" / "dist").exists():
     check_contains("ui-tui/dist/theme.js", ["name: '爱马仕机器人'", "icon: '♞'"])
     check_contains("ui-tui/dist/banner.js", ["⠘⢛⣿", "⢀⣠⣴⣾"])
     check_contains("ui-tui/dist/components/branding.js", ["爱马仕机器人", "可用工具"])
+
+if os.environ.get("XIAOMA_HERMES_SKIP_CONFIG", "0") != "1":
+    skin_path = hermes_home / "skins" / "xiaoma-zh.yaml"
+    config_path = hermes_home / "config.yaml"
+    if xiaoma_skin_state.get("state") == "failed":
+        validation.append("中文皮肤写入失败")
+    elif not skin_path.exists():
+        validation.append("中文皮肤文件缺失")
+    else:
+        skin_text = skin_path.read_text(encoding="utf-8", errors="ignore")
+        for needle in ("⠘⢛⣿", "⢀⣠⣴⣾", "banner_logo", "banner_hero"):
+            if needle not in skin_text:
+                validation.append(f"中文皮肤缺少 {needle}")
+    if not config_path.exists():
+        validation.append("Hermes 配置文件缺失")
+    else:
+        config_text = config_path.read_text(encoding="utf-8", errors="ignore")
+        if "skin: xiaoma-zh" not in config_text:
+            validation.append("Hermes 当前皮肤未切换到 xiaoma-zh")
 
 status["validation"] = validation
 if validation:
