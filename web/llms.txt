@@ -16,7 +16,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 ## Coverage
 
 - Hermes Agent 启动页标题改为爱马仕机器人。
-- 启动页图形改为原版风格点阵马头。
+- 启动页图形改为原版风格点阵标识。
 - Hermes TUI 常见提示中文化。
 - `/help` 快捷指令说明中文化。
 - 工具分类、技能分类、状态页、配置页、医生检查页中文化。
