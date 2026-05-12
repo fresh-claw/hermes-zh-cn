@@ -47,6 +47,10 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 XIAOMA_HERMES_BASE_URL=http://127.0.0.1:4173 bash web/install.sh
 ```
 
-## English
+## 多语言说明
 
-This repository provides the Xiaoma AI Chinese enhancement pack for Hermes Agent. It uses the official `display.language=zh` setting, adds a Chinese helper skill, checks for updated localization files from `useai.live/hermes`, and applies a backed-up source patch for Hermes startup text, slash command descriptions, runtime progress messages, tool labels, and TUI strings that are not wired to the official language setting yet.
+网站页面保持中文；其他语言说明仅在 GitHub 仓库提供：
+
+- [English](README.en.md)
+- [日本語](README.ja.md)
+- [한국어](README.ko.md)
