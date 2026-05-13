@@ -34,6 +34,19 @@ if (themeChoices.length) {
   });
 }
 
+const updatePointerVars = (event) => {
+  if (!window.matchMedia("(pointer: fine)").matches) {
+    return;
+  }
+
+  const x = ((event.clientX / window.innerWidth) - 0.5) * 18;
+  const y = ((event.clientY / window.innerHeight) - 0.5) * 18;
+  document.documentElement.style.setProperty("--pointer-x", `${x.toFixed(2)}px`);
+  document.documentElement.style.setProperty("--pointer-y", `${y.toFixed(2)}px`);
+};
+
+window.addEventListener("pointermove", updatePointerVars, { passive: true });
+
 copyButtons.forEach((button) => {
   button.addEventListener("click", async () => {
     const value = button.getAttribute("data-copy") || "";

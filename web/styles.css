@@ -1,4 +1,7 @@
 :root {
+  --font-display: Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  --font-code: "SFMono-Regular", "Cascadia Mono", "Courier New", Courier, monospace;
   --bg: #1a0f2e;
   --bg-deep: #0d0718;
   --ink: #fff0dc;
@@ -10,6 +13,9 @@
   --terminal-ink: rgba(255, 240, 220, 0.82);
   --terminal-panel: rgba(13, 7, 24, 0.92);
   --max: 1384px;
+  --cell-pad: 16px;
+  --pointer-x: 0px;
+  --pointer-y: 0px;
 }
 
 * {
@@ -28,7 +34,7 @@ body {
     linear-gradient(135deg, rgba(255, 240, 220, 0.04) 0 1px, transparent 1px 18px),
     var(--bg);
   color: var(--ink);
-  font-family: "Times New Roman", "Songti SC", "SimSun", serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   overflow-x: hidden;
 }
@@ -44,6 +50,21 @@ body::before {
     radial-gradient(circle at 80% 48%, rgba(217, 195, 255, 0.09), transparent 20%);
   mix-blend-mode: overlay;
   opacity: 0.55;
+  transform: translate3d(var(--pointer-x), var(--pointer-y), 0);
+  animation: texture-drift 18s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -18% -24%;
+  pointer-events: none;
+  background:
+    linear-gradient(116deg, transparent 0 42%, rgba(255, 240, 220, 0.08) 42.2% 42.45%, transparent 42.7% 100%),
+    linear-gradient(63deg, transparent 0 62%, rgba(255, 240, 220, 0.04) 62.1% 62.25%, transparent 62.4% 100%);
+  opacity: 0.48;
+  transform: translateX(-4%) rotate(0.001deg);
+  animation: light-sweep 12s ease-in-out infinite alternate;
 }
 
 a {
@@ -65,6 +86,7 @@ button {
     linear-gradient(rgba(26, 15, 46, 0.9), rgba(26, 15, 46, 0.9)),
     radial-gradient(circle at 50% 40%, rgba(255, 240, 220, 0.1), transparent 30%);
   min-height: calc(100vh - 56px);
+  animation: shell-enter 620ms cubic-bezier(0.2, 0.72, 0.18, 1) both;
 }
 
 .topbar {
@@ -72,6 +94,7 @@ button {
   grid-template-columns: 278px 176px 1fr;
   border-bottom: 1px solid var(--line);
   min-height: 104px;
+  animation: rise-in 560ms ease both;
 }
 
 .brand {
@@ -81,9 +104,15 @@ button {
   border-right: 1px solid var(--line);
   padding: 14px 16px;
   font-size: clamp(2rem, 3.2vw, 3.1rem);
+  font-family: var(--font-display);
   line-height: 0.82;
   font-weight: 900;
   letter-spacing: -0.05em;
+  transition: color 180ms ease, text-shadow 180ms ease, transform 180ms ease;
+}
+
+.brand:hover {
+  transform: translateX(2px);
 }
 
 .nav {
@@ -98,11 +127,24 @@ button {
   font-size: 0.93rem;
   letter-spacing: 0.24em;
   color: var(--muted);
+  font-family: var(--font-display);
 }
 
 .nav a:hover,
 .footer a:hover {
   color: var(--ink);
+}
+
+.nav a,
+.footer a,
+.tools > a {
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.nav a:hover,
+.tools > a:hover,
+.footer a:hover {
+  transform: translateY(-1px);
 }
 
 .tools {
@@ -121,6 +163,7 @@ button {
   background: rgba(13, 7, 24, 0.34);
   padding: 3px;
   backdrop-filter: blur(14px);
+  transform: translateZ(0);
 }
 
 .theme-choice {
@@ -130,6 +173,7 @@ button {
   cursor: pointer;
   color: var(--muted);
   font-size: 0.72rem;
+  font-family: var(--font-display);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
@@ -166,6 +210,19 @@ button {
     linear-gradient(90deg, transparent, rgba(255, 240, 220, 0.03), transparent);
 }
 
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 46%, rgba(255, 240, 220, 0.05) 46.1% 46.25%, transparent 46.4% 100%),
+    repeating-linear-gradient(90deg, transparent 0 96px, rgba(255, 240, 220, 0.035) 96px 97px);
+  opacity: 0.7;
+  transform: translate3d(calc(var(--pointer-x) * -0.6), calc(var(--pointer-y) * -0.4), 0);
+  animation: grid-breathe 8s ease-in-out infinite alternate;
+}
+
 .hero-inner {
   position: relative;
   z-index: 1;
@@ -175,6 +232,7 @@ button {
   text-align: center;
   padding: 52px 0;
   max-width: 100%;
+  animation: rise-in 680ms 90ms ease both;
 }
 
 .kicker,
@@ -186,6 +244,7 @@ button {
 .steps small {
   margin: 0;
   font-size: 0.94rem;
+  font-family: var(--font-display);
   letter-spacing: 0.24em;
   font-weight: 500;
 }
@@ -197,13 +256,14 @@ button {
 
 h1 {
   margin: 0;
-  font-family: Arial, "PingFang SC", sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 5vw, 5rem);
   line-height: 0.85;
   letter-spacing: -0.08em;
   color: var(--ink);
   text-wrap: balance;
   overflow-wrap: anywhere;
+  animation: title-pop 760ms 120ms cubic-bezier(0.2, 0.78, 0.18, 1) both;
 }
 
 .lede {
@@ -227,7 +287,7 @@ h1 {
 
 .install-stat strong {
   color: var(--ink);
-  font-family: Arial, "PingFang SC", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.12rem;
   letter-spacing: 0;
 }
@@ -249,8 +309,21 @@ h1 {
   margin-bottom: 6px;
 }
 
+.steps article {
+  animation: rise-in 560ms ease both;
+}
+
+.steps article:nth-child(1) {
+  animation-delay: 180ms;
+}
+
+.steps article:nth-child(2) {
+  animation-delay: 260ms;
+}
+
 .steps small {
   color: var(--muted);
+  line-height: 1.25;
 }
 
 .steps button {
@@ -258,14 +331,20 @@ h1 {
   background: transparent;
   cursor: pointer;
   color: var(--muted);
-  font-family: "Courier New", monospace;
+  font-family: var(--font-code);
   font-size: 0.7rem;
   letter-spacing: 0.18em;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.steps button:hover {
+  color: var(--ink);
+  transform: translateY(-1px);
 }
 
 code,
 pre {
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-code);
   text-transform: none;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -282,6 +361,13 @@ pre {
   overflow-wrap: anywhere;
   word-break: break-all;
   white-space: normal;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.steps article:hover code {
+  border-color: var(--accent);
+  transform: translateX(4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
 }
 
 .agent-brief {
@@ -300,7 +386,7 @@ pre {
 .agent-brief-title h2 {
   margin: 0;
   color: var(--ink);
-  font-family: Arial, "PingFang SC", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -329,7 +415,7 @@ pre {
   min-height: 120px;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  padding: 16px;
+  padding: var(--cell-pad);
   min-width: 0;
 }
 
@@ -343,13 +429,14 @@ pre {
 
 .terminal-cell h2,
 .section-title h2 {
-  font-family: Arial, "PingFang SC", sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: 0.18em;
   margin-bottom: 10px;
 }
 
 .terminal {
+  position: relative;
   min-height: 320px;
   border: 4px double currentColor;
   max-width: 100%;
@@ -357,6 +444,23 @@ pre {
   background:
     linear-gradient(rgba(13, 7, 24, 0.92), rgba(13, 7, 24, 0.92)),
     radial-gradient(circle at 72% 20%, rgba(217, 195, 255, 0.1), transparent 32%);
+  transform: translateZ(0);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  animation: rise-in 620ms 180ms ease both;
+}
+
+.terminal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 0 38%, rgba(255, 240, 220, 0.12) 40%, transparent 43% 100%);
+  transform: translateX(-110%);
+  animation: panel-shine 7.5s ease-in-out infinite;
+}
+
+.terminal:hover {
+  transform: translateY(-3px);
 }
 
 .terminal-top {
@@ -386,7 +490,7 @@ pre {
 .terminal-top b {
   margin-left: 8px;
   color: var(--muted);
-  font-family: "Courier New", monospace;
+  font-family: var(--font-code);
   font-size: 0.63rem;
   letter-spacing: 0.2em;
 }
@@ -405,7 +509,7 @@ pre {
   min-height: 288px;
   padding: 16px;
   color: rgba(255, 240, 220, 0.82);
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-code);
   font-size: 0.75rem;
   line-height: 1.72;
   text-transform: none;
@@ -499,6 +603,85 @@ pre {
   }
 }
 
+@keyframes shell-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes title-pop {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes texture-drift {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 18px, 24px 0, -18px 10px;
+  }
+}
+
+@keyframes light-sweep {
+  from {
+    transform: translateX(-5%) rotate(0.001deg);
+  }
+  to {
+    transform: translateX(5%) rotate(0.001deg);
+  }
+}
+
+@keyframes grid-breathe {
+  from {
+    opacity: 0.46;
+  }
+  to {
+    opacity: 0.82;
+  }
+}
+
+@keyframes frame-float {
+  from {
+    opacity: 0.42;
+  }
+  to {
+    opacity: 0.64;
+  }
+}
+
+@keyframes panel-shine {
+  0%,
+  62% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+
 @keyframes terminal-line {
   to {
     opacity: 1;
@@ -517,6 +700,17 @@ pre {
     radial-gradient(circle at 58% 44%, rgba(217, 195, 255, 0.22), transparent 12%),
     radial-gradient(circle at 28% 72%, rgba(255, 240, 220, 0.1), transparent 20%),
     linear-gradient(130deg, rgba(13, 7, 24, 0.3), rgba(109, 79, 194, 0.45));
+}
+
+.image-cell::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    linear-gradient(72deg, transparent 0 43%, rgba(255, 240, 220, 0.08) 43.2% 43.45%, transparent 43.7% 100%),
+    linear-gradient(140deg, transparent 0 65%, rgba(255, 240, 220, 0.06) 65.2% 65.45%, transparent 65.7% 100%);
+  transform: translate3d(calc(var(--pointer-x) * 0.4), calc(var(--pointer-y) * 0.3), 0);
+  animation: light-sweep 11s ease-in-out infinite alternate;
 }
 
 .link-list {
@@ -542,6 +736,19 @@ pre {
   color: var(--muted);
   text-align: left;
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+  animation: rise-in 560ms ease both;
+}
+
+.link-list a:nth-child(1) {
+  animation-delay: 220ms;
+}
+
+.link-list a:nth-child(2) {
+  animation-delay: 300ms;
+}
+
+.link-list a:nth-child(3) {
+  animation-delay: 380ms;
 }
 
 .link-list a:hover {
@@ -552,13 +759,15 @@ pre {
 
 .link-list span {
   color: var(--ink);
+  font-family: var(--font-display);
   font-size: 1rem;
+  font-weight: 800;
   letter-spacing: 0.18em;
 }
 
 .link-list small {
   width: 100%;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-code);
   font-size: 0.72rem;
   letter-spacing: 0;
   line-height: 1.35;
@@ -693,6 +902,7 @@ pre {
 
 .footer small,
 .footer a {
+  font-family: var(--font-display);
   color: var(--muted);
   letter-spacing: 0.2em;
 }
@@ -731,7 +941,7 @@ pre {
 
 .file-list b {
   color: var(--ink);
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-code);
   font-weight: 600;
 }
 
@@ -811,9 +1021,10 @@ html[data-theme="orange"] .hero::after {
   background:
     linear-gradient(135deg, rgba(255, 122, 26, 0.12), transparent 40%),
     repeating-linear-gradient(90deg, rgba(255, 244, 223, 0.08) 0 1px, transparent 1px 18px);
-  transform: rotate(-11deg);
+  transform: translate3d(calc(var(--pointer-x) * 0.7), calc(var(--pointer-y) * 0.45), 0) rotate(-11deg);
   opacity: 0.52;
   pointer-events: none;
+  animation: frame-float 9s ease-in-out infinite alternate;
 }
 
 html[data-theme="orange"] .kicker,
@@ -850,6 +1061,13 @@ html[data-theme="orange"] .terminal {
     inset 0 0 0 1px rgba(255, 244, 223, 0.07);
 }
 
+html[data-theme="orange"] .terminal:hover {
+  box-shadow:
+    12px 12px 0 rgba(255, 122, 26, 0.24),
+    0 20px 64px rgba(255, 95, 0, 0.12),
+    inset 0 0 0 1px rgba(255, 244, 223, 0.09);
+}
+
 html[data-theme="orange"] .terminal-body,
 html[data-theme="orange"] .terminal pre,
 html[data-theme="orange"] .resolver pre {
@@ -876,6 +1094,12 @@ html[data-theme="orange"] .engraving {
 html[data-theme="orange"] .link-list a {
   border-left: 2px solid rgba(255, 122, 26, 0.52);
   padding-left: 16px;
+  transform-origin: left center;
+}
+
+html[data-theme="orange"] .link-list a:hover {
+  border-left-color: #ff9b3d;
+  transform: translateX(7px) scale(1.015);
 }
 
 html[data-theme="orange"] .link-list span {
@@ -1047,5 +1271,16 @@ html[data-theme="orange"] .resolver-head strong {
   .detail-cta,
   .file-list li {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
   }
 }
