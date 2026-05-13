@@ -170,6 +170,14 @@
   ]
 }
     </script>
+    <script>
+      try {
+        var savedTheme = localStorage.getItem("xiaoma-hermes-theme");
+        if (savedTheme === "violet" || savedTheme === "orange") {
+          document.documentElement.dataset.theme = savedTheme;
+        }
+      } catch {}
+    </script>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -304,6 +312,10 @@
           <a href="./details.html">详细介绍</a>
         </nav>
         <div class="tools" aria-label="页面工具">
+          <div class="theme-switch" aria-label="主题选择">
+            <button type="button" class="theme-choice" data-theme-choice="violet" aria-pressed="true">紫夜</button>
+            <button type="button" class="theme-choice" data-theme-choice="orange" aria-pressed="false">爱马仕橙</button>
+          </div>
           <a href="https://useai.live/hermes">小马AI</a>
         </div>
       </header>

@@ -7,6 +7,8 @@
   --line: rgba(255, 240, 220, 0.24);
   --accent: #d9c3ff;
   --violet: #6d4fc2;
+  --terminal-ink: rgba(255, 240, 220, 0.82);
+  --terminal-panel: rgba(13, 7, 24, 0.92);
   --max: 1384px;
 }
 
@@ -108,7 +110,39 @@ button {
   display: flex;
   justify-content: flex-end;
   align-items: start;
-  gap: 22px;
+  gap: 18px;
+}
+
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--line);
+  background: rgba(13, 7, 24, 0.34);
+  padding: 3px;
+  backdrop-filter: blur(14px);
+}
+
+.theme-choice {
+  border: 0;
+  background: transparent;
+  padding: 7px 9px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.theme-choice:hover {
+  color: var(--ink);
+}
+
+.theme-choice.is-active {
+  background: var(--ink);
+  color: var(--bg-deep);
+  transform: translateY(-1px);
 }
 
 .grid {
@@ -122,6 +156,8 @@ button {
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   min-height: 490px;
   align-items: center;
   border-bottom: 1px solid var(--line);
@@ -131,6 +167,8 @@ button {
 }
 
 .hero-inner {
+  position: relative;
+  z-index: 1;
   grid-column: 1 / -1;
   width: min(560px, calc(100% - 32px));
   margin: 0 auto;
@@ -697,6 +735,168 @@ pre {
   font-weight: 600;
 }
 
+html[data-theme="orange"] {
+  --bg: #160801;
+  --bg-deep: #050201;
+  --ink: #fff4df;
+  --muted: rgba(255, 244, 223, 0.68);
+  --faint: rgba(255, 125, 22, 0.18);
+  --line: rgba(255, 132, 31, 0.36);
+  --accent: #ff7a1a;
+  --violet: #ff7a1a;
+  --terminal-ink: rgba(255, 244, 223, 0.88);
+  --terminal-panel: rgba(8, 3, 0, 0.94);
+}
+
+html[data-theme="orange"] body {
+  background:
+    linear-gradient(122deg, transparent 0 22%, rgba(255, 122, 26, 0.2) 22% 22.5%, transparent 22.5% 100%),
+    linear-gradient(58deg, transparent 0 64%, rgba(255, 179, 88, 0.12) 64% 64.4%, transparent 64.4% 100%),
+    repeating-linear-gradient(90deg, rgba(255, 244, 223, 0.035) 0 1px, transparent 1px 88px),
+    linear-gradient(155deg, #050201 0%, #170802 44%, #361502 100%);
+}
+
+html[data-theme="orange"] body::before {
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 184, 86, 0.08) 0 1px, transparent 1px 12px),
+    linear-gradient(90deg, transparent 0 12%, rgba(255, 122, 26, 0.12) 12% 12.2%, transparent 12.2% 78%, rgba(255, 244, 223, 0.1) 78% 78.1%, transparent 78.1% 100%),
+    radial-gradient(ellipse at 50% 18%, rgba(255, 122, 26, 0.16), transparent 38%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
+}
+
+html[data-theme="orange"] .shell {
+  border-color: rgba(255, 132, 31, 0.46);
+  background:
+    linear-gradient(rgba(10, 4, 1, 0.78), rgba(22, 8, 1, 0.84)),
+    linear-gradient(118deg, rgba(255, 122, 26, 0.16) 0 18%, transparent 18.2% 100%),
+    linear-gradient(180deg, rgba(255, 244, 223, 0.04), transparent 36%);
+  box-shadow:
+    0 34px 120px rgba(0, 0, 0, 0.58),
+    inset 0 0 0 1px rgba(255, 244, 223, 0.04);
+}
+
+html[data-theme="orange"] .topbar {
+  background: rgba(7, 3, 0, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+html[data-theme="orange"] .brand,
+html[data-theme="orange"] h1 {
+  color: #fff6d9;
+  text-shadow:
+    1px 1px 0 rgba(255, 122, 26, 0.72),
+    5px 6px 0 rgba(83, 28, 0, 0.58);
+}
+
+html[data-theme="orange"] .brand {
+  letter-spacing: -0.055em;
+}
+
+html[data-theme="orange"] .hero {
+  background:
+    linear-gradient(116deg, transparent 0 58%, rgba(255, 122, 26, 0.16) 58% 58.4%, transparent 58.4% 100%),
+    repeating-linear-gradient(0deg, rgba(255, 244, 223, 0.035) 0 1px, transparent 1px 28px),
+    linear-gradient(90deg, rgba(255, 122, 26, 0.06), transparent 34%, rgba(255, 190, 96, 0.09));
+}
+
+html[data-theme="orange"] .hero::after {
+  content: "";
+  position: absolute;
+  right: 10%;
+  bottom: 12%;
+  width: min(360px, 34vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 122, 26, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 122, 26, 0.12), transparent 40%),
+    repeating-linear-gradient(90deg, rgba(255, 244, 223, 0.08) 0 1px, transparent 1px 18px);
+  transform: rotate(-11deg);
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+html[data-theme="orange"] .kicker,
+html[data-theme="orange"] .section-title h2,
+html[data-theme="orange"] .terminal-cell h2,
+html[data-theme="orange"] .feature h3,
+html[data-theme="orange"] .resolver-head,
+html[data-theme="orange"] .steps small {
+  color: rgba(255, 189, 99, 0.82);
+}
+
+html[data-theme="orange"] .theme-switch {
+  background: rgba(5, 2, 1, 0.52);
+  box-shadow: inset 0 0 18px rgba(255, 122, 26, 0.12);
+}
+
+html[data-theme="orange"] .theme-choice.is-active {
+  background: linear-gradient(135deg, #ff6b00, #ffb35b);
+  color: #130600;
+  box-shadow: 0 0 18px rgba(255, 122, 26, 0.28);
+}
+
+html[data-theme="orange"] .steps code,
+html[data-theme="orange"] .terminal {
+  background:
+    linear-gradient(var(--terminal-panel), var(--terminal-panel)),
+    linear-gradient(135deg, rgba(255, 122, 26, 0.18), transparent 52%);
+}
+
+html[data-theme="orange"] .terminal {
+  color: #ffd8a3;
+  box-shadow:
+    8px 8px 0 rgba(255, 122, 26, 0.2),
+    inset 0 0 0 1px rgba(255, 244, 223, 0.07);
+}
+
+html[data-theme="orange"] .terminal-body,
+html[data-theme="orange"] .terminal pre,
+html[data-theme="orange"] .resolver pre {
+  color: var(--terminal-ink);
+}
+
+html[data-theme="orange"] .image-cell {
+  background:
+    linear-gradient(135deg, rgba(255, 122, 26, 0.2) 0 24%, transparent 24.2%),
+    linear-gradient(65deg, transparent 0 69%, rgba(255, 184, 86, 0.16) 69% 69.5%, transparent 69.5% 100%),
+    repeating-linear-gradient(115deg, rgba(255, 244, 223, 0.065) 0 1px, transparent 1px 11px),
+    linear-gradient(135deg, #100501, #462006);
+}
+
+html[data-theme="orange"] .engraving {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 244, 223, 0.08) 0 1px, transparent 1px 9px),
+    linear-gradient(140deg, transparent 0 38%, rgba(255, 122, 26, 0.34) 38% 38.35%, transparent 38.35% 100%),
+    linear-gradient(55deg, transparent 0 66%, rgba(255, 244, 223, 0.18) 66% 66.25%, transparent 66.25% 100%);
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+html[data-theme="orange"] .link-list a {
+  border-left: 2px solid rgba(255, 122, 26, 0.52);
+  padding-left: 16px;
+}
+
+html[data-theme="orange"] .link-list span {
+  color: #fff6d9;
+}
+
+html[data-theme="orange"] .link-list small {
+  color: rgba(255, 216, 163, 0.78);
+}
+
+html[data-theme="orange"] .feature::after {
+  background: #ff7a1a;
+}
+
+html[data-theme="orange"] .success,
+html[data-theme="orange"] .prompt,
+html[data-theme="orange"] .tui-label,
+html[data-theme="orange"] .resolver-head strong {
+  color: #ff9b3d;
+}
+
 @media (max-width: 920px) {
   .shell {
     width: calc(100% - 28px);
@@ -717,7 +917,11 @@ pre {
   }
 
   .tools {
-    display: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding: 12px 16px;
   }
 
   .hero {

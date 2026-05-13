@@ -1,4 +1,38 @@
 const copyButtons = document.querySelectorAll("[data-copy]");
+const themeChoices = document.querySelectorAll("[data-theme-choice]");
+const themeStorageKey = "xiaoma-hermes-theme";
+const allowedThemes = new Set(["violet", "orange"]);
+
+const getStoredTheme = () => {
+  try {
+    const value = localStorage.getItem(themeStorageKey);
+    return allowedThemes.has(value) ? value : "violet";
+  } catch {
+    return "violet";
+  }
+};
+
+const setTheme = (theme) => {
+  const nextTheme = allowedThemes.has(theme) ? theme : "violet";
+  document.documentElement.dataset.theme = nextTheme;
+  themeChoices.forEach((button) => {
+    const active = button.getAttribute("data-theme-choice") === nextTheme;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  try {
+    localStorage.setItem(themeStorageKey, nextTheme);
+  } catch {}
+};
+
+if (themeChoices.length) {
+  setTheme(getStoredTheme());
+  themeChoices.forEach((button) => {
+    button.addEventListener("click", () => {
+      setTheme(button.getAttribute("data-theme-choice"));
+    });
+  });
+}
 
 copyButtons.forEach((button) => {
   button.addEventListener("click", async () => {
