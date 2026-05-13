@@ -6,12 +6,12 @@
     <title>Hermes Agent 汉化补丁｜小马AI Hermes 中文增强版</title>
     <meta
       name="description"
-      content="小马AI Hermes Agent 汉化补丁：一条命令安装中文增强版，覆盖爱马仕机器人启动页、TUI、/help 快捷指令、工具分类和中文语言包。未安装 Hermes 时会先安装官方版。"
+      content="小马AI Hermes Agent 汉化补丁：一条命令安装中文增强版，含新手教程、常见问题、人工辅导入口，覆盖爱马仕机器人启动页、TUI、/help 快捷指令、工具分类和中文语言包。未安装 Hermes 时会先安装官方版。"
     />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large" />
     <meta
       name="keywords"
-      content="Hermes Agent 汉化,Hermes Agent 汉化补丁,Hermes 中文补丁,Hermes 中文增强包,Hermes 中文版,爱马仕机器人,爱马仕汉化,爱马仕补丁,爱马仕龙虾,Hermes Agent 中文语言包,Hermes Agent TUI 汉化,Hermes Agent CLI 中文化,/help 中文,NousResearch Hermes Agent 中文"
+      content="Hermes Agent 汉化,Hermes Agent 汉化补丁,Hermes Agent 新手教程,Hermes 中文补丁,Hermes 中文增强包,Hermes 中文版,爱马仕机器人,爱马仕汉化,爱马仕补丁,爱马仕龙虾,Hermes Agent 中文语言包,Hermes Agent TUI 汉化,Hermes Agent CLI 中文化,/help 中文,NousResearch Hermes Agent 中文"
     />
     <link rel="canonical" href="https://useai.live/hermes/" />
     <link rel="sitemap" type="application/xml" href="https://useai.live/hermes/sitemap.xml" />
@@ -178,7 +178,7 @@
         }
       } catch {}
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260513-motion2" />
+    <link rel="stylesheet" href="./styles.css?v=20260513-guide1" />
   </head>
   <body>
     <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
@@ -309,6 +309,7 @@
           <span>中文增强版</span>
         </a>
         <nav class="nav" aria-label="页面导航">
+          <a href="#beginner">新手教程</a>
           <a href="./details.html">详细介绍</a>
         </nav>
         <div class="tools" aria-label="页面工具">
@@ -346,6 +347,82 @@
               </div>
               <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="beginner-guide grid" id="beginner" aria-labelledby="beginner-title">
+        <div class="cell section-title beginner-title">
+          <p class="kicker">START HERE</p>
+          <h2 id="beginner-title">新手从 0 开始怎么用</h2>
+          <p>不需要懂代码。按下面顺序做，先让 Hermes 变成中文，再学会判断是否成功。</p>
+        </div>
+
+        <article class="beginner-panel beginner-map">
+          <small>第一步：先看自己是哪种情况</small>
+          <ul>
+            <li><b>还没装 Hermes</b><span>直接用页面里的命令，安装器会先装官方 Hermes，再装中文补丁。</span></li>
+            <li><b>已经装了 Hermes</b><span>把“请访问 useai.live/hermes 安装汉化补丁”发给 Hermes，或复制命令运行。</span></li>
+            <li><b>装完还是英文</b><span>关闭当前窗口，重新打开 Hermes；不行就再运行一次安装命令。</span></li>
+            <li><b>看到安全提示</b><span>确认命令来自 useai.live/hermes 后再授权；不确定就停止。</span></li>
+          </ul>
+        </article>
+
+        <article class="beginner-panel beginner-steps">
+          <small>第二步：照着做</small>
+          <ol>
+            <li><span>复制上方“发送以下对话给 Hermes”的那句话。</span></li>
+            <li><span>粘贴到 Hermes 对话框里，等待它读取安装说明。</span></li>
+            <li><span>如果 Hermes 要求授权，选择本次允许。</span></li>
+            <li><span>安装完成后重新打开 Hermes。</span></li>
+            <li><span>看到“爱马仕机器人”“可用工具”“可用命令”，就说明中文补丁已生效。</span></li>
+          </ol>
+        </article>
+
+        <div class="cell beginner-problems">
+          <div class="resolver-head">
+            <span>常见问题</span>
+            <strong>按症状处理</strong>
+          </div>
+          <div class="problem-list">
+            <article>
+              <h3>提示 command not found</h3>
+              <p>说明电脑找不到 Hermes。继续运行页面里的命令即可，安装器会先安装官方 Hermes。</p>
+            </article>
+            <article>
+              <h3>出现 Dangerous Command</h3>
+              <p>这是因为安装器需要修改 Hermes 的显示文件。确认命令是 useai.live/hermes 后再允许。</p>
+            </article>
+            <article>
+              <h3>装完还是英文</h3>
+              <p>先关掉当前 Hermes，再重新打开。若仍然没有中文，再运行一次命令。</p>
+            </article>
+            <article>
+              <h3>不知道是否成功</h3>
+              <p>在终端运行 <code>~/.xiaoma-hermes/bin/xiaoma-hermes status</code>，看到 applied 就表示补丁已应用。</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="cell beginner-help">
+          <div class="help-copy">
+            <p class="kicker">HUMAN HELP</p>
+            <h2>不想自己折腾，也可以找人带你做</h2>
+            <p>适合完全不懂命令行、担心装错、或想把 Hermes 真正用到日常工作的人。</p>
+          </div>
+          <div class="service-links" aria-label="咨询服务">
+            <a href="https://m.tb.cn/h.RaFgatR?tk=2cFf5JZ20Re" target="_blank" rel="noopener noreferrer">
+              <b>代安装 + 3 天辅导</b>
+              <span>适合卡在安装、授权、中文不生效的人。</span>
+            </a>
+            <a href="https://m.tb.cn/h.Rbk3qB4?tk=JoKA5JZX6gk" target="_blank" rel="noopener noreferrer">
+              <b>一周陪跑</b>
+              <span>适合已经装好，想学会日常使用和排错的人。</span>
+            </a>
+            <a href="https://m.tb.cn/h.RZl8VI9?tk=YoRL5JZeIB6" target="_blank" rel="noopener noreferrer">
+              <b>3 个月深度陪伴</b>
+              <span>适合想从新手练到能独立使用 AI Agent 做事的人。</span>
+            </a>
           </div>
         </div>
       </section>
@@ -427,6 +504,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=20260513-motion2"></script>
+    <script src="./app.js?v=20260513-guide1"></script>
   </body>
 </html>

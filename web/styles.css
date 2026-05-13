@@ -91,7 +91,7 @@ button {
 
 .topbar {
   display: grid;
-  grid-template-columns: 278px 176px 1fr;
+  grid-template-columns: 278px minmax(300px, 360px) 1fr;
   border-bottom: 1px solid var(--line);
   min-height: 104px;
   animation: rise-in 560ms ease both;
@@ -117,7 +117,7 @@ button {
 
 .nav {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr);
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
 }
 
 .nav a,
@@ -368,6 +368,173 @@ pre {
   border-color: var(--accent);
   transform: translateX(4px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+}
+
+.beginner-guide {
+  border-bottom: 1px solid var(--line);
+}
+
+.beginner-title {
+  padding: 28px var(--cell-pad) 24px;
+}
+
+.beginner-title h2,
+.help-copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.2vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  text-transform: none;
+}
+
+.beginner-title p,
+.help-copy p {
+  max-width: 760px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.75;
+  text-transform: none;
+}
+
+.beginner-panel {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 20px var(--cell-pad) 24px;
+  min-width: 0;
+}
+
+.beginner-panel:nth-of-type(2) {
+  border-right: 0;
+}
+
+.beginner-panel small,
+.beginner-problems h3,
+.service-links b {
+  display: block;
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.beginner-panel ul,
+.beginner-panel ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: guide-step;
+}
+
+.beginner-panel li {
+  display: grid;
+  grid-template-columns: 142px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  text-transform: none;
+}
+
+.beginner-panel ol li {
+  counter-increment: guide-step;
+  grid-template-columns: 38px 1fr;
+}
+
+.beginner-panel ol li::before {
+  content: counter(guide-step, decimal-leading-zero);
+  color: var(--accent);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+}
+
+.beginner-panel b {
+  color: var(--ink);
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+.beginner-panel span,
+.beginner-problems p,
+.service-links span {
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  text-transform: none;
+}
+
+.beginner-problems {
+  border-right: 1px solid var(--line);
+  padding: 0;
+}
+
+.problem-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.problem-list article {
+  min-height: 150px;
+  padding: 18px var(--cell-pad) 20px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.problem-list article:nth-child(2n) {
+  border-right: 0;
+}
+
+.problem-list article:hover {
+  background: rgba(255, 240, 220, 0.035);
+  transform: translateY(-2px);
+}
+
+.beginner-problems h3 {
+  margin-bottom: 10px;
+  letter-spacing: 0.08em;
+}
+
+.beginner-problems code {
+  color: var(--ink);
+  font-size: 0.86em;
+}
+
+.beginner-help {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(280px, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.service-links {
+  display: grid;
+  gap: 12px;
+}
+
+.service-links a {
+  display: block;
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+  transition: color 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+
+.service-links a:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+  transform: translateX(5px);
+}
+
+.service-links b {
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
 }
 
 .agent-brief {
@@ -1110,6 +1277,25 @@ html[data-theme="orange"] .link-list small {
   color: rgba(255, 216, 163, 0.78);
 }
 
+html[data-theme="orange"] .beginner-title h2,
+html[data-theme="orange"] .help-copy h2 {
+  color: #fff6d9;
+  text-shadow:
+    1px 1px 0 rgba(255, 122, 26, 0.5),
+    4px 5px 0 rgba(83, 28, 0, 0.42);
+}
+
+html[data-theme="orange"] .beginner-panel:hover,
+html[data-theme="orange"] .problem-list article:hover,
+html[data-theme="orange"] .service-links a:hover {
+  background: rgba(255, 122, 26, 0.055);
+}
+
+html[data-theme="orange"] .beginner-panel ol li::before,
+html[data-theme="orange"] .service-links a:hover b {
+  color: #ff9b3d;
+}
+
 html[data-theme="orange"] .feature::after {
   background: #ff7a1a;
 }
@@ -1137,7 +1323,9 @@ html[data-theme="orange"] .resolver-head strong {
   }
 
   .nav {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
   }
 
   .tools {
@@ -1164,6 +1352,16 @@ html[data-theme="orange"] .resolver-head strong {
   .grid,
   .features,
   .footer {
+    grid-template-columns: 1fr;
+  }
+
+  .beginner-panel,
+  .beginner-panel:nth-of-type(2),
+  .beginner-problems {
+    border-right: 0;
+  }
+
+  .beginner-help {
     grid-template-columns: 1fr;
   }
 
@@ -1266,6 +1464,21 @@ html[data-theme="orange"] .resolver-head strong {
 
   .cell {
     padding: 16px;
+  }
+
+  .beginner-title {
+    padding: 24px 16px;
+  }
+
+  .beginner-panel li,
+  .beginner-panel ol li,
+  .problem-list {
+    grid-template-columns: 1fr;
+  }
+
+  .problem-list article,
+  .problem-list article:nth-child(2n) {
+    border-right: 0;
   }
 
   .detail-cta,
