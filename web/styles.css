@@ -135,6 +135,11 @@ button {
   color: var(--ink);
 }
 
+.nav-primary {
+  color: var(--ink) !important;
+  background: rgba(255, 240, 220, 0.055);
+}
+
 .nav a,
 .footer a,
 .tools > a {
@@ -151,8 +156,8 @@ button {
   border-right: 0;
   display: flex;
   justify-content: flex-end;
-  align-items: start;
-  gap: 18px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .theme-switch {
@@ -292,6 +297,27 @@ h1 {
   letter-spacing: 0;
 }
 
+.guide-jump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.guide-jump:hover {
+  border-color: var(--accent);
+  background: rgba(255, 240, 220, 0.055);
+  transform: translateY(-2px);
+}
+
 .steps {
   display: flex;
   flex-direction: column;
@@ -371,11 +397,33 @@ pre {
 }
 
 .beginner-guide {
+  position: relative;
   border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(255, 240, 220, 0.035), transparent 36%),
+    linear-gradient(180deg, rgba(255, 240, 220, 0.028), transparent 32%);
 }
 
 .beginner-title {
-  padding: 28px var(--cell-pad) 24px;
+  position: relative;
+  padding: 34px var(--cell-pad) 30px;
+  background:
+    linear-gradient(90deg, rgba(255, 240, 220, 0.055), transparent 48%),
+    repeating-linear-gradient(90deg, transparent 0 84px, rgba(255, 240, 220, 0.035) 84px 85px);
+}
+
+.beginner-title::after {
+  content: "BEGINNER";
+  position: absolute;
+  right: var(--cell-pad);
+  top: 24px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 5.6rem);
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  opacity: 0.08;
+  pointer-events: none;
 }
 
 .beginner-title h2,
@@ -400,10 +448,12 @@ pre {
 }
 
 .beginner-panel {
+  position: relative;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   padding: 20px var(--cell-pad) 24px;
   min-width: 0;
+  background: rgba(13, 7, 24, 0.08);
 }
 
 .beginner-panel:nth-of-type(2) {
@@ -420,6 +470,10 @@ pre {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.beginner-panel small {
+  color: var(--accent);
 }
 
 .beginner-panel ul,
@@ -473,6 +527,7 @@ pre {
 .beginner-problems {
   border-right: 1px solid var(--line);
   padding: 0;
+  background: rgba(13, 7, 24, 0.1);
 }
 
 .problem-list {
@@ -512,6 +567,9 @@ pre {
   grid-template-columns: minmax(220px, 0.9fr) minmax(280px, 1.1fr);
   gap: 24px;
   align-items: start;
+  background:
+    linear-gradient(135deg, rgba(255, 240, 220, 0.05), transparent 45%),
+    rgba(13, 7, 24, 0.1);
 }
 
 .service-links {
@@ -1214,6 +1272,12 @@ html[data-theme="orange"] .theme-choice.is-active {
   box-shadow: 0 0 18px rgba(255, 122, 26, 0.28);
 }
 
+html[data-theme="orange"] .nav-primary,
+html[data-theme="orange"] .guide-jump {
+  background: rgba(255, 122, 26, 0.12);
+  border-color: rgba(255, 122, 26, 0.48);
+}
+
 html[data-theme="orange"] .steps code,
 html[data-theme="orange"] .terminal {
   background:
@@ -1283,6 +1347,18 @@ html[data-theme="orange"] .help-copy h2 {
   text-shadow:
     1px 1px 0 rgba(255, 122, 26, 0.5),
     4px 5px 0 rgba(83, 28, 0, 0.42);
+}
+
+html[data-theme="orange"] .beginner-guide {
+  background:
+    linear-gradient(90deg, rgba(255, 122, 26, 0.12), transparent 40%),
+    linear-gradient(180deg, rgba(255, 122, 26, 0.055), transparent 34%);
+}
+
+html[data-theme="orange"] .beginner-title {
+  background:
+    linear-gradient(90deg, rgba(255, 122, 26, 0.16), transparent 50%),
+    repeating-linear-gradient(90deg, transparent 0 84px, rgba(255, 184, 86, 0.05) 84px 85px);
 }
 
 html[data-theme="orange"] .beginner-panel:hover,
@@ -1468,6 +1544,12 @@ html[data-theme="orange"] .resolver-head strong {
 
   .beginner-title {
     padding: 24px 16px;
+  }
+
+  .beginner-title::after {
+    top: 12px;
+    right: 16px;
+    font-size: 3rem;
   }
 
   .beginner-panel li,

@@ -67,13 +67,15 @@
     </script>
     <script>
       try {
-        var savedTheme = localStorage.getItem("xiaoma-hermes-theme");
+        var savedTheme = localStorage.getItem("xiaoma-hermes-theme-v2");
         if (savedTheme === "violet" || savedTheme === "orange") {
           document.documentElement.dataset.theme = savedTheme;
+        } else {
+          document.documentElement.dataset.theme = "orange";
         }
       } catch {}
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260513-guide1" />
+    <link rel="stylesheet" href="./styles.css?v=20260514-guide2" />
   </head>
   <body>
     <main class="shell detail-page">
@@ -83,15 +85,14 @@
           <span>中文增强版</span>
         </a>
         <nav class="nav" aria-label="页面导航">
-          <a href="./index.html#beginner">新手教程</a>
+          <a class="nav-primary" href="./index.html#beginner">新手教程</a>
           <a href="./index.html">安装入口</a>
         </nav>
         <div class="tools" aria-label="页面工具">
           <div class="theme-switch" aria-label="主题选择">
-            <button type="button" class="theme-choice" data-theme-choice="violet" aria-pressed="true">紫夜</button>
-            <button type="button" class="theme-choice" data-theme-choice="orange" aria-pressed="false">爱马仕橙</button>
+            <button type="button" class="theme-choice" data-theme-choice="orange" aria-pressed="true">爱马仕橙</button>
+            <button type="button" class="theme-choice" data-theme-choice="violet" aria-pressed="false">紫夜</button>
           </div>
-          <a href="https://useai.live/hermes">小马AI</a>
         </div>
       </header>
 
@@ -186,6 +187,6 @@
         </div>
       </footer>
     </main>
-    <script src="./app.js?v=20260513-guide1"></script>
+    <script src="./app.js?v=20260514-guide2"></script>
   </body>
 </html>

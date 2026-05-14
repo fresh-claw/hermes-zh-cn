@@ -1,19 +1,19 @@
 const copyButtons = document.querySelectorAll("[data-copy]");
 const themeChoices = document.querySelectorAll("[data-theme-choice]");
-const themeStorageKey = "xiaoma-hermes-theme";
+const themeStorageKey = "xiaoma-hermes-theme-v2";
 const allowedThemes = new Set(["violet", "orange"]);
 
 const getStoredTheme = () => {
   try {
     const value = localStorage.getItem(themeStorageKey);
-    return allowedThemes.has(value) ? value : "violet";
+    return allowedThemes.has(value) ? value : "orange";
   } catch {
-    return "violet";
+    return "orange";
   }
 };
 
 const setTheme = (theme) => {
-  const nextTheme = allowedThemes.has(theme) ? theme : "violet";
+  const nextTheme = allowedThemes.has(theme) ? theme : "orange";
   document.documentElement.dataset.theme = nextTheme;
   themeChoices.forEach((button) => {
     const active = button.getAttribute("data-theme-choice") === nextTheme;
