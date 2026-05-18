@@ -2,13 +2,13 @@
   "name": "xiaoma-hermes-zh-cn",
   "brand": "小马AI版",
   "locale": "zh-CN",
-  "hermes_compat": "legacy",
+  "hermes_compat": "0.14.x",
   "version": "2026.05.19.2",
   "upstream_commit": "52e3bfc2f4440186763a7840c0be669a2659c6dd",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "a93897e0b3cbcfd71834938aaf127191ec0c60873ee269e73ce60c0b91f2f453",
+      "sha256": "315101a7a30e9e8e99ba1f69e6307f9f11cd8f939eb85e74d2a839efc6a00800",
       "bytes": 14707,
       "purpose": "中文增强包、安装动作、Hermes 技能说明、0.14/0.13/legacy 分流、启动/TUI/命令/状态页/网关/ACP/审批/OAuth/贴纸/技能同步、目标、推理、默认模型、Copilot ACP 与重启提示补丁、当前皮肤切换、记忆/MCP 设置与网关服务状态提示补丁、ACP 权限、平台审批结果、允许名单与配对配置提示补丁",
       "size": 14707

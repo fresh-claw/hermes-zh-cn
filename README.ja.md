@@ -30,7 +30,7 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 - ツール分類とスキル分類を中国語化。
 - よく使われる TUI 表示と実行中の進行メッセージを中国語化。
 - Hermes `0.2` から `0.12` までの旧版に対応。
-- 現行 `0.13.x` パッケージに対応。
+- `0.14.x`、`0.13.x`、legacy パッケージに対応。
 
 ## 境界
 
@@ -44,7 +44,8 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 ```text
 web/install.sh               インストーラー
 web/latest.json              バージョン情報
-web/packages/0.13.x/zh-CN/   現行パッケージ
+web/packages/0.14.x/zh-CN/   Hermes 0.14.x パッケージ
+web/packages/0.13.x/zh-CN/   Hermes 0.13.x パッケージ
 web/packages/legacy/zh-CN/   旧版互換パッケージ
 tools/xiaoma-hermes          状態確認と更新ヘルパー
 ```

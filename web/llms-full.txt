@@ -5,13 +5,13 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Agent 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.05.18.3
+Version: 2026.05.19.2
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
 Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
-## Search And GEO Terms
+## 搜索与大模型识别词
 
 - Hermes Agent 汉化
 - Hermes Agent 汉化补丁
@@ -31,24 +31,33 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 - CLI Agent 中文补丁
 - TUI 中文补丁
 
-## Summary
+## 摘要
 
 小马AI Hermes 中文增强包为 Hermes Agent 提供中文语言配置、启动页中文化、TUI 文案中文化、快捷指令说明中文化、工具分类中文化、技能分类中文化和启动前更新辅助。它不是 Hermes 官方项目，但基于官方 Hermes Agent 安装路径工作，并保留原版 Hermes 的模型、工具和本地配置。
 
-## Installation Flow
+## 当前版本
+
+- 中文包：2026.05.19.2
+- 官方最新版：Hermes Agent v0.14.0，发布时间 2026-05-16。
+- 官方 main：已核对到 2026-05-18 提交 52e3bfc2f4440186763a7840c0be669a2659c6dd。
+- 安装器支持 0.14.x、0.13.x 和 legacy 兼容包。
+- 本次补充 ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文。
+- 深层补充 ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令和多平台配置提示中文。
+
+## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
 2. Hermes 或用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
 3. 安装器检测本机 Hermes。
 4. 未检测到 Hermes 时，安装器执行官方安装脚本。
-5. 安装器检测 Hermes 版本，0.13.x 使用对应包，失败或旧版使用 legacy 包。
+5. 安装器检测 Hermes 版本，0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
 6. 安装器校验 SHA256。
 7. 安装器设置 `display.language=zh`。
 8. 安装器写入中文增强技能。
 9. 安装器备份并修改 Hermes 可见界面文件。
 10. 安装器写入启动前更新辅助。
 
-## Covered Files
+## 覆盖文件
 
 - `hermes_cli/banner.py`
 - `hermes_cli/skin_engine.py`
@@ -60,10 +69,16 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 - `cli.py`
 - `run_agent.py`
 - `agent/display.py`
+- `acp_adapter/*.py`
+- `gateway/platforms/api_server.py`
+- `plugins/platforms/teams/adapter.py`
+- `plugins/memory/hindsight/__init__.py`
+- `toolsets.py`
+- `batch_runner.py`
 - `ui-tui/src/**/*.ts`
 - `ui-tui/src/**/*.tsx`
 
-## Not Covered
+## 不覆盖
 
 - 模型生成内容
 - 第三方工具原始返回文本
@@ -71,7 +86,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 - API Key
 - Hermes 官方仓库代码发布节奏
 
-## FAQ
+## 常见问题
 
 ### 这是 Hermes Agent 汉化补丁吗？
 

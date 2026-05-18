@@ -44,7 +44,7 @@
       "isPartOf": { "@id": "https://useai.live/#website" },
       "description": "Hermes Agent 中文增强、汉化补丁和中文语言包安装入口，覆盖爱马仕机器人启动页、TUI、/help 快捷指令、工具分类和中文提示。",
       "inLanguage": "zh-CN",
-      "dateModified": "2026-05-12",
+      "dateModified": "2026-05-19",
       "keywords": [
         "Hermes Agent 汉化",
         "Hermes Agent 汉化补丁",
@@ -83,7 +83,7 @@
       ],
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "macOS, Linux, Windows, Termux",
-      "softwareVersion": "2026.05.18.3",
+      "softwareVersion": "2026.05.19.2",
       "inLanguage": "zh-CN",
       "isBasedOn": "https://github.com/NousResearch/hermes-agent",
       "downloadUrl": "https://useai.live/hermes/install.sh",
@@ -239,13 +239,13 @@
                         "type": "install_package_and_patch_tui",
                         "visibility": "agent",
                         "allowed_paths": [
+                                "/usr/local/lib/hermes-agent",
+                                "/usr/local/bin/hermes",
+                                "~/.local/bin/hermes",
+                                "~/.hermes/hermes-agent",
                                 "~/.xiaoma-hermes",
                                 "~/.hermes/skills/xiaoma-hermes-zh",
                                 "~/.hermes/config.yaml",
-                                "~/.hermes/hermes-agent",
-                                "~/.local/bin/hermes",
-                                "/usr/local/bin/hermes",
-                                "/usr/local/lib/hermes-agent",
                                 "Hermes安装目录/hermes_cli/*.py",
                                 "Hermes安装目录/cli.py",
                                 "Hermes安装目录/run_agent.py",
@@ -253,7 +253,33 @@
                                 "Hermes安装目录/gateway/run.py",
                                 "Hermes安装目录/tui_gateway/server.py",
                                 "Hermes安装目录/ui-tui/src/**/*.ts",
-                                "Hermes安装目录/ui-tui/src/**/*.tsx"
+                                "Hermes安装目录/ui-tui/src/**/*.tsx",
+                                "Hermes安装目录/acp_adapter/server.py",
+                                "Hermes安装目录/acp_adapter/entry.py",
+                                "Hermes安装目录/acp_adapter/edit_approval.py",
+                                "Hermes安装目录/acp_adapter/tools.py",
+                                "Hermes安装目录/gateway/platforms/api_server.py",
+                                "Hermes安装目录/plugins/platforms/teams/adapter.py",
+                                "Hermes安装目录/plugins/memory/hindsight/__init__.py",
+                                "Hermes安装目录/toolsets.py",
+                                "Hermes安装目录/batch_runner.py",
+                                "Hermes安装目录/ui-tui/src/gatewayClient.ts",
+                                "Hermes安装目录/ui-tui/src/lib/terminalSetup.ts",
+                                "Hermes安装目录/ui-tui/src/app/useMainApp.ts",
+                                "Hermes安装目录/hermes_cli/goals.py",
+                                "Hermes安装目录/agent/copilot_acp_client.py",
+                                "Hermes安装目录/agent/conversation_loop.py",
+                                "Hermes安装目录/plugins/memory/honcho/cli.py",
+                                "Hermes安装目录/hermes_cli/web_server.py",
+                                "Hermes安装目录/plugins/platforms/irc/adapter.py",
+                                "Hermes安装目录/plugins/platforms/google_chat/adapter.py",
+                                "Hermes安装目录/acp_adapter/permissions.py",
+                                "Hermes安装目录/gateway/platforms/discord.py",
+                                "Hermes安装目录/hermes_cli/pairing.py",
+                                "Hermes安装目录/plugins/platforms/teams/plugin.yaml",
+                                "Hermes安装目录/plugins/platforms/line/plugin.yaml",
+                                "Hermes安装目录/plugins/platforms/irc/plugin.yaml",
+                                "Hermes安装目录/scripts/whatsapp-bridge/bridge.js"
                         ],
                         "backup": "~/.xiaoma-hermes/backups/"
                 },
@@ -283,8 +309,19 @@
                         "思考过程",
                         "正在初始化爱马仕机器人",
                         "正在调用 API",
+                        "PATCH_STATUS state=applied",
                         "快捷指令说明显示中文",
-                        "PATCH_STATUS state=applied"
+                        "ACP 服务中文",
+                        "Teams 确认卡片中文",
+                        "API 服务错误中文",
+                        "TUI 网关状态中文",
+                        "目标状态中文",
+                        "推理设置中文",
+                        "默认模型设置中文",
+                        "Copilot ACP 错误中文",
+                        "ACP 权限按钮中文",
+                        "审批结果提示中文",
+                        "允许名单配置提示中文"
                 ]
         },
         "privacy": {
@@ -300,6 +337,17 @@
         "fallback": {
                 "on_version_miss": "legacy package",
                 "on_install_fail": "keep_original_hermes"
+        },
+        "official_hermes_install": {
+                "when": "local hermes command/source not found",
+                "url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
+                "command": "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
+        },
+        "version": "2026.05.19.2",
+        "upstream": {
+                "latest_release": "Hermes Agent v0.14.0 (2026-05-16)",
+                "main_commit": "52e3bfc2f4440186763a7840c0be669a2659c6dd",
+                "main_commit_date": "2026-05-18"
         }
 }
     </script>
@@ -324,10 +372,10 @@
 
       <section class="hero grid" id="top">
         <div class="hero-inner">
-          <p class="kicker">XIAOMA AI VERSION · ZH-CN PACK</p>
+          <p class="kicker">小马AI版本 · 中文增强包</p>
           <h1>Hermes<br />中文增强版</h1>
           <p class="lede">
-            一句话让 Hermes 更新为中文。
+            把这句话发给 Hermes，就能安装中文增强补丁。
           </p>
           <p class="install-stat" aria-live="polite">
             已有 <strong data-install-count>10,000</strong> 人安装
@@ -357,13 +405,13 @@
         <div class="cell section-title beginner-title">
           <p class="kicker">新手教程</p>
           <h2 id="beginner-title">第一次用 Hermes，从这里开始</h2>
-          <p>不用懂代码，也不用先看一堆英文说明。你照着下面做，先把界面变成中文，再确认安装是否成功。</p>
+          <p>不用先研究英文教程。照着下面做，先把界面改成中文，再确认安装结果。</p>
         </div>
 
         <article class="beginner-panel beginner-map">
           <small>先判断你现在在哪一步</small>
           <ul>
-            <li><b>我还没安装 Hermes</b><span>不用先找官方教程。复制本页命令运行，它会先安装原版 Hermes，再安装中文补丁。</span></li>
+            <li><b>我还没安装 Hermes</b><span>复制本页命令运行，它会先安装原版 Hermes，再安装中文补丁。</span></li>
             <li><b>我已经有 Hermes</b><span>优先把上方那句话发给 Hermes；如果它没有反应，再复制命令运行。</span></li>
             <li><b>安装后还是英文</b><span>先退出 Hermes，再重新打开。很多时候是旧窗口没有刷新。</span></li>
             <li><b>系统弹出风险提醒</b><span>确认来源是 useai.live/hermes 后再允许本次安装；来源不对就停下。</span></li>
@@ -389,7 +437,7 @@
           <div class="problem-list">
             <article>
               <h3>提示 command not found</h3>
-              <p>说明电脑还没找到 Hermes。继续运行本页命令即可，它会自动安装原版 Hermes。</p>
+              <p>说明电脑还没找到 Hermes。继续运行本页命令，它会自动安装原版 Hermes。</p>
             </article>
             <article>
               <h3>出现 Dangerous Command</h3>
@@ -431,7 +479,7 @@
 
       <section class="demo grid" aria-labelledby="demo-title">
         <div class="cell terminal-cell">
-          <h2 id="demo-title">SEE IT IN ACTION</h2>
+          <h2 id="demo-title">安装过程演示</h2>
           <div class="terminal terminal-demo" role="img" aria-label="Hermes 自动读取小马AI中文增强包演示">
             <div class="terminal-top">
               <span></span><span></span><span></span>
@@ -447,13 +495,13 @@
                 <p>正在读取 useai.live/hermes 的安装说明。</p>
               </div>
               <div class="terminal-output" aria-live="polite">
-                <p>execute install.sh</p>
-                <p>install Hermes first when missing</p>
-                <p>detect version with 4s timeout</p>
-                <p>fallback legacy when needed</p>
-                <p>set display.language zh</p>
-                <p>patch startup labels and categories</p>
-                <p>install ~/.xiaoma-hermes/current</p>
+                <p>执行 install.sh</p>
+                <p>未检测到 Hermes 时先安装官方版</p>
+                <p>4 秒内检测本机版本</p>
+                <p>旧版或检测失败时使用 legacy 兼容包</p>
+                <p>设置 display.language=zh</p>
+                <p>修补启动页、快捷指令和分类文案</p>
+                <p>安装到 ~/.xiaoma-hermes/current</p>
                 <p class="success">小马AI中文增强已启用。</p>
                 <p>下次启动 Hermes 时会自动检查更新。</p>
               </div>
@@ -477,6 +525,29 @@
             </a>
           </div>
         </div>
+      </section>
+
+      <section class="updates grid" aria-labelledby="updates-title">
+        <div class="cell section-title">
+          <p class="kicker">更新</p>
+          <h2 id="updates-title">本次更新</h2>
+        </div>
+        <article class="feature update-card">
+          <h3>中文包版本</h3>
+          <p>2026.05.19.2</p>
+        </article>
+        <article class="feature update-card">
+          <h3>官方版本核对</h3>
+          <p>已核对 Hermes Agent v0.14.0，官方发布时间为 2026-05-16；官方 main 最新提交为 2026-05-18（52e3bfc）。</p>
+        </article>
+        <article class="feature update-card">
+          <h3>新增覆盖</h3>
+          <p>补充 ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令、多平台配置提示，并继续覆盖 /goal、推理设置、默认模型和 TUI 网关状态。</p>
+        </article>
+        <article class="feature update-card">
+          <h3>版本分流</h3>
+          <p>安装器已支持 0.14.x、0.13.x 和 legacy 三类包，老版本继续走兼容路径。</p>
+        </article>
       </section>
 
       <section class="agent-brief grid" aria-label="Hermes 自动安装说明">

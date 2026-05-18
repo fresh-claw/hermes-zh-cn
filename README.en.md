@@ -30,7 +30,7 @@ It sets `display.language=zh`, installs a Xiaoma AI helper skill, adds a startup
 - Tool categories and skill categories translated.
 - Common TUI prompts and runtime progress messages translated.
 - Hermes `0.2` to `0.12` legacy versions are supported.
-- Current `0.13.x` package is supported.
+- `0.14.x`, `0.13.x`, and legacy packages are supported.
 
 ## Boundaries
 
@@ -44,7 +44,8 @@ It sets `display.language=zh`, installs a Xiaoma AI helper skill, adds a startup
 ```text
 web/install.sh               Installer
 web/latest.json              Version metadata
-web/packages/0.13.x/zh-CN/   Current package
+web/packages/0.14.x/zh-CN/   Hermes 0.14.x package
+web/packages/0.13.x/zh-CN/   Hermes 0.13.x package
 web/packages/legacy/zh-CN/   Legacy package
 tools/xiaoma-hermes          Status and update helper
 ```

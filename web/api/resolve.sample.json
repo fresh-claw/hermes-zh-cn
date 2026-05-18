@@ -1,17 +1,40 @@
 {
   "matched": true,
   "hermes_version": "installer-detected",
-  "xiaoma_version": "2026.05.18.3",
+  "xiaoma_version": "2026.05.19.2",
   "locale": "zh-CN",
   "install_url": "https://useai.live/hermes/install.sh",
   "recommended_command": "curl -fsSL https://useai.live/hermes/install.sh | bash",
-  "resolver_note": "2026.05.18.3 增补 Telegram/Slack/飞书/Discord 审批按钮、OAuth 授权、贴纸说明、技能同步和 TUI 阻断提示深层汉化。",
-  "manifest_url": "https://useai.live/hermes/packages/0.13.x/zh-CN/manifest.json",
-  "package_url": "https://useai.live/hermes/packages/0.13.x/zh-CN/zh-cn.min.json",
+  "resolver_note": "2026.05.19.2 补充 ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令和多平台配置提示中文。 安装器继续适配 Hermes 0.14.x、0.13.x 和 legacy。",
+  "manifest_url": "https://useai.live/hermes/packages/0.14.x/zh-CN/manifest.json",
+  "package_url": "https://useai.live/hermes/packages/0.14.x/zh-CN/zh-cn.min.json",
+  "compat_packages": [
+    {
+      "hermes": "0.14.x",
+      "version": "2026.05.19.2",
+      "manifest": "packages/0.14.x/zh-CN/manifest.json",
+      "package": "packages/0.14.x/zh-CN/zh-cn.min.json",
+      "sha256": "315101a7a30e9e8e99ba1f69e6307f9f11cd8f939eb85e74d2a839efc6a00800"
+    },
+    {
+      "hermes": "0.13.x",
+      "version": "2026.05.19.2",
+      "manifest": "packages/0.13.x/zh-CN/manifest.json",
+      "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
+      "sha256": "1e20ef8c96a6ad44d86c5333e245b5efbd66d4256d8c44e03ddf64c54fb89657"
+    },
+    {
+      "hermes": "legacy",
+      "version": "2026.05.19.2",
+      "manifest": "packages/legacy/zh-CN/manifest.json",
+      "package": "packages/legacy/zh-CN/zh-cn.min.json",
+      "sha256": "a93897e0b3cbcfd71834938aaf127191ec0c60873ee269e73ce60c0b91f2f453"
+    }
+  ],
   "legacy_manifest_url": "https://useai.live/hermes/packages/legacy/zh-CN/manifest.json",
   "legacy_package_url": "https://useai.live/hermes/packages/legacy/zh-CN/zh-cn.min.json",
-  "sha256": "29369410c47115562787ef2fd44b1efee1882526477e17116402c4472b1b07af",
-  "legacy_sha256": "e8d146e98f55e22eaf702d8a8042513c3900d5ae4b5bc60ee8a618871d08c287",
+  "sha256": "315101a7a30e9e8e99ba1f69e6307f9f11cd8f939eb85e74d2a839efc6a00800",
+  "legacy_sha256": "a93897e0b3cbcfd71834938aaf127191ec0c60873ee269e73ce60c0b91f2f453",
   "requires_user_confirmation": true,
   "authorization": "single install command",
   "fallback": "legacy",

@@ -1016,6 +1016,20 @@ pre {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.updates {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.updates .section-title {
+  background:
+    linear-gradient(90deg, rgba(255, 240, 220, 0.05), transparent 52%),
+    repeating-linear-gradient(90deg, transparent 0 92px, rgba(255, 240, 220, 0.028) 92px 93px);
+}
+
+.updates .feature {
+  min-height: 158px;
+}
+
 .section-title {
   grid-column: 1 / -1;
   min-height: auto;
@@ -1376,6 +1390,12 @@ html[data-theme="orange"] .feature::after {
   background: #ff7a1a;
 }
 
+html[data-theme="orange"] .updates .section-title {
+  background:
+    linear-gradient(90deg, rgba(255, 122, 26, 0.12), transparent 55%),
+    repeating-linear-gradient(90deg, transparent 0 92px, rgba(255, 184, 86, 0.045) 92px 93px);
+}
+
 html[data-theme="orange"] .success,
 html[data-theme="orange"] .prompt,
 html[data-theme="orange"] .tui-label,
@@ -1427,6 +1447,7 @@ html[data-theme="orange"] .resolver-head strong {
 
   .grid,
   .features,
+  .updates,
   .footer {
     grid-template-columns: 1fr;
   }
