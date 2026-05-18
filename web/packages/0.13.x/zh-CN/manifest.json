@@ -3,20 +3,20 @@
   "brand": "小马AI版",
   "locale": "zh-CN",
   "hermes_compat": "0.13.x",
-  "version": "2026.05.12.6",
+  "version": "2026.05.18.3",
   "upstream_commit": "404640a2b752f502825dc8b26212204fa890d495",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "969c34751e1972f80d256f7b3b599ccb8bdf59cc9bae074a949a365b182a466b",
-      "bytes": 9104,
-      "purpose": "中文增强包、安装动作、Hermes 技能说明、启动/TUI/命令/状态页补丁、当前皮肤切换",
-      "size": 6544
+      "sha256": "29369410c47115562787ef2fd44b1efee1882526477e17116402c4472b1b07af",
+      "bytes": 11096,
+      "purpose": "中文增强包、安装动作、Hermes 技能说明、启动/TUI/命令/状态页/网关菜单/审批按钮/OAuth/贴纸/技能同步与重启提示补丁、当前皮肤切换、记忆/MCP 设置与网关服务状态提示补丁",
+      "size": 11096
     }
   ],
   "promo": {
     "enabled": false,
     "slots": []
   },
-  "generated_at": "2026-05-12T10:55:38+08:00"
+  "generated_at": "2026-05-18T21:20:00+08:00"
 }

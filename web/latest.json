@@ -1,7 +1,7 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.05.12.6",
+  "latest": "2026.05.18.3",
   "install": "https://useai.live/hermes/install.sh",
   "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
@@ -13,17 +13,17 @@
   "packages": [
     {
       "hermes": "0.13.x",
-      "version": "2026.05.12.6",
+      "version": "2026.05.18.3",
       "manifest": "packages/0.13.x/zh-CN/manifest.json",
       "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
-      "sha256": "969c34751e1972f80d256f7b3b599ccb8bdf59cc9bae074a949a365b182a466b"
+      "sha256": "29369410c47115562787ef2fd44b1efee1882526477e17116402c4472b1b07af"
     },
     {
       "hermes": "legacy",
-      "version": "2026.05.12.6",
+      "version": "2026.05.18.3",
       "manifest": "packages/legacy/zh-CN/manifest.json",
       "package": "packages/legacy/zh-CN/zh-cn.min.json",
-      "sha256": "6629bfab226fdae96d1fdd917adde474812daf6550376984037d22586d65c19a"
+      "sha256": "e8d146e98f55e22eaf702d8a8042513c3900d5ae4b5bc60ee8a618871d08c287"
     }
   ],
   "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh"

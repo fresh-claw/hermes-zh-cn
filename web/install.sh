@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.12.6"
+PACKAGE_VERSION="2026.05.18.3"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -144,98 +144,118 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-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
-AHgAAA==
+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
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -894,8 +914,94 @@ basic_replacements = {
 	    ],
 	    "hermes_cli/mcp_config.py": [
 	        ('print(color("  MCP Servers:", Colors.CYAN + Colors.BOLD))', 'print(color("  MCP 服务:", Colors.CYAN + Colors.BOLD))'),
+	        ('_success(f"Saved \'{name}\' to {display_hermes_home()}/config.yaml ({tool_count}/{total} tools enabled)")', '_success(f"已保存 \'{name}\' 到 {display_hermes_home()}/config.yaml（已启用 {tool_count}/{total} 个工具）")'),
+	        ('_info("Start a new session to use these tools.")', '_info("请新建会话后使用这些工具。")'),
+	        ('_success(f"Updated config: {new_count}/{total} tools enabled")', '_success(f"配置已更新：已启用 {new_count}/{total} 个工具")'),
+	        ('_info("Start a new session for changes to take effect.")', '_info("请新建会话后使改动生效。")'),
 	    ],
-	    "hermes_cli/commands.py": [],
+	    "hermes_cli/memory_setup.py": [
+	        ('print(f"\\n  Memory provider \'{provider_name}\' not found.")', 'print(f"\\n  未找到记忆服务 \'{provider_name}\'。")'),
+	        ('print("  Run \'hermes memory setup\' to see available providers.\\n")', 'print("  运行 \'hermes memory setup\' 查看可用服务。\\n")'),
+	        ('print("\\n  No memory provider plugins detected.")', 'print("\\n  未检测到记忆服务插件。")'),
+	        ('print("  Install a plugin to ~/.hermes/plugins/ and try again.\\n")', 'print("  请安装插件到 ~/.hermes/plugins/ 后重试。\\n")'),
+	        ('items.append(("Built-in only", "— MEMORY.md / USER.md (default)"))', 'items.append(("仅使用内置记忆", "— MEMORY.md / USER.md（默认）"))'),
+	        ('selected = _curses_select("Memory provider setup", items, default=builtin_idx)', 'selected = _curses_select("记忆服务设置", items, default=builtin_idx)'),
+	        ('print("\\n  ✓ Memory provider: built-in only")', 'print("\\n  ✓ 记忆服务：仅使用内置记忆")'),
+	        ('print(f"  Failed to write provider config: {e}")', 'print(f"  写入记忆服务配置失败：{e}")'),
+	        ('print(f"\\n  Memory provider: {name}")', 'print(f"\\n  记忆服务：{name}")'),
+	        ('print(f"  Activation saved to config.yaml")', 'print(f"  启用状态已保存到 config.yaml")'),
+	        ('print(f"  Provider config saved")', 'print(f"  服务配置已保存")'),
+	        ('print(f"  API keys saved to .env")', 'print(f"  API Key 已保存到 .env")'),
+	        ('print(f"\\n  Start a new session to activate.\\n")', 'print(f"\\n  请新建会话后启用。\\n")'),
+	    ],
+	    "hermes_cli/commands.py": [
+	        ('"Start a new session (fresh session ID + history)"', '"新建会话（新的会话 ID 和历史）"'),
+	        ('"Enable or inspect Telegram DM topic sessions"', '"启用或查看 Telegram 私信主题会话"'),
+	        ('"Clear screen and start a new session"', '"清屏并新建会话"'),
+	        ('"Force a full UI repaint (recovers from terminal drift)"', '"强制刷新界面（修复终端显示错位）"'),
+	        ('"Show conversation history"', '"查看对话历史"'),
+	        ('"Save the current conversation"', '"保存当前对话"'),
+	        ('"Retry the last message (resend to agent)"', '"重试上一条消息（重新发送给 Agent）"'),
+	        ('"Remove the last user/assistant exchange"', '"移除上一轮用户和助手对话"'),
+	        ('"Set a title for the current session"', '"设置当前会话标题"'),
+	        ('"Hand off this session to a messaging platform (Telegram, Discord, etc.)"', '"将此会话转交到消息平台（Telegram、Discord 等）"'),
+	        ('"Branch the current session (explore a different path)"', '"从当前会话创建分支（尝试另一条思路）"'),
+	        ('"Manually compress conversation context"', '"手动压缩对话上下文"'),
+	        ('"List or restore filesystem checkpoints"', '"列出或恢复文件检查点"'),
+	        ('"Create or restore state snapshots of Hermes config/state"', '"创建或恢复 Hermes 配置和状态快照"'),
+	        ('"Kill all running background processes"', '"结束所有后台进程"'),
+	        ('"Approve a pending dangerous command"', '"批准待处理的危险命令"'),
+	        ('"Deny a pending dangerous command"', '"拒绝待处理的危险命令"'),
+	        ('"Run a prompt in the background"', '"在后台执行提示词"'),
+	        ('"Show active agents and running tasks"', '"查看活跃 Agent 和运行任务"'),
+	        ('"Queue a prompt for the next turn (doesn\'t interrupt)"', '"将提示词加入下一轮队列（不打断当前任务）"'),
+	        ('"Inject a message after the next tool call without interrupting"', '"在下一次工具调用后插入消息，不打断当前任务"'),
+	        ('"Set a standing goal Hermes works on across turns until achieved"', '"设置持续目标，Hermes 会跨轮执行直到完成"'),
+	        ('"Add or manage checklist items on the active goal"', '"添加或管理当前目标的清单项"'),
+	        ('"Show session info"', '"查看会话信息"'),
+	        ('"Show your slash command access (admin / user)"', '"查看当前斜杠命令权限（管理员/用户）"'),
+	        ('"Show active profile name and home directory"', '"查看当前配置档名称和主目录"'),
+	        ('"Set this chat as the home channel"', '"将当前聊天设为主频道"'),
+	        ('"Resume a previously-named session"', '"继续之前命名的会话"'),
+	        ('"Browse and resume previous sessions"', '"浏览并继续之前的会话"'),
+	        ('"Show current configuration"', '"查看当前配置"'),
+	        ('"Switch model for this session"', '"切换本会话模型"'),
+	        ('"Show Google Gemini Code Assist quota usage"', '"查看 Google Gemini Code Assist 配额"'),
+	        ('"Set a predefined personality"', '"设置预设人格"'),
+	        ('"Toggle the context/model status bar"', '"切换上下文/模型状态栏"'),
+	        ('"Cycle tool progress display: off -> new -> all -> verbose"', '"切换工具进度显示：关闭、新调用、全部、详细"'),
+	        ('"Toggle gateway runtime-metadata footer on final replies"', '"切换网关最终回复中的运行元信息页脚"'),
+	        ('"Toggle YOLO mode (skip all dangerous command approvals)"', '"切换 YOLO 模式（跳过危险命令确认）"'),
+	        ('"Manage reasoning effort and display"', '"管理推理强度和显示方式"'),
+	        ('"Toggle fast mode — OpenAI Priority Processing / Anthropic Fast Mode (Normal/Fast)"', '"切换快速模式（普通/快速）"'),
+	        ('"Show or change the display skin/theme"', '"查看或切换显示主题"'),
+	        ('"Pick the TUI busy-indicator style"', '"选择 TUI 忙碌指示器样式"'),
+	        ('"Toggle voice mode"', '"切换语音模式"'),
+	        ('"Control what Enter does while Hermes is working"', '"控制 Hermes 忙碌时按 Enter 的行为"'),
+	        ('"Manage tools: /tools [list|disable|enable] [name...]"', '"管理工具：/tools [list|disable|enable] [名称...]"'),
+	        ('"List available toolsets"', '"列出可用工具集"'),
+	        ('"Search, install, inspect, or manage skills"', '"搜索、安装、查看或管理技能"'),
+	        ('"Manage scheduled tasks"', '"管理定时任务"'),
+	        ('"Background skill maintenance (status, run, pin, archive, list-archived)"', '"后台技能维护（状态、运行、固定、归档、列出归档）"'),
+	        ('"Multi-profile collaboration board (tasks, links, comments)"', '"多配置协作看板（任务、链接、评论）"'),
+	        ('"Reload .env variables into the running session"', '"重新读取 .env 变量"'),
+	        ('"Reload MCP servers from config"', '"重新读取 MCP 服务配置"'),
+	        ('"Re-scan ~/.hermes/skills/ for newly installed or removed skills"', '"重新扫描 ~/.hermes/skills/ 中的技能"'),
+	        ('"Connect browser tools to your live Chrome via CDP"', '"通过 CDP 连接本机 Chrome 浏览器工具"'),
+	        ('"List installed plugins and their status"', '"列出已安装插件及状态"'),
+	        ('"Browse all commands and skills (paginated)"', '"分页浏览全部命令和技能"'),
+	        ('"Show available commands"', '"查看可用命令"'),
+	        ('"Gracefully restart the gateway after draining active runs"', '"当前运行完成后平滑重启网关"'),
+	        ('"Show token usage and rate limits for the current session"', '"查看当前会话的 token 用量和速率限制"'),
+	        ('"Show usage insights and analytics"', '"查看用量分析"'),
+	        ('"Show gateway/messaging platform status"', '"查看网关/消息平台状态"'),
+	        ('"Copy the last assistant response to clipboard"', '"复制上一条助手回复"'),
+	        ('"Attach clipboard image from your clipboard"', '"附加剪贴板图片"'),
+	        ('"Attach a local image file for your next prompt"', '"为下一条提示附加本地图片"'),
+	        ('"Update Hermes Agent to the latest version"', '"将 Hermes Agent 更新到最新版"'),
+	        ('"Upload debug report (system info + logs) and get shareable links"', '"上传调试报告（系统信息和日志），获得分享链接"'),
+	        ('"Exit the CLI"', '"退出 CLI"'),
+	    ],
 	    "agent/display.py": [
 	        ('"pondering", "contemplating", "musing", "cogitating", "ruminating",\n        "deliberating", "mulling", "reflecting", "processing", "reasoning",\n        "analyzing", "computing", "synthesizing", "formulating", "brainstorming",', '"思考中", "分析中", "整理中", "推理中", "处理中",\n        "规划中", "检索中", "生成中", "归纳中", "判断中",\n        "计算中", "汇总中", "构思中", "准备中", "推进中",'),
 	        ("return verbs", 'return ["思考中", "分析中", "整理中", "推理中", "处理中", "规划中", "生成中"]'),
@@ -1694,6 +1800,12 @@ basic_replacements = {
 		    ],
 		    "gateway/run.py": [
 		        ('message = "♻️ Gateway online — Hermes is back and ready."', 'message = "♻️ 网关已上线，Hermes 已恢复并就绪。"'),
+		        ('_INTERRUPT_REASON_GATEWAY_RESTART = "Gateway restarting"', '_INTERRUPT_REASON_GATEWAY_RESTART = "网关正在重启"'),
+		        ('action = "restarting" if self._restart_requested else "shutting down"', 'action = "正在重启" if self._restart_requested else "正在关闭"'),
+		        ('"Your current task will be interrupted. "\n            "Send any message after restart and I\'ll try to resume where you left off."', '"当前任务会被中断。"\n            "重启后发送任意消息，我会尝试从中断处继续。"'),
+		        ('else "Your current task will be interrupted."', 'else "当前任务会被中断。"'),
+		        ('msg = f"⚠️ Gateway {action} — {hint}"', 'msg = f"⚠️ 网关{action}：{hint}"'),
+		        ('"♻ Gateway restarted successfully. Your session continues."', '"♻ 网关已成功重启，当前会话继续。"'),
 		        ('f"⚠️ **Dangerous command requires approval:**\\n"', 'f"⚠️ **危险命令需要确认：**\\n"'),
 		        ('f"**Command:**\\n```\\n{cmd}\\n```\\n"', 'f"**命令：**\\n```\\n{cmd}\\n```\\n"'),
 		        ('f"**Reason:** {desc}\\n\\n"', 'f"**原因：** {desc}\\n\\n"'),
@@ -1702,6 +1814,96 @@ basic_replacements = {
 		        ('f"[Background process {session_id} is still running~ "', 'f"[后台进程 {session_id} 仍在运行~ "'),
 		        ('running: {current_tool}', '运行中：{current_tool}'),
 		        ('running: {_a[\'current_tool\']}', '运行中：{_a[\'current_tool\']}'),
+		        ('"Gateway drain timed out after %.1fs with %d active agent(s); interrupting remaining work."', '"网关等待 %.1f 秒后仍有 %d 个 Agent 在运行；正在中断剩余任务。"'),
+		        ('"a gateway restart"', '"网关重启"'),
+		        ('"a gateway shutdown"', '"网关关闭"'),
+		        ('"a gateway interruption"', '"网关中断"'),
+		        ('f"[System note: Your previous turn in this session was interrupted "\n                    f"by {_reason_phrase}. The conversation history below is intact. "\n                    f"If it contains unfinished tool result(s), process them first and "\n                    f"summarize what was accomplished, then address the user\'s new "\n                    f"message below.]\\n\\n"', 'f"[系统提示：本会话上一轮因{_reason_phrase}被中断。下面的对话历史仍然完整。若其中包含尚未处理的工具结果，请先处理并总结已完成内容，再回应用户的新消息。]\\n\\n"'),
+		        ('"[System note: Your previous turn was interrupted before you could "\n                    "process the last tool result(s). The conversation history contains "\n                    "tool outputs you haven\'t responded to yet. Please finish processing "\n                    "those results and summarize what was accomplished, then address the "\n                    "user\'s new message below.]\\n\\n"', '"[系统提示：上一轮在处理最后的工具结果前被中断。对话历史里有尚未回应的工具输出，请先处理并总结已完成内容，再回应用户的新消息。]\\n\\n"'),
+		        ('f"\\n❌ Gateway already running (PID {existing_pid}).\\n"\n                f"   Use \'hermes gateway restart\' to replace it,\\n"\n                f"   or \'hermes gateway stop\' to kill it first.\\n"\n                f"   Or use \'hermes gateway run --replace\' to auto-replace.\\n"', 'f"\\n❌ 网关已在运行（PID {existing_pid}）。\\n"\n                f"   可运行 \'hermes gateway restart\' 替换它，\\n"\n                f"   或先运行 \'hermes gateway stop\' 停止它。\\n"\n                f"   也可运行 \'hermes gateway run --replace\' 自动替换。\\n"'),
+		    ],
+		    "hermes_cli/gateway.py": [
+		        ('print(f"✓ {scope_label} service restarted (PID {new_pid})")', 'print(f"✓ {scope_label} 服务已重启（PID {new_pid}）")'),
+		        ('print(f"⚠ {scope_label} service process restarted (PID {new_pid}), but gateway startup failed: {reason}")', 'print(f"⚠ {scope_label} 服务进程已重启（PID {new_pid}），但网关启动失败：{reason}")'),
+		        ('print(f"⏳ {scope_label} service process started (PID {new_pid}); waiting for gateway runtime...")', 'print(f"⏳ {scope_label} 服务进程已启动（PID {new_pid}），正在等待网关运行...")'),
+		        ('f"⚠ {scope_label} service did not become active within {int(timeout)}s.\\n"\n        f"  Check status: {\'sudo \' if system else \'\'}hermes gateway status\\n"\n        f"  Check logs:   journalctl {\'--user \' if not system else \'\'}-u {svc} -l --since \'2 min ago\'"', 'f"⚠ {scope_label} 服务在 {int(timeout)} 秒内没有变为可用。\\n"\n        f"  查看状态：{\'sudo \' if system else \'\'}hermes gateway status\\n"\n        f"  查看日志：journalctl {\'--user \' if not system else \'\'}-u {svc} -l --since \'2 min ago\'"'),
+		        ('print(f"⏳ {scope_label} service is temporarily rate-limited by systemd.")', 'print(f"⏳ {scope_label} 服务被 systemd 临时限流。")'),
+		        ('print("  systemd is refusing another immediate start after repeated exits.")', 'print("  因多次退出，systemd 暂时拒绝立即再次启动。")'),
+		        ('print(f"  Wait for the start-limit window to expire, then run: {\'sudo \' if system else \'\'}hermes gateway restart{scope_flag}")', 'print(f"  等待限流窗口结束后运行：{\'sudo \' if system else \'\'}hermes gateway restart{scope_flag}")'),
+		        ('print(f"  Or clear the failed state manually: {systemctl_prefix}reset-failed {svc}")', 'print(f"  或手动清除失败状态：{systemctl_prefix}reset-failed {svc}")'),
+		        ('print(f"  Check logs: {journal_prefix}-u {svc} -l --since \'5 min ago\'")', 'print(f"  查看日志：{journal_prefix}-u {svc} -l --since \'5 min ago\'")'),
+		        ('print("⏳ Service restart already pending — waiting for systemd relaunch...")', 'print("⏳ 服务重启已在等待中，正在等待 systemd 重新拉起...")'),
+		        ('print(f"↻ Clearing failed state for pending {scope_label.lower()} service restart...")', 'print(f"↻ 正在清除待重启 {scope_label.lower()} 服务的失败状态...")'),
+		        ('print("⚠ Gateway process is running for this profile, but the service is not active")', 'print("⚠ 当前配置档已有网关进程在运行，但服务未处于活动状态")'),
+		        ('print("  This is usually a manual foreground/tmux/nohup run, so `hermes gateway`")', 'print("  这通常是手动前台、tmux 或 nohup 运行，因此 `hermes gateway`")'),
+		        ('print("  can refuse to start another copy until this process stops.")', 'print("  在该进程停止前可能拒绝启动另一份实例。")'),
+		        ('print("Other profiles:")', 'print("其他配置档：")'),
+		        ('print("Unable to list profiles.")', 'print("无法列出配置档。")'),
+		        ('print("No profiles found.")', 'print("未找到配置档。")'),
+		        ('print("Gateways:")', 'print("网关：")'),
+		        ('print("⏳ {scope_label} service restarting gracefully (PID {pid})...")', 'print(f"⏳ {scope_label} 服务正在平滑重启（PID {pid}）...")'),
+		        ('f"⚠ Graceful restart did not complete within {int(drain_timeout + 5)}s; "\n            "forcing a service restart..."', 'f"⚠ 平滑重启在 {int(drain_timeout + 5)} 秒内未完成；"\n            "正在强制重启服务..."'),
+		        ('f"Gateway {label} service is still restarting after 90s; "\n                "check `hermes gateway status` or logs for final state."', 'f"网关 {label} 服务 90 秒后仍在重启；"\n                "请用 `hermes gateway status` 或日志查看最终状态。"'),
+		        ('print(f"⚠ Gateway PID {remaining_pid} still running after {timeout}s — restart may fail")', 'print(f"⚠ 网关 PID {remaining_pid} 在 {timeout} 秒后仍在运行，重启可能失败")'),
+		        ('print("✓ Service restart requested")', 'print("✓ 服务重启请求已发送")'),
+		        ('print(f"⚠ Gateway drain timed out after {drain_timeout:.0f}s — forcing launchd restart")', 'print(f"⚠ 网关等待 {drain_timeout:.0f} 秒后仍未结束，正在强制重启 launchd 服务")'),
+		        ('print("✓ Service restarted")', 'print("✓ 服务已重启")'),
+		        ('print("↻ launchd job was unloaded; reloading")', 'print("↻ launchd 任务未加载，正在重新加载")'),
+		    ],
+		    "hermes_cli/plugins_cmd.py": [
+		        ('f"[green]\\u2713[/green] Memory provider: [bold]{new_memory}[/bold]  "', 'f"[green]\\u2713[/green] 记忆服务：[bold]{new_memory}[/bold]  "'),
+		    ],
+		    "gateway/platforms/discord.py": [
+		        ('description="Start a new conversation"', 'description="开始新会话"'),
+		        ('description="Reset your Hermes session"', 'description="重置 Hermes 会话"'),
+		        ('description="Show or change the model"', 'description="查看或切换模型"'),
+		        ('description="Show or change reasoning effort"', 'description="查看或切换推理强度"'),
+		        ('description="Set a personality"', 'description="设置人格"'),
+		        ('description="Retry your last message"', 'description="重试上一条消息"'),
+		        ('description="Remove the last exchange"', 'description="移除上一轮对话"'),
+		        ('description="Show Hermes session status"', 'description="查看 Hermes 会话状态"'),
+		        ('description="Set this chat as the home channel"', 'description="将当前聊天设为主频道"'),
+		        ('description="Stop the running Hermes agent"', 'description="停止运行中的 Hermes Agent"'),
+		        ('description="Inject a message after the next tool call (no interrupt)"', 'description="在下一次工具调用后插入消息（不打断）"'),
+		        ('description="Compress conversation context"', 'description="压缩对话上下文"'),
+		        ('description="Set or show the session title"', 'description="设置或查看会话标题"'),
+		        ('description="Resume a previously-named session"', 'description="继续之前命名的会话"'),
+		        ('description="Show token usage for this session"', 'description="查看当前会话 token 用量"'),
+		        ('description="Show available commands"', 'description="查看可用命令"'),
+		        ('description="Show usage insights and analytics"', 'description="查看用量分析"'),
+		        ('description="Reload MCP servers from config"', 'description="从配置重新读取 MCP 服务"'),
+		        ('description="Re-scan ~/.hermes/skills/ for new or removed skills"', 'description="重新扫描新增或移除的技能"'),
+		        ('description="Toggle voice reply mode"', 'description="切换语音回复模式"'),
+		        ('description="Update Hermes Agent to the latest version"', 'description="将 Hermes Agent 更新到最新版"'),
+		        ('description="Gracefully restart the Hermes gateway"', 'description="平滑重启 Hermes 网关"'),
+		        ('description="Approve a pending dangerous command"', 'description="批准待处理的危险命令"'),
+		        ('description="Deny a pending dangerous command"', 'description="拒绝待处理的危险命令"'),
+		        ('description="Create a new thread and start a Hermes session in it"', 'description="创建新话题并启动 Hermes 会话"'),
+		        ('description="Queue a prompt for the next turn (doesn\'t interrupt)"', 'description="将提示词加入下一轮队列（不打断当前任务）"'),
+		        ('description="Run a prompt in the background"', 'description="在后台执行提示词"'),
+		        ('name="Model name (e.g. anthropic/claude-sonnet-4). Leave empty to see current."', 'name="模型名称（例如 anthropic/claude-sonnet-4），留空则查看当前模型。"'),
+		        ('effort="Reasoning effort: none, minimal, low, medium, high, or xhigh."', 'effort="推理强度：none、minimal、low、medium、high 或 xhigh。"'),
+		        ('name="Personality name. Leave empty to list available."', 'name="人格名称，留空则列出可用项。"'),
+		        ('prompt="Text to inject into the agent\\\'s next tool result"', 'prompt="要插入到下一次工具结果后的文本"'),
+		        ('name="Session title. Leave empty to show current."', 'name="会话标题，留空则查看当前标题。"'),
+		        ('name="Session name to resume. Leave empty to list sessions."', 'name="要继续的会话名，留空则列出会话。"'),
+		        ('days="Number of days to analyze (default: 7)"', 'days="要分析的天数（默认 7）"'),
+		        ('mode="Voice mode: join, channel, leave, on, tts, off, or status"', 'mode="语音模式：join、channel、leave、on、tts、off 或 status"'),
+		        ("scope=\"Optional: 'all', 'session', 'always', 'all session', 'all always'\"", 'scope="可选：all、session、always、all session、all always"'),
+		        ("scope=\"Optional: 'all' to deny all pending commands\"", 'scope="可选：all 表示拒绝全部待处理命令"'),
+		        ('name="Thread name"', 'name="话题名称"'),
+		        ('message="Optional first message to send to Hermes in the thread"', 'message="可选：发给 Hermes 的第一条消息"'),
+		        ('prompt="The prompt to queue"', 'prompt="要加入队列的提示词"'),
+		        ('prompt="The prompt to run in the background"', 'prompt="要在后台执行的提示词"'),
+		        ('"New conversation started~"', '"新会话已开始~"'),
+		        ('"Session reset~"', '"会话已重置~"'),
+		        ('"Retrying~"', '"正在重试~"'),
+		        ('"Status sent~"', '"状态已发送~"'),
+		        ('"Stop requested~"', '"已请求停止~"'),
+		        ('"Update initiated~"', '"已开始更新~"'),
+		        ('"Restart requested~"', '"已请求重启~"'),
+		        ('"Queued for the next turn."', '"已加入下一轮队列。"'),
+		        ('"Background task started~"', '"后台任务已启动~"'),
 		    ],
 		    "acp_adapter/permissions.py": [
 		        ('name="Allow once"', 'name="允许一次"'),
@@ -1914,6 +2116,8 @@ basic_replacements = {
 		        ('print("Select provider:")', 'print("选择模型服务：")'),
 		        ('title="Select provider to remove:"', 'title="选择要移除的模型服务："'),
 		        ('print(f"Hermes Agent v{__version__} ({__release_date__})")', 'print(f"爱马仕机器人 v{__version__} ({__release_date__})")'),
+		        ('print("\\n  ✓ Memory provider: built-in only")', 'print("\\n  ✓ 记忆服务：仅使用内置记忆")'),
+		        ('print("  Saved to config.yaml\\n")', 'print("  已保存到 config.yaml\\n")'),
 		        ('# Select provider and model', '# 选择模型服务和模型'),
 		    ],
 		    "hermes_cli/tools_config.py": [
@@ -1929,6 +2133,264 @@ basic_replacements = {
 		        ('[Tool calls:\\n', '[工具调用：\\n'),
 		    ],
 		}
+
+deep_replacements = {
+    "hermes_cli/commands.py": [
+        ('"Background skill maintenance (status, run, pin, archive)"', '"后台技能维护（状态、运行、固定、归档）"'),
+    ],
+    "tui_gateway/server.py": [
+        ("return f\"No API key configured for provider '{provider}'. First message will fail.\"", "return f\"模型服务 '{provider}' 未配置 API Key，第一条消息会失败。\""),
+        ('raise ValueError(f"Invalid checkpoint number. Use 1-{len(checkpoints)}.")', 'raise ValueError(f"检查点编号无效。请输入 1-{len(checkpoints)}。")'),
+        ('return "bare `hermes` is interactive — use `/hermes chat -q …` or run `hermes` in another terminal"', 'return "直接运行 `hermes` 需要交互终端；请用 `/hermes chat -q …`，或在另一个终端运行 `hermes`"'),
+        ('return "`hermes setup` needs a full terminal — run it outside the TUI"', 'return "`hermes setup` 需要完整终端，请在 TUI 外运行"'),
+        ('return "`hermes sessions browse` is interactive — use /resume here, or run browse in another terminal"', 'return "`hermes sessions browse` 需要交互终端；这里请用 /resume，或在另一个终端浏览会话"'),
+        ('return "`hermes config edit` needs $EDITOR in a real terminal"', 'return "`hermes config edit` 需要真实终端里的 $EDITOR"'),
+        ('raise ValueError(result.error_message or "model switch failed")', 'raise ValueError(result.error_message or "模型切换失败")'),
+    ],
+    "gateway/sticker_cache.py": [
+        ('return f"[The user sent a sticker{context}~ It shows: \\"{description}\\" (=^.w.^=)]"', 'return f"[用户发送了一个贴纸{context}。画面内容：\\"{description}\\" (=^.w.^=)]"'),
+        ('f"[The user sent an animated sticker {emoji}~ "\n            f"I can\\\'t see animated ones yet, but the emoji suggests: {emoji}]"', 'f"[用户发送了一个动态贴纸 {emoji}。我暂时无法查看动态贴纸，但 emoji 可能表示：{emoji}]"'),
+        ('return "[The user sent an animated sticker~ I can\\\'t see animated ones yet]"', 'return "[用户发送了一个动态贴纸。我暂时无法查看动态贴纸]"'),
+    ],
+    "tools/mcp_oauth.py": [
+        ('f"  Open this URL in your browser:\\n\\n"', 'f"  请在浏览器中打开这个地址：\\n\\n"'),
+        ('print("  (Browser opened automatically.)\\n", file=sys.stderr)', 'print("  （已自动打开浏览器。）\\n", file=sys.stderr)'),
+        ('print("  (Could not open browser — please open the URL manually.)\\n", file=sys.stderr)', 'print("  （无法自动打开浏览器，请手动打开上面的地址。）\\n", file=sys.stderr)'),
+        ('print("  (Headless environment detected — open the URL manually.)\\n", file=sys.stderr)', 'print("  （检测到无界面环境，请手动打开上面的地址。）\\n", file=sys.stderr)'),
+        ('"OAuth callback port not set — build_oauth_auth must be called "\n            "before _wait_for_oauth_callback"', '"OAuth 回调端口未设置：必须先调用 build_oauth_auth，"\n            "再调用 _wait_for_oauth_callback"'),
+        ('"OAuth callback timed out — could not bind callback port. "\n            "Complete the authorization in a browser first, then retry."', '"OAuth 回调超时，无法绑定回调端口。"\n            "请先在浏览器中完成授权，然后重试。"'),
+        ('raise RuntimeError(f"OAuth authorization failed: {result[\'error\']}")', 'raise RuntimeError(f"OAuth 授权失败：{result[\'error\']}")'),
+        ('"OAuth callback timed out — no authorization code received. "\n            "Ensure you completed the browser authorization flow."', '"OAuth 回调超时，未收到授权码。"\n            "请确认已经在浏览器中完成授权流程。"'),
+    ],
+    "tools/skills_sync.py": [
+        ('print("Syncing bundled skills into ~/.hermes/skills/ ...")', 'print("正在同步内置技能到 ~/.hermes/skills/ ...")'),
+        ('f"{len(result[\'copied\'])} new"', 'f"{len(result[\'copied\'])} 个新增"'),
+        ('f"{len(result[\'updated\'])} updated"', 'f"{len(result[\'updated\'])} 个更新"'),
+        ('f"{result[\'skipped\']} unchanged"', 'f"{result[\'skipped\']} 个未变更"'),
+        ('parts.append(f"{len(result[\'user_modified\'])} user-modified (kept)")', 'parts.append(f"{len(result[\'user_modified\'])} 个用户修改项（已保留）")'),
+        ('parts.append(f"{len(result[\'cleaned\'])} cleaned from manifest")', 'parts.append(f"{len(result[\'cleaned\'])} 个清单项已清理")'),
+        ('print(f"\\nDone: {\', \'.join(parts)}. {result[\'total_bundled\']} total bundled.")', 'print(f"\\n完成：{\', \'.join(parts)}。内置技能共 {result[\'total_bundled\']} 个。")'),
+    ],
+    "gateway/platforms/feishu.py": [
+        ('default_message="image upload failed"', 'default_message="图片上传失败"'),
+        ('default_message="file upload failed"', 'default_message="文件上传失败"'),
+    ],
+    "gateway/platforms/discord.py": [
+        ('return SendResult(success=False, error="Not connected")', 'return SendResult(success=False, error="未连接")'),
+        ('title="⚠️ Command Approval Required"', 'title="⚠️ 命令需要确认"'),
+        ('embed.add_field(name="Reason", value=description, inline=False)', 'embed.add_field(name="原因", value=description, inline=False)'),
+        ('title=title or "Confirm"', 'title=title or "确认"'),
+        ('title="⚕ Update Needs Your Input"', 'title="⚕ 更新需要你确认"'),
+        ('default_hint = f" (default: {default})" if default else ""', 'default_hint = f"（默认：{default}）" if default else ""'),
+        ('description="Run a Hermes skill"', 'description="运行 Hermes 技能"'),
+        ('title="⚙ Model Configuration"', 'title="⚙ 模型配置"'),
+        ('title="⚙ Switching Model"', 'title="⚙ 正在切换模型"'),
+        ('description=f"Switching to `{model_id}`..."', 'description=f"正在切换到 `{model_id}`..."'),
+        ('result_text = f"Error switching model: {exc}"', 'result_text = f"切换模型出错：{exc}"'),
+        ('title="⚙ Model Switched"', 'title="⚙ 模型已切换"'),
+        ('"You\\\'re not authorized~"', '"你没有权限~"'),
+        ('f"Current model: `{self.current_model or \'unknown\'}`\\n"', 'f"当前模型：`{self.current_model or \'未知\'}`\\n"'),
+        ('f"Provider: {provider_label}\\n\\n"', 'f"模型服务：{provider_label}\\n\\n"'),
+        ('f"Select a provider:"', 'f"选择模型服务："'),
+        ('description="Model selection cancelled."', 'description="已取消模型选择。"'),
+        ('@discord.ui.button(label="Allow Once", style=discord.ButtonStyle.green)', '@discord.ui.button(label="允许一次", style=discord.ButtonStyle.green)'),
+        ('@discord.ui.button(label="Allow Session", style=discord.ButtonStyle.grey)', '@discord.ui.button(label="本会话允许", style=discord.ButtonStyle.grey)'),
+        ('@discord.ui.button(label="Always Allow", style=discord.ButtonStyle.blurple)', '@discord.ui.button(label="始终允许", style=discord.ButtonStyle.blurple)'),
+        ('@discord.ui.button(label="Deny", style=discord.ButtonStyle.red)', '@discord.ui.button(label="拒绝", style=discord.ButtonStyle.red)'),
+        ('@discord.ui.button(label="Approve Once", style=discord.ButtonStyle.green)', '@discord.ui.button(label="批准一次", style=discord.ButtonStyle.green)'),
+        ('@discord.ui.button(label="Always Approve", style=discord.ButtonStyle.blurple)', '@discord.ui.button(label="始终批准", style=discord.ButtonStyle.blurple)'),
+        ('@discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)', '@discord.ui.button(label="取消", style=discord.ButtonStyle.red)'),
+        ('await self._resolve(interaction, "once", discord.Color.green(), "Approved once")', 'await self._resolve(interaction, "once", discord.Color.green(), "已批准一次")'),
+        ('await self._resolve(interaction, "session", discord.Color.blue(), "Approved for session")', 'await self._resolve(interaction, "session", discord.Color.blue(), "本会话已批准")'),
+        ('await self._resolve(interaction, "always", discord.Color.purple(), "Approved permanently")', 'await self._resolve(interaction, "always", discord.Color.purple(), "已永久批准")'),
+        ('await self._resolve(interaction, "always", discord.Color.purple(), "Always approved")', 'await self._resolve(interaction, "always", discord.Color.purple(), "已始终批准")'),
+    ],
+    "run_agent.py": [
+        ('raise RuntimeError(f"Failed to initialize OpenAI client: {e}")', 'raise RuntimeError(f"初始化 OpenAI 客户端失败：{e}")'),
+        ('logger.info("Memory provider \\\'%s\\\' activated", _mem_provider_name)', 'logger.info("记忆服务 \\\'%s\\\' 已启用", _mem_provider_name)'),
+        ('logger.warning("Memory provider plugin init failed: %s", _mpe)', 'logger.warning("记忆服务插件初始化失败：%s", _mpe)'),
+        ('return "Unknown error"', 'return "未知错误"'),
+        ('return "Service temporarily unavailable (HTML error page returned)"', 'return "服务暂时不可用（返回 HTML 错误页）"'),
+        ('print("\\n⚡ Interrupt requested" + (f": \'{message[:40]}...\'" if message and len(message) > 40 else f": \'{message}\'" if message else ""))', 'print("\\n⚡ 已请求中断" + (f"：\'{message[:40]}...\'" if message and len(message) > 40 else f"：\'{message}\'" if message else ""))'),
+        ('print(f"{self.log_prefix}⚡ Interrupt: skipping {num_tools} tool call(s)")', 'print(f"{self.log_prefix}⚡ 已中断：跳过 {num_tools} 次工具调用")'),
+        ('print(f"  ⚡ Concurrent: {num_tools} tool calls — {tool_names_str}")', 'print(f"  ⚡ 并发：{num_tools} 次工具调用 — {tool_names_str}")'),
+        ('print(f"{self.log_prefix}⚡ Interrupt: skipping {len(remaining_calls)} tool call(s)", force=True)', 'print(f"{self.log_prefix}⚡ 已中断：跳过 {len(remaining_calls)} 次工具调用", force=True)'),
+        ('self._vprint(f"{self.log_prefix}⚡ Interrupt: skipping {remaining} remaining tool call(s)", force=True)', 'self._vprint(f"{self.log_prefix}⚡ 已中断：跳过剩余 {remaining} 次工具调用", force=True)'),
+        ('print(f"⚠️  Reached maximum iterations ({self.max_iterations}). Requesting summary...")', 'print(f"⚠️  已达到最大迭代次数（{self.max_iterations}）。正在请求总结...")'),
+        ('self._safe_print(f"💬 Starting conversation: \'{_print_preview[:60]}{\'...\' if len(_print_preview) > 60 else \'\'}\'")', 'self._safe_print(f"💬 开始对话：\'{_print_preview[:60]}{\'...\' if len(_print_preview) > 60 else \'\'}\'")'),
+        ('return "[A multimodal message was converted to text for Anthropic compatibility.]"', 'return "[为兼容 Anthropic，多模态消息已转换为文本。]"'),
+    ],
+    "hermes_cli/main.py": [
+        ('title="Select reasoning effort:"', 'title="选择推理强度："'),
+        ('help="Select default model and provider"', 'help="选择默认模型和模型服务"'),
+        ('description="Interactively select your inference provider and default model"', 'description="交互式选择推理模型服务和默认模型"'),
+        ('help="Messaging gateway management"', 'help="消息网关管理"'),
+        ('description="Manage the messaging gateway (Telegram, Discord, WhatsApp)"', 'description="管理消息网关（Telegram、Discord、WhatsApp）"'),
+        ('"run", help="Run gateway in foreground (recommended for WSL, Docker, Termux)"', '"run", help="在前台运行网关（推荐用于 WSL、Docker、Termux）"'),
+        ('help="Increase stderr log verbosity (-v=INFO, -vv=DEBUG)"', 'help="提高错误日志详细程度（-v=INFO，-vv=DEBUG）"'),
+        ('"-q", "--quiet", action="store_true", help="Suppress all stderr log output"', '"-q", "--quiet", action="store_true", help="关闭错误日志输出"'),
+        ('help="Replace any existing gateway instance (useful for systemd)"', 'help="替换现有网关实例（适用于 systemd）"'),
+        ('"start", help="Start the installed systemd/launchd background service"', '"start", help="启动已安装的 systemd/launchd 后台服务"'),
+        ('help="Target the Linux system-level gateway service"', 'help="目标为 Linux 系统级网关服务"'),
+        ('help="Kill ALL stale gateway processes across all profiles before starting"', 'help="启动前结束所有配置档里的旧网关进程"'),
+        ('gateway_stop = gateway_subparsers.add_parser("stop", help="Stop gateway service")', 'gateway_stop = gateway_subparsers.add_parser("stop", help="停止网关服务")'),
+        ('help="Stop ALL gateway processes across all profiles"', 'help="停止所有配置档里的网关进程"'),
+        ('"restart", help="Restart gateway service"', '"restart", help="重启网关服务"'),
+        ('help="Kill ALL gateway processes across all profiles before restarting"', 'help="重启前结束所有配置档里的网关进程"'),
+        ('gateway_status = gateway_subparsers.add_parser("status", help="Show gateway status")', 'gateway_status = gateway_subparsers.add_parser("status", help="查看网关状态")'),
+        ('gateway_status.add_argument("--deep", action="store_true", help="Deep status check")', 'gateway_status.add_argument("--deep", action="store_true", help="深度状态检查")'),
+        ('help="Show full, untruncated service/log output where supported"', 'help="支持时显示完整服务/日志输出"'),
+        ('"install", help="Install gateway as a systemd/launchd background service"', '"install", help="将网关安装为 systemd/launchd 后台服务"'),
+        ('gateway_install.add_argument("--force", action="store_true", help="Force reinstall")', 'gateway_install.add_argument("--force", action="store_true", help="强制重新安装")'),
+        ('help="Install as a Linux system-level service (starts at boot)"', 'help="安装为 Linux 系统级服务（开机启动）"'),
+        ('help="User account the Linux system service should run as"', 'help="Linux 系统服务运行所用用户"'),
+        ('"uninstall", help="Uninstall gateway service"', '"uninstall", help="卸载网关服务"'),
+        ('gateway_subparsers.add_parser("setup", help="Configure messaging platforms")', 'gateway_subparsers.add_parser("setup", help="配置消息平台")'),
+        ('help="Remove legacy hermes.service units from pre-rename installs"', 'help="移除旧安装中遗留的 hermes.service 单元"'),
+        ('help="List what would be removed without doing it"', 'help="列出将移除内容，但不执行"'),
+        ('help="Skip the confirmation prompt"', 'help="跳过确认提示"'),
+        ('help="Interactive setup wizard"', 'help="交互式配置向导"'),
+        ('description="Configure Hermes Agent with an interactive wizard. "', 'description="通过交互式向导配置 Hermes Agent。"'),
+        ('help="Run a specific setup section instead of the full wizard"', 'help="运行指定配置项，而不是完整向导"'),
+        ('help="Non-interactive mode (use defaults/env vars)"', 'help="非交互模式（使用默认值/环境变量）"'),
+        ('"--reset", action="store_true", help="Reset configuration to defaults"', '"--reset", action="store_true", help="将配置重置为默认值"'),
+        ('help="Set up WhatsApp integration"', 'help="设置 WhatsApp 集成"'),
+        ('description="Configure WhatsApp and pair via QR code"', 'description="配置 WhatsApp，并通过二维码配对"'),
+        ('help="Authenticate with an inference provider"', 'help="登录推理模型服务"'),
+        ('description="Run OAuth device authorization flow for Hermes CLI"', 'description="为 Hermes CLI 运行 OAuth 设备授权流程"'),
+        ('help="Provider to authenticate with (default: nous)"', 'help="要登录的模型服务（默认：nous）"'),
+        ('help="Do not attempt to open the browser automatically"', 'help="不要自动打开浏览器"'),
+        ('help="HTTP request timeout in seconds (default: 15)"', 'help="HTTP 请求超时时间，单位秒（默认：15）"'),
+        ('"--ca-bundle", help="Path to CA bundle PEM file for TLS verification"', '"--ca-bundle", help="用于 TLS 验证的 CA bundle PEM 文件路径"'),
+        ('help="Disable TLS verification (testing only)"', 'help="关闭 TLS 验证（仅测试使用）"'),
+        ('help="Show status of all components"', 'help="查看所有组件状态"'),
+        ('description="Display status of Hermes Agent components"', 'description="显示 Hermes Agent 组件状态"'),
+        ('"--all", action="store_true", help="Show all details (redacted for sharing)"', '"--all", action="store_true", help="显示全部详情（分享时会脱敏）"'),
+        ('"--deep", action="store_true", help="Run deep checks (may take longer)"', '"--deep", action="store_true", help="运行深度检查（可能更耗时）"'),
+        ('"cron", help="Cron job management", description="Manage scheduled tasks"', '"cron", help="定时任务管理", description="管理定时任务"'),
+        ('cron_list = cron_subparsers.add_parser("list", help="List scheduled jobs")', 'cron_list = cron_subparsers.add_parser("list", help="列出定时任务")'),
+        ('cron_list.add_argument("--all", action="store_true", help="Include disabled jobs")', 'cron_list.add_argument("--all", action="store_true", help="包含已禁用任务")'),
+        ('"create", aliases=["add"], help="Create a scheduled job"', '"create", aliases=["add"], help="创建定时任务"'),
+        ('"edit", help="Edit an existing scheduled job"', '"edit", help="编辑已有定时任务"'),
+        ('help="Pause a scheduled job"', 'help="暂停定时任务"'),
+        ('help="Resume a paused job"', 'help="恢复已暂停任务"'),
+        ('"run", help="Run a job on the next scheduler tick"', '"run", help="在下一次调度时运行任务"'),
+        ('"remove", aliases=["rm", "delete"], help="Remove a scheduled job"', '"remove", aliases=["rm", "delete"], help="移除定时任务"'),
+        ('cron_subparsers.add_parser("status", help="Check if cron scheduler is running")', 'cron_subparsers.add_parser("status", help="检查定时任务调度器是否运行")'),
+        ('cron_tick = cron_subparsers.add_parser("tick", help="Run due jobs once and exit")', 'cron_tick = cron_subparsers.add_parser("tick", help="运行一次到期任务后退出")'),
+    ],
+    "hermes_cli/curator.py": [
+        ('help="Show curator status and skill stats"', 'help="查看技能维护状态和技能统计"'),
+        ('help="Trigger a curator review now"', 'help="立即触发一次技能维护检查"'),
+        ('help="Wait for the LLM review pass to finish (default: background thread)"', 'help="等待 LLM 检查完成（默认在后台线程执行）"'),
+        ('help="Pause the curator until resumed"', 'help="暂停技能维护，直到恢复"'),
+        ('help="Resume a paused curator"', 'help="恢复已暂停的技能维护"'),
+        ('help="Pin a skill so the curator never auto-transitions it"', 'help="固定技能，使维护器不自动改变它"'),
+        ('help="Skill name"', 'help="技能名称"'),
+        ('help="Restore an archived skill"', 'help="恢复已归档技能"'),
+        ('help="List available snapshots and exit without restoring"', 'help="列出可用快照，不执行恢复"'),
+        ('help="Skip confirmation prompt"', 'help="跳过确认提示"'),
+    ],
+    "gateway/platforms/slack.py": [
+        ('f":warning: *Command Approval Required*\\n"', 'f":warning: *命令需要确认*\\n"'),
+        ('f"Reason: {description}"', 'f"原因：{description}"'),
+        ('"text": {"type": "plain_text", "text": "Allow Once"}', '"text": {"type": "plain_text", "text": "允许一次"}'),
+        ('"text": {"type": "plain_text", "text": "Allow Session"}', '"text": {"type": "plain_text", "text": "本会话允许"}'),
+        ('"text": {"type": "plain_text", "text": "Always Allow"}', '"text": {"type": "plain_text", "text": "始终允许"}'),
+        ('"text": {"type": "plain_text", "text": "Deny"}', '"text": {"type": "plain_text", "text": "拒绝"}'),
+    ],
+    "gateway/platforms/feishu.py": [
+        ('default_message="image upload failed"', 'default_message="图片上传失败"'),
+        ('default_message="file upload failed"', 'default_message="文件上传失败"'),
+        ('"title": {"content": "⚠️ Command Approval Required", "tag": "plain_text"}', '"title": {"content": "⚠️ 命令需要确认", "tag": "plain_text"}'),
+        ('"content": f"```\\n{cmd_preview}\\n```\\n**Reason:** {description}"', '"content": f"```\\n{cmd_preview}\\n```\\n**原因：** {description}"'),
+        ('_btn("✅ Allow Once", "approve_once", "primary")', '_btn("✅ 允许一次", "approve_once", "primary")'),
+        ('_btn("✅ Session", "approve_session")', '_btn("✅ 本会话", "approve_session")'),
+        ('_btn("✅ Always", "approve_always")', '_btn("✅ 始终允许", "approve_always")'),
+        ('_btn("❌ Deny", "deny", "danger")', '_btn("❌ 拒绝", "deny", "danger")'),
+    ],
+    "gateway/platforms/telegram.py": [
+        ('f"⚠️ <b>Command Approval Required</b>\\n\\n"', 'f"⚠️ <b>命令需要确认</b>\\n\\n"'),
+        ('f"Reason: {_html.escape(description)}"', 'f"原因：{_html.escape(description)}"'),
+        ('InlineKeyboardButton("✅ Allow Once", callback_data=f"ea:once:{approval_id}")', 'InlineKeyboardButton("✅ 允许一次", callback_data=f"ea:once:{approval_id}")'),
+        ('InlineKeyboardButton("✅ Session", callback_data=f"ea:session:{approval_id}")', 'InlineKeyboardButton("✅ 本会话", callback_data=f"ea:session:{approval_id}")'),
+        ('InlineKeyboardButton("✅ Always", callback_data=f"ea:always:{approval_id}")', 'InlineKeyboardButton("✅ 始终允许", callback_data=f"ea:always:{approval_id}")'),
+        ('InlineKeyboardButton("❌ Deny", callback_data=f"ea:deny:{approval_id}")', 'InlineKeyboardButton("❌ 拒绝", callback_data=f"ea:deny:{approval_id}")'),
+        ('text="Model selection cancelled."', 'text="已取消模型选择。"'),
+    ],
+    "hermes_cli/main.py": [
+        ('print("→ Syncing bundled skills...")', 'print("→ 正在同步内置技能...")'),
+        ('print("→ Syncing bundled skills to other profiles...")', 'print("→ 正在同步内置技能到其他配置档...")'),
+        ('print(f"  + {len(result[\'copied\'])} new: {\', \'.join(result[\'copied\'])}")', 'print(f"  + {len(result[\'copied\'])} 个新增：{\', \'.join(result[\'copied\'])}")'),
+        ('f"  ↑ {len(result[\'updated\'])} updated: {\', \'.join(result[\'updated\'])}"', 'f"  ↑ {len(result[\'updated\'])} 个更新：{\', \'.join(result[\'updated\'])}"'),
+        ('print(f"  ~ {len(result[\'user_modified\'])} user-modified (kept)")', 'print(f"  ~ {len(result[\'user_modified\'])} 个用户修改项（已保留）")'),
+        ('print(f"  − {len(result[\'cleaned\'])} removed from manifest")', 'print(f"  − {len(result[\'cleaned\'])} 个清单项已移除")'),
+        ('print("  ✓ Skills are up to date")', 'print("  ✓ 技能已是最新")'),
+    ],
+}
+
+for rel, replacements in deep_replacements.items():
+    basic_replacements.setdefault(rel, []).extend(replacements)
+
+basic_replacements.setdefault("hermes_cli/main.py", []).extend([
+    ('title="Select reasoning effort:"', 'title="选择推理强度："'),
+    ('help="Select default model and provider"', 'help="选择默认模型和模型服务"'),
+    ('description="Interactively select your inference provider and default model"', 'description="交互式选择推理模型服务和默认模型"'),
+    ('help="Messaging gateway management"', 'help="消息网关管理"'),
+    ('description="Manage the messaging gateway (Telegram, Discord, WhatsApp)"', 'description="管理消息网关（Telegram、Discord、WhatsApp）"'),
+    ('"run", help="Run gateway in foreground (recommended for WSL, Docker, Termux)"', '"run", help="在前台运行网关（推荐用于 WSL、Docker、Termux）"'),
+    ('help="Increase stderr log verbosity (-v=INFO, -vv=DEBUG)"', 'help="提高错误日志详细程度（-v=INFO，-vv=DEBUG）"'),
+    ('"-q", "--quiet", action="store_true", help="Suppress all stderr log output"', '"-q", "--quiet", action="store_true", help="关闭错误日志输出"'),
+    ('help="Replace any existing gateway instance (useful for systemd)"', 'help="替换现有网关实例（适用于 systemd）"'),
+    ('"start", help="Start the installed systemd/launchd background service"', '"start", help="启动已安装的 systemd/launchd 后台服务"'),
+    ('help="Target the Linux system-level gateway service"', 'help="目标为 Linux 系统级网关服务"'),
+    ('help="Kill ALL stale gateway processes across all profiles before starting"', 'help="启动前结束所有配置档里的旧网关进程"'),
+    ('gateway_stop = gateway_subparsers.add_parser("stop", help="Stop gateway service")', 'gateway_stop = gateway_subparsers.add_parser("stop", help="停止网关服务")'),
+    ('help="Stop ALL gateway processes across all profiles"', 'help="停止所有配置档里的网关进程"'),
+    ('"restart", help="Restart gateway service"', '"restart", help="重启网关服务"'),
+    ('help="Kill ALL gateway processes across all profiles before restarting"', 'help="重启前结束所有配置档里的网关进程"'),
+    ('gateway_status = gateway_subparsers.add_parser("status", help="Show gateway status")', 'gateway_status = gateway_subparsers.add_parser("status", help="查看网关状态")'),
+    ('gateway_status.add_argument("--deep", action="store_true", help="Deep status check")', 'gateway_status.add_argument("--deep", action="store_true", help="深度状态检查")'),
+    ('help="Show full, untruncated service/log output where supported"', 'help="支持时显示完整服务/日志输出"'),
+    ('"install", help="Install gateway as a systemd/launchd background service"', '"install", help="将网关安装为 systemd/launchd 后台服务"'),
+    ('gateway_install.add_argument("--force", action="store_true", help="Force reinstall")', 'gateway_install.add_argument("--force", action="store_true", help="强制重新安装")'),
+    ('help="Install as a Linux system-level service (starts at boot)"', 'help="安装为 Linux 系统级服务（开机启动）"'),
+    ('help="User account the Linux system service should run as"', 'help="Linux 系统服务运行所用用户"'),
+    ('"uninstall", help="Uninstall gateway service"', '"uninstall", help="卸载网关服务"'),
+    ('gateway_subparsers.add_parser("setup", help="Configure messaging platforms")', 'gateway_subparsers.add_parser("setup", help="配置消息平台")'),
+    ('help="Remove legacy hermes.service units from pre-rename installs"', 'help="移除旧安装中遗留的 hermes.service 单元"'),
+    ('help="List what would be removed without doing it"', 'help="列出将移除内容，但不执行"'),
+    ('help="Skip the confirmation prompt"', 'help="跳过确认提示"'),
+    ('help="Interactive setup wizard"', 'help="交互式配置向导"'),
+    ('description="Configure Hermes Agent with an interactive wizard. "', 'description="通过交互式向导配置 Hermes Agent。"'),
+    ('help="Run a specific setup section instead of the full wizard"', 'help="运行指定配置项，而不是完整向导"'),
+    ('help="Non-interactive mode (use defaults/env vars)"', 'help="非交互模式（使用默认值/环境变量）"'),
+    ('"--reset", action="store_true", help="Reset configuration to defaults"', '"--reset", action="store_true", help="将配置重置为默认值"'),
+    ('help="Set up WhatsApp integration"', 'help="设置 WhatsApp 集成"'),
+    ('description="Configure WhatsApp and pair via QR code"', 'description="配置 WhatsApp，并通过二维码配对"'),
+    ('help="Authenticate with an inference provider"', 'help="登录推理模型服务"'),
+    ('description="Run OAuth device authorization flow for Hermes CLI"', 'description="为 Hermes CLI 运行 OAuth 设备授权流程"'),
+    ('help="Provider to authenticate with (default: nous)"', 'help="要登录的模型服务（默认：nous）"'),
+    ('help="Do not attempt to open the browser automatically"', 'help="不要自动打开浏览器"'),
+    ('help="HTTP request timeout in seconds (default: 15)"', 'help="HTTP 请求超时时间，单位秒（默认：15）"'),
+    ('"--ca-bundle", help="Path to CA bundle PEM file for TLS verification"', '"--ca-bundle", help="用于 TLS 验证的 CA bundle PEM 文件路径"'),
+    ('help="Disable TLS verification (testing only)"', 'help="关闭 TLS 验证（仅测试使用）"'),
+    ('help="Show status of all components"', 'help="查看所有组件状态"'),
+    ('description="Display status of Hermes Agent components"', 'description="显示 Hermes Agent 组件状态"'),
+    ('"--all", action="store_true", help="Show all details (redacted for sharing)"', '"--all", action="store_true", help="显示全部详情（分享时会脱敏）"'),
+    ('"--deep", action="store_true", help="Run deep checks (may take longer)"', '"--deep", action="store_true", help="运行深度检查（可能更耗时）"'),
+    ('"cron", help="Cron job management", description="Manage scheduled tasks"', '"cron", help="定时任务管理", description="管理定时任务"'),
+    ('cron_list = cron_subparsers.add_parser("list", help="List scheduled jobs")', 'cron_list = cron_subparsers.add_parser("list", help="列出定时任务")'),
+    ('cron_list.add_argument("--all", action="store_true", help="Include disabled jobs")', 'cron_list.add_argument("--all", action="store_true", help="包含已禁用任务")'),
+    ('"create", aliases=["add"], help="Create a scheduled job"', '"create", aliases=["add"], help="创建定时任务"'),
+    ('"edit", help="Edit an existing scheduled job"', '"edit", help="编辑已有定时任务"'),
+    ('help="Pause a scheduled job"', 'help="暂停定时任务"'),
+    ('help="Resume a paused job"', 'help="恢复已暂停任务"'),
+    ('"run", help="Run a job on the next scheduler tick"', '"run", help="在下一次调度时运行任务"'),
+    ('"remove", aliases=["rm", "delete"], help="Remove a scheduled job"', '"remove", aliases=["rm", "delete"], help="移除定时任务"'),
+    ('cron_subparsers.add_parser("status", help="Check if cron scheduler is running")', 'cron_subparsers.add_parser("status", help="检查定时任务调度器是否运行")'),
+    ('cron_tick = cron_subparsers.add_parser("tick", help="Run due jobs once and exit")', 'cron_tick = cron_subparsers.add_parser("tick", help="运行一次到期任务后退出")'),
+])
 
 zh_tips = '''TIPS = [
     "输入 /help 查看命令。",
@@ -2120,6 +2582,22 @@ for category_commands in COMMANDS_BY_CATEGORY.values():
         updated = updated.replace(
             'lines.append(f"`/{cmd.name}{args}` -- {cmd.description}{alias_note}")',
             'lines.append(f"`/{cmd.name}{args}` — {_zh_command_description(cmd)}{alias_note}")',
+        )
+        updated = updated.replace(
+            'result.append((tg_name, cmd.description))',
+            'result.append((tg_name, _zh_command_description(cmd)))',
+        )
+        updated = updated.replace(
+            'entries.append(("hermes", "Talk to Hermes or run a subcommand", "[subcommand] [args]"))',
+            'entries.append(("hermes", "与 Hermes 对话或运行子命令", "[子命令] [参数]"))',
+        )
+        updated = updated.replace(
+            '_add(cmd.name, cmd.description, cmd.args_hint or "")',
+            '_add(cmd.name, _zh_command_description(cmd), _zh_command_args_hint(cmd) or "")',
+        )
+        updated = updated.replace(
+            '_add(alias, f"Alias for /{cmd.name} — {cmd.description}", cmd.args_hint or "")',
+            '_add(alias, f"/{cmd.name} 的别名 — {_zh_command_description(cmd)}", _zh_command_args_hint(cmd) or "")',
         )
 
     if updated != original:
