@@ -263,8 +263,8 @@ h1 {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(3rem, 5vw, 5rem);
-  line-height: 0.85;
-  letter-spacing: -0.08em;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
   color: var(--ink);
   text-wrap: balance;
   overflow-wrap: anywhere;
@@ -396,6 +396,207 @@ pre {
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
 }
 
+.first-use-demo {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(255, 240, 220, 0.05), transparent 44%),
+    radial-gradient(circle at 82% 22%, rgba(255, 240, 220, 0.1), transparent 24%);
+}
+
+.first-use-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px var(--cell-pad) 30px;
+}
+
+.first-use-copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 3.3vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-transform: none;
+}
+
+.first-use-copy > p:not(.kicker) {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.78;
+  text-transform: none;
+}
+
+.first-use-flow {
+  display: grid;
+  gap: 10px;
+}
+
+.first-use-flow article {
+  display: grid;
+  grid-template-columns: 44px 150px 1fr;
+  gap: 12px;
+  align-items: center;
+  min-height: 58px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  animation: flow-enter 520ms ease both;
+}
+
+.first-use-flow article:nth-child(1) { animation-delay: 120ms; }
+.first-use-flow article:nth-child(2) { animation-delay: 220ms; }
+.first-use-flow article:nth-child(3) { animation-delay: 320ms; }
+.first-use-flow article:nth-child(4) { animation-delay: 420ms; }
+.first-use-flow article:nth-child(5) { animation-delay: 520ms; }
+
+.first-use-flow b {
+  color: var(--accent);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.first-use-flow span {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.first-use-flow small {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  text-transform: none;
+}
+
+.first-use-visual {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 240, 220, 0.055) 0 1px, transparent 1px 11px),
+    linear-gradient(135deg, rgba(13, 7, 24, 0.25), rgba(109, 79, 194, 0.28));
+}
+
+.first-use-visual .terminal {
+  min-height: 398px;
+}
+
+.first-use-visual .terminal-body {
+  min-height: 360px;
+}
+
+.demo-progress {
+  display: grid;
+  gap: 9px;
+  margin-top: 2px;
+}
+
+.demo-progress p {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: terminal-line 420ms ease forwards;
+}
+
+.demo-progress p:nth-child(1) { animation-delay: 2.5s; }
+.demo-progress p:nth-child(2) { animation-delay: 2.9s; }
+.demo-progress p:nth-child(3) { animation-delay: 3.3s; }
+.demo-progress p:nth-child(4) { animation-delay: 3.7s; }
+.demo-progress p:nth-child(5) { animation-delay: 4.15s; }
+
+.demo-progress span {
+  color: var(--terminal-ink);
+}
+
+.demo-progress i {
+  display: block;
+  height: 4px;
+  border: 1px solid rgba(255, 240, 220, 0.28);
+  background: linear-gradient(90deg, var(--accent), rgba(255, 240, 220, 0.2));
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: progress-fill 700ms ease forwards;
+}
+
+.demo-progress p:nth-child(1) i { animation-delay: 2.62s; }
+.demo-progress p:nth-child(2) i { animation-delay: 3.02s; }
+.demo-progress p:nth-child(3) i { animation-delay: 3.42s; }
+.demo-progress p:nth-child(4) i { animation-delay: 3.82s; }
+
+.before-after {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.before-after div {
+  position: relative;
+  padding: 10px 12px 12px;
+  border: 1px solid rgba(255, 240, 220, 0.18);
+  overflow: hidden;
+}
+
+.before-after div::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 240, 220, 0.12), transparent);
+  transform: translateX(-120%);
+  animation: panel-shine 4.8s ease-in-out infinite;
+}
+
+.before-after small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+}
+
+.before-after b {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.first-use-visual .link-list {
+  position: static;
+  z-index: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.first-use-visual .link-list a {
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+  gap: 6px;
+}
+
+.first-use-visual .link-list span {
+  font-size: 0.86rem;
+  letter-spacing: 0.1em;
+}
+
+.first-use-visual .link-list small {
+  font-size: 0.68rem;
+}
+
 .beginner-guide {
   position: relative;
   border-bottom: 1px solid var(--line);
@@ -413,7 +614,7 @@ pre {
 }
 
 .beginner-title::after {
-  content: "BEGINNER";
+  content: "新手入门";
   position: absolute;
   right: var(--cell-pad);
   top: 24px;
@@ -911,6 +1112,23 @@ pre {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes flow-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes progress-fill {
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -1445,6 +1663,19 @@ html[data-theme="orange"] .resolver-head strong {
     font-size: clamp(2.75rem, 15vw, 4.3rem);
   }
 
+  .first-use-flow article {
+    grid-template-columns: 44px 1fr;
+    gap: 8px 12px;
+  }
+
+  .first-use-flow small {
+    grid-column: 2;
+  }
+
+  .first-use-visual .link-list {
+    grid-template-columns: 1fr;
+  }
+
   .grid,
   .features,
   .updates,
@@ -1513,7 +1744,7 @@ html[data-theme="orange"] .resolver-head strong {
   h1 {
     font-size: clamp(2.05rem, 8.8vw, 2.65rem);
     line-height: 0.96;
-    letter-spacing: -0.04em;
+    letter-spacing: 0;
   }
 
   .lede {

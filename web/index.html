@@ -44,7 +44,7 @@
       "isPartOf": { "@id": "https://useai.live/#website" },
       "description": "Hermes Agent 中文增强、汉化补丁和中文语言包安装入口，覆盖爱马仕机器人启动页、TUI、/help 快捷指令、工具分类和中文提示。",
       "inLanguage": "zh-CN",
-      "dateModified": "2026-05-19",
+      "dateModified": "2026-05-20",
       "keywords": [
         "Hermes Agent 汉化",
         "Hermes Agent 汉化补丁",
@@ -180,7 +180,7 @@
         }
       } catch {}
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260514-guide2" />
+    <link rel="stylesheet" href="./styles.css?v=20260520-firstuse" />
   </head>
   <body>
     <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
@@ -374,8 +374,8 @@
         <div class="hero-inner">
           <p class="kicker">小马AI版本 · 中文增强包</p>
           <h1>Hermes<br />中文增强版</h1>
-          <p class="lede">
-            把这句话发给 Hermes，就能安装中文增强补丁。
+          <p class="lede version-lede">
+            更新日期：2026-05-20 · 支持 Hermes Agent v0.14.0（2026.5.16）
           </p>
           <p class="install-stat" aria-live="polite">
             已有 <strong data-install-count>10,000</strong> 人安装
@@ -397,6 +397,93 @@
               </div>
               <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="first-use-demo grid" aria-labelledby="first-use-title">
+        <div class="cell first-use-copy">
+          <p class="kicker">第一次使用 Hermes</p>
+          <h2 id="first-use-title">先看自动安装会做什么</h2>
+          <p>把上面那句话发给 Hermes 后，它会读取本页说明，按顺序检查环境、匹配版本、安装中文补丁。初学者照着这个顺序看，不用理解每一行命令。</p>
+
+          <div class="first-use-flow" aria-label="自动安装流程">
+            <article>
+              <b>01</b>
+              <span>发一句话</span>
+              <small>请访问 useai.live/hermes 安装汉化补丁</small>
+            </article>
+            <article>
+              <b>02</b>
+              <span>检测电脑环境</span>
+              <small>没有 Hermes 时，先安装官方版</small>
+            </article>
+            <article>
+              <b>03</b>
+              <span>匹配中文包</span>
+              <small>0.14.x、0.13.x、老版本走对应补丁</small>
+            </article>
+            <article>
+              <b>04</b>
+              <span>应用中文</span>
+              <small>启动页、快捷指令、工具名称一起换成中文</small>
+            </article>
+            <article>
+              <b>05</b>
+              <span>重新打开 Hermes</span>
+              <small>看到“爱马仕机器人”表示生效</small>
+            </article>
+          </div>
+        </div>
+
+        <div class="cell first-use-visual">
+          <div class="terminal terminal-demo" role="img" aria-label="Hermes 自动安装中文补丁演示">
+            <div class="terminal-top">
+              <span></span><span></span><span></span>
+              <b>HERMES</b>
+            </div>
+            <div class="terminal-body tui-body">
+              <div class="tui-row tui-user">
+                <span class="tui-label">你</span>
+                <p class="typing-line"><span class="prompt">›</span> <span id="typed-command" class="typed-command"></span><span class="typing-cursor"></span></p>
+              </div>
+              <div class="tui-row tui-agent">
+                <span class="tui-label">Hermes</span>
+                <p>已读取安装说明，开始按顺序处理。</p>
+              </div>
+              <div class="demo-progress" aria-live="polite">
+                <p><span>检测 Hermes 是否已安装</span><i></i></p>
+                <p><span>未安装时自动获取官方版</span><i></i></p>
+                <p><span>匹配 0.14.x / 0.13.x / legacy</span><i></i></p>
+                <p><span>写入中文补丁和更新检查</span><i></i></p>
+                <p class="success">完成后重新打开 Hermes</p>
+              </div>
+              <div class="before-after" aria-label="汉化前后对比">
+                <div>
+                  <small>汉化前</small>
+                  <b>Available Tools</b>
+                </div>
+                <div>
+                  <small>汉化后</small>
+                  <b>可用工具</b>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="link-list compact-links" aria-label="相关链接">
+            <a href="https://nousresearch.com/hermes-agent/" aria-label="Hermes 原版官网">
+              <span>原版官网</span>
+              <small>nousresearch.com/hermes-agent</small>
+            </a>
+            <a href="https://github.com/NousResearch/hermes-agent" aria-label="Hermes GitHub">
+              <span>原版仓库</span>
+              <small>github.com/NousResearch/hermes-agent</small>
+            </a>
+            <a href="https://github.com/fresh-claw/hermes-zh-cn" aria-label="小马AI汉化仓库">
+              <span>汉化仓库</span>
+              <small>github.com/fresh-claw/hermes-zh-cn</small>
+            </a>
           </div>
         </div>
       </section>
@@ -477,56 +564,6 @@
         </div>
       </section>
 
-      <section class="demo grid" aria-labelledby="demo-title">
-        <div class="cell terminal-cell">
-          <h2 id="demo-title">安装过程演示</h2>
-          <div class="terminal terminal-demo" role="img" aria-label="Hermes 自动读取小马AI中文增强包演示">
-            <div class="terminal-top">
-              <span></span><span></span><span></span>
-              <b>HERMES</b>
-            </div>
-            <div class="terminal-body tui-body">
-              <div class="tui-row tui-user">
-                <span class="tui-label">YOU</span>
-                <p class="typing-line"><span class="prompt">›</span> <span id="typed-command" class="typed-command"></span><span class="typing-cursor"></span></p>
-              </div>
-              <div class="tui-row tui-agent">
-                <span class="tui-label">HERMES</span>
-                <p>正在读取 useai.live/hermes 的安装说明。</p>
-              </div>
-              <div class="terminal-output" aria-live="polite">
-                <p>执行 install.sh</p>
-                <p>未检测到 Hermes 时先安装官方版</p>
-                <p>4 秒内检测本机版本</p>
-                <p>旧版或检测失败时使用 legacy 兼容包</p>
-                <p>设置 display.language=zh</p>
-                <p>修补启动页、快捷指令和分类文案</p>
-                <p>安装到 ~/.xiaoma-hermes/current</p>
-                <p class="success">小马AI中文增强已启用。</p>
-                <p>下次启动 Hermes 时会自动检查更新。</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cell image-cell">
-          <div class="engraving"></div>
-          <div class="link-list" aria-label="相关链接">
-            <a href="https://nousresearch.com/hermes-agent/" aria-label="Hermes 原版官网">
-              <span>原版官网</span>
-              <small>nousresearch.com/hermes-agent</small>
-            </a>
-            <a href="https://github.com/NousResearch/hermes-agent" aria-label="Hermes GitHub">
-              <span>原版仓库</span>
-              <small>github.com/NousResearch/hermes-agent</small>
-            </a>
-            <a href="https://github.com/fresh-claw/hermes-zh-cn" aria-label="小马AI汉化仓库">
-              <span>汉化仓库</span>
-              <small>github.com/fresh-claw/hermes-zh-cn</small>
-            </a>
-          </div>
-        </div>
-      </section>
-
       <section class="updates grid" aria-labelledby="updates-title">
         <div class="cell section-title">
           <p class="kicker">更新</p>
@@ -577,6 +614,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=20260514-guide2"></script>
+    <script src="./app.js?v=20260520-firstuse"></script>
   </body>
 </html>
