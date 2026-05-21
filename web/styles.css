@@ -597,7 +597,8 @@ pre {
   font-size: 0.68rem;
 }
 
-.community-band {
+.community-band,
+.demo-community {
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
@@ -607,7 +608,8 @@ pre {
     repeating-linear-gradient(115deg, rgba(255, 240, 220, 0.035) 0 1px, transparent 1px 12px);
 }
 
-.community-band::before {
+.community-band::before,
+.demo-community::before {
   content: "";
   position: absolute;
   inset: -20%;
@@ -617,6 +619,42 @@ pre {
     radial-gradient(circle at 82% 22%, rgba(255, 240, 220, 0.08), transparent 12%);
   transform: translate3d(calc(var(--pointer-x) * 0.6), calc(var(--pointer-y) * 0.5), 0);
   animation: light-sweep 13s ease-in-out infinite alternate;
+}
+
+.demo-community-visual {
+  position: relative;
+  z-index: 1;
+  min-height: 620px;
+}
+
+.demo-community .community-qr-cell {
+  align-content: center;
+  justify-items: center;
+  gap: 22px;
+  min-height: 620px;
+}
+
+.demo-community .community-copy {
+  min-height: 0;
+  width: min(430px, 100%);
+}
+
+.demo-community .community-copy h2 {
+  font-size: clamp(2.05rem, 3.2vw, 3.45rem);
+}
+
+.demo-community .community-copy p:not(.kicker) {
+  max-width: none;
+  font-size: 0.98rem;
+  line-height: 1.78;
+}
+
+.demo-community .qr-stage {
+  width: min(360px, 86vw);
+}
+
+.demo-community .qr-frame {
+  width: min(284px, 78%);
 }
 
 .community-copy {
@@ -1743,7 +1781,8 @@ html[data-theme="orange"] .beginner-guide {
     linear-gradient(180deg, rgba(255, 122, 26, 0.055), transparent 34%);
 }
 
-html[data-theme="orange"] .community-band {
+html[data-theme="orange"] .community-band,
+html[data-theme="orange"] .demo-community {
   background:
     radial-gradient(circle at 72% 36%, rgba(255, 151, 46, 0.18), transparent 24%),
     linear-gradient(90deg, rgba(255, 122, 26, 0.16), transparent 50%),
