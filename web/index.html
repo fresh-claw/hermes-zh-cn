@@ -21,9 +21,11 @@
     <meta property="og:title" content="Hermes Agent 汉化补丁｜小马AI Hermes 中文增强版" />
     <meta property="og:description" content="Hermes Agent 中文增强、汉化补丁和中文语言包安装入口，支持启动页、TUI、快捷指令、工具分类中文化。" />
     <meta property="og:url" content="https://useai.live/hermes/" />
+    <meta property="og:image" content="https://useai.live/hermes/assets/site-logo.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Hermes Agent 汉化补丁｜小马AI Hermes 中文增强版" />
     <meta name="twitter:description" content="一条命令安装 Hermes Agent 中文增强版，未安装 Hermes 时先安装官方版，再应用汉化补丁。" />
+    <meta name="twitter:image" content="https://useai.live/hermes/assets/site-logo.png" />
     <meta name="xiaoma-agent-manifest" content="https://useai.live/hermes/agent.json" />
     <script type="application/ld+json">
 {
@@ -44,7 +46,7 @@
       "isPartOf": { "@id": "https://useai.live/#website" },
       "description": "Hermes Agent 中文增强、汉化补丁和中文语言包安装入口，覆盖爱马仕机器人启动页、TUI、/help 快捷指令、工具分类和中文提示。",
       "inLanguage": "zh-CN",
-      "dateModified": "2026-05-20",
+      "dateModified": "2026-05-21",
       "keywords": [
         "Hermes Agent 汉化",
         "Hermes Agent 汉化补丁",
@@ -180,7 +182,9 @@
         }
       } catch {}
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260520-firstuse" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/site-logo-32.png?v=20260521" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/site-logo-180.png?v=20260521" />
+    <link rel="stylesheet" href="./styles.css?v=20260521-community" />
   </head>
   <body>
     <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
@@ -488,6 +492,27 @@
         </div>
       </section>
 
+      <section class="community-band grid" aria-labelledby="community-title">
+        <div class="cell community-copy">
+          <p class="kicker">交流答疑</p>
+          <h2 id="community-title">Hermes交流答疑群</h2>
+          <p>扫码加入，安装中文补丁、版本匹配、启动页未变化、快捷指令仍是英文等问题，都可以在群里交流。</p>
+          <div class="community-tags" aria-label="群内交流主题">
+            <span>安装问题</span>
+            <span>汉化补丁</span>
+            <span>版本适配</span>
+            <span>新手答疑</span>
+          </div>
+        </div>
+        <div class="cell community-qr-cell">
+          <div class="qr-stage" aria-label="Hermes 交流答疑群二维码">
+            <div class="qr-frame">
+              <img src="./assets/hermes-group-qr.png?v=20260521" alt="Hermes交流答疑群二维码" loading="lazy" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="beginner-guide grid" id="beginner" aria-labelledby="beginner-title">
         <div class="cell section-title beginner-title">
           <p class="kicker">新手教程</p>
@@ -614,6 +639,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=20260520-firstuse"></script>
+    <script src="./app.js?v=20260521-community"></script>
   </body>
 </html>
