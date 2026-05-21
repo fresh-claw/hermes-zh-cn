@@ -1,5 +1,11 @@
 # 小马AI Hermes 中文增强包
 
+面向中文用户的 Hermes Agent 汉化补丁。适合刚开始用 Hermes、看不懂英文启动页和快捷指令、或者安装后仍有部分界面没有变成中文的人。
+
+官网入口：[useai.live/hermes](https://useai.live/hermes/)
+
+遇到安装问题、版本适配、中文补丁未生效，或者想讨论 Hermes 在真实业务里的用法，可以扫码加入官网首页的「Hermes交流答疑群」。群里主要讨论业务落地和疑难杂症。
+
 让用户在 Hermes 对话中发送一句话：
 
 ```text
