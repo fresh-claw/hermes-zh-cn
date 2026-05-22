@@ -184,7 +184,7 @@
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/site-logo-32.png?v=20260521" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/site-logo-180.png?v=20260521" />
-    <link rel="stylesheet" href="./styles.css?v=20260521-community2" />
+    <link rel="stylesheet" href="./styles.css?v=20260522-ui1" />
   </head>
   <body>
     <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
@@ -389,17 +389,21 @@
           <div class="steps" id="install">
             <article>
               <div>
-                <small>1. 发送以下对话给 Hermes</small>
-                <button type="button" data-copy="请访问 useai.live/hermes 安装汉化补丁">复制</button>
+                <small>方法1 · 发送以下对话给 Hermes</small>
               </div>
-              <code>请访问 useai.live/<wbr />hermes 安装汉化补丁</code>
+              <div class="command-input" role="group" aria-label="方法1 复制给 Hermes 的对话">
+                <code>请访问 useai.live/<wbr />hermes 安装汉化补丁</code>
+                <button type="button" data-copy="请访问 useai.live/hermes 安装汉化补丁" aria-label="复制方法1">复制</button>
+              </div>
             </article>
             <article>
               <div>
-                <small>2. 使用命令行安装</small>
-                <button type="button" data-copy="curl -fsSL https://useai.live/hermes/install.sh | bash">复制</button>
+                <small>方法2 · 使用命令行安装</small>
               </div>
-              <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
+              <div class="command-input" role="group" aria-label="方法2 命令行安装">
+                <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
+                <button type="button" data-copy="curl -fsSL https://useai.live/hermes/install.sh | bash" aria-label="复制方法2">复制</button>
+              </div>
             </article>
           </div>
         </div>
@@ -461,7 +465,7 @@
           <div class="community-copy">
             <p class="kicker">交流答疑</p>
             <h2 id="community-title">Hermes交流答疑群</h2>
-            <p>扫码加入。群里主要讨论业务落地和疑难杂症：Hermes 怎么用到真实工作、安装后哪里不对、中文补丁没有生效、版本适配等问题。</p>
+            <p>群里主要讨论业务落地和疑难杂症：Hermes 怎么用到真实工作、安装后哪里不对、中文补丁没有生效、版本适配等问题。</p>
             <div class="community-tags" aria-label="群内交流主题">
               <span>业务落地</span>
               <span>疑难杂症</span>
@@ -507,8 +511,7 @@
 
         <div class="cell beginner-problems">
           <div class="resolver-head">
-            <span>卡住了先看这里</span>
-            <strong>照症状处理</strong>
+            <span>常见错误解决方法</span>
           </div>
           <div class="problem-list">
             <article>
@@ -533,7 +536,7 @@
         <div class="cell beginner-help">
           <div class="help-copy">
             <p class="kicker">人工帮助</p>
-            <h2>不想研究命令，可以找人带你做</h2>
+            <h2>点这里找小马帮忙</h2>
             <p>适合完全不懂终端、担心装错、或者想把 Hermes 用到日常工作里的人。</p>
           </div>
           <div class="service-links" aria-label="咨询服务">
@@ -603,6 +606,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=20260521-community"></script>
+    <script src="./app.js?v=20260522-ui1"></script>
   </body>
 </html>

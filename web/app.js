@@ -2,6 +2,7 @@ const copyButtons = document.querySelectorAll("[data-copy]");
 const themeChoices = document.querySelectorAll("[data-theme-choice]");
 const themeStorageKey = "xiaoma-hermes-theme-v2";
 const allowedThemes = new Set(["violet", "orange"]);
+const finePointer = window.matchMedia("(pointer: fine)");
 
 const getStoredTheme = () => {
   try {
@@ -35,7 +36,7 @@ if (themeChoices.length) {
 }
 
 const updatePointerVars = (event) => {
-  if (!window.matchMedia("(pointer: fine)").matches) {
+  if (!finePointer.matches) {
     return;
   }
 
@@ -47,18 +48,102 @@ const updatePointerVars = (event) => {
 
 window.addEventListener("pointermove", updatePointerVars, { passive: true });
 
+if (finePointer.matches) {
+  const cursorOrb = document.createElement("div");
+  cursorOrb.className = "cursor-orb";
+  cursorOrb.setAttribute("aria-hidden", "true");
+  document.body.prepend(cursorOrb);
+
+  let orbX = window.innerWidth / 2;
+  let orbY = window.innerHeight / 2;
+  let raf = 0;
+
+  const renderCursorOrb = () => {
+    raf = 0;
+    cursorOrb.style.left = `${orbX}px`;
+    cursorOrb.style.top = `${orbY}px`;
+  };
+
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      orbX = event.clientX;
+      orbY = event.clientY;
+      cursorOrb.classList.add("is-active");
+      if (!raf) {
+        raf = window.requestAnimationFrame(renderCursorOrb);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("pointerleave", () => {
+    cursorOrb.classList.remove("is-active");
+  });
+}
+
+const fallbackCopy = (value) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "readonly");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
+  textarea.remove();
+  return copied;
+};
+
+const selectCommandText = (button) => {
+  const commandText = button.closest(".command-input")?.querySelector("code");
+  if (!commandText) {
+    return false;
+  }
+  const range = document.createRange();
+  range.selectNodeContents(commandText);
+  const selection = window.getSelection();
+  if (!selection) {
+    return false;
+  }
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
+};
+
 copyButtons.forEach((button) => {
   button.addEventListener("click", async () => {
     const value = button.getAttribute("data-copy") || "";
+    const old = button.textContent;
     try {
-      await navigator.clipboard.writeText(value);
-      const old = button.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+      } else if (!fallbackCopy(value)) {
+        throw new Error("copy failed");
+      }
       button.textContent = "已复制";
       setTimeout(() => {
         button.textContent = old || "复制";
       }, 1200);
     } catch {
-      button.textContent = "复制失败";
+      if (selectCommandText(button)) {
+        button.textContent = "已选中";
+        setTimeout(() => {
+          button.textContent = old || "复制";
+        }, 1400);
+        return;
+      }
+      button.textContent = "请长按";
+      setTimeout(() => {
+        button.textContent = old || "复制";
+      }, 1400);
     }
   });
 });
