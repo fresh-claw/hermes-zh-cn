@@ -15,7 +15,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 
 ## 当前版本
 
-- 中文包：2026.05.19.2
+- 中文包：2026.05.26.1
 - 官方最新版：Hermes Agent v0.14.0，发布时间 2026-05-16。
 - 官方 main：已核对到 2026-05-18 提交。
 - 安装器支持 0.14.x、0.13.x 和 legacy 兼容包。

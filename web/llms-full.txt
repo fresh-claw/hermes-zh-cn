@@ -5,7 +5,7 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Agent 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.05.19.2
+Version: 2026.05.26.1
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
@@ -37,11 +37,12 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 当前版本
 
-- 中文包：2026.05.19.2
+- 中文包：2026.05.26.1
 - 官方最新版：Hermes Agent v0.14.0，发布时间 2026-05-16。
 - 官方 main：已核对到 2026-05-18 提交 52e3bfc2f4440186763a7840c0be669a2659c6dd。
 - 安装器支持 0.14.x、0.13.x 和 legacy 兼容包。
 - 本次补充 ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文。
+- 2026.05.26.1 补齐主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理等用户可见中文。
 - 深层补充 ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令和多平台配置提示中文。
 
 ## 安装流程
