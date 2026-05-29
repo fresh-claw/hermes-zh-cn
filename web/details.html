@@ -115,11 +115,11 @@
         </div>
         <article class="feature">
           <h3>中文包版本</h3>
-          <p>2026.05.26.1</p>
+          <p>2026.05.29.1</p>
         </article>
         <article class="feature">
           <h3>适配 Hermes</h3>
-          <p>0.14.x、0.13.x；未安装 Hermes 时先自动安装官方 Hermes，版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。</p>
+          <p>0.15.x、0.14.x、0.13.x；未安装 Hermes 时先自动安装官方 Hermes，版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。</p>
         </article>
         <article class="feature">
           <h3>更新方式</h3>
@@ -132,16 +132,20 @@
           <h2 id="iteration-title">最近迭代</h2>
         </div>
         <article class="feature">
+          <h3>2026.05.29.1</h3>
+          <p>适配 Hermes Agent v0.15.1；补齐 TUI 0.15.1 品牌组件、技能包、MCP 目录选择器、Bitwarden Secrets Manager、xAI 模型迁移、ntfy、Krea 和 xAI 网页搜索插件中文。</p>
+        </article>
+        <article class="feature">
           <h3>2026.05.26.1</h3>
           <p>适配 Hermes Agent v0.14.0；补齐主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理等用户可见中文，并继续覆盖 /goal、推理设置、默认模型和 TUI 网关状态。</p>
         </article>
         <article class="feature">
           <h3>官方核对</h3>
-          <p>官方最新发布版为 v0.14.0（2026-05-16），官方 main 已核对到 2026-05-18 提交 52e3bfc。</p>
+          <p>官方最新发布版为 v0.15.1（2026-05-29），官方 main 已核对到 2026-05-29 提交 e71a2bd。</p>
         </article>
         <article class="feature">
           <h3>兼容策略</h3>
-          <p>安装器按 0.14.x、0.13.x、legacy 选择中文包；老版本继续使用兼容包。</p>
+          <p>安装器按 0.15.x、0.14.x、0.13.x、legacy 选择中文包；老版本继续使用兼容包。</p>
         </article>
       </section>
 
@@ -193,7 +197,7 @@
             <strong>官方语言接口 + 小马AI增强</strong>
           </div>
           <pre>{
-  "已覆盖": ["display.language=zh", "中文增强技能", "启动前更新", "0.14.x/0.13.x/legacy 兼容安装", "启动界面补丁", "快捷指令说明", "工具集分类中文", "技能分类中文", "ACP 与网关状态提示", "目标和推理提示", "默认模型设置提示"],
+  "已覆盖": ["display.language=zh", "中文增强技能", "启动前更新", "0.15.x/0.14.x/0.13.x/legacy 兼容安装", "启动界面补丁", "快捷指令说明", "工具集分类中文", "技能分类中文", "ACP 与网关状态提示", "技能包/MCP/Bitwarden/xAI/ntfy/Krea 提示", "目标和推理提示", "默认模型设置提示"],
   "未覆盖": ["模型回复", "工具原始输出", "第三方工具返回文本", "异常栈"],
   "原因": "Hermes 原版并未把全部 TUI 文案接入语言配置",
   "处理方式": "安装器备份后修改启动界面与分类文案文件；升级 Hermes 后可重新运行安装命令"

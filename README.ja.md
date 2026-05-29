@@ -29,8 +29,9 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 - スラッシュコマンド説明を中国語化。
 - ツール分類とスキル分類を中国語化。
 - よく使われる TUI 表示と実行中の進行メッセージを中国語化。
+- Hermes `0.15.x` の追加機能（スキルバンドル、MCP カタログ選択、Bitwarden Secrets Manager、ntfy、Krea、xAI Web 検索／移行文言）に対応。
 - Hermes `0.2` から `0.12` までの旧版に対応。
-- `0.14.x`、`0.13.x`、legacy パッケージに対応。
+- `0.15.x`、`0.14.x`、`0.13.x`、legacy パッケージに対応。
 
 ## 境界
 
@@ -44,6 +45,7 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 ```text
 web/install.sh               インストーラー
 web/latest.json              バージョン情報
+web/packages/0.15.x/zh-CN/   Hermes 0.15.x パッケージ
 web/packages/0.14.x/zh-CN/   Hermes 0.14.x パッケージ
 web/packages/0.13.x/zh-CN/   Hermes 0.13.x パッケージ
 web/packages/legacy/zh-CN/   旧版互換パッケージ

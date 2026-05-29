@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.26.1"
+PACKAGE_VERSION="2026.05.29.1"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -144,105 +144,98 @@ extract_payload() {
 import base64
 import sys
 DATA = """
-	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
-	qRrP+aSj8oX7BUdVD57iSJ+zbCT60/vRAn1Q+Y1CD0F10VNOyUKZ+Rx8ZqZvvDrExSxuEA+5O/HnzSLMKA02CSC7WmvjPv72xvMR
-	UJpDD9D581iqTrBYsM8b43O53PtdLvWvy0H5zTJieC6MJy+mIszMucEbp3c+0XUYiAUwvEELH4sx97EGo7myoXY0sFKQ0hCf639v
-	FijzZurg7eun3i+ImQhFo5Gx4OIr/vVXZRi/TsSeyRXE9fISqYxNe9QNTZwpG8A084bL/vlFFp1BJP1e7kcdDetffzNVQXfjwJA8
-	hnX/ofV43N1FIDFr9hrTdtC5+M036wujAKezx9QHBpp1pQNtMQBkiZ+svbwJ6AWhbS2ueZQkCLJrT1wTbHy4uDTLULC+NOTyBrOs
-	rKHx2oqaaZRxQPg8syzYkZzfDP0rBuRPaoEL74ir0cv7/XfL31P9j2bx/fcvqv5Hy8+k/gdSppyKJSPptBTpiLZFOzpkKd2yB6BI
-	Sq1RqT2Zbt3TkU5HU5GWREJOSKlorC0tRztSkZiU6OgQ9T9E/Y+faf2Plr+n+h+i/pOo/9Fg/Y8WUf9D1P8Q9T9E/Q9R/0PU/xD1
-	P0T9D1H/Q9T/EPU/RP0PUf9D1P8Q9T9E/Q9R/0PU/xD1P0T9D1H/Q9T/EPU/RP0PUf9D1P8Q9T9E/Q9R/0PU/xD1P0T9D1H/Q9T/
-	EPU/RP0PUf9D1P8Q9T9E/Q9R/0PU/xD1P0T9D1H/Q9T/EPU/RP0PUf9D1P8Q9T9E/Q9R/0PU/xD1P0T9D1H/Q9T/+KXV/2BK4e+k
-	/kdbLNouvv/+5dT/4EdvP4v6H8mOWHubHIklYxGpra21fU9MTiZTzelkJJqMpKX2FqklITenpPbmtlRHW0vHntZkW3si3ZbYE2mX
-	WhOi/oeo//FzrP/hk///3/U/QP63Cfkv6n80UP/DUS2i/oeo/yHqf4j6H6L+h6j/Iep/iPofov6HqP8h6n+I+h+i/oeo/yHqf4j6
-	H6L+h6j/Iep/iPofov6HqP8h6n+I+h+i/oeo/yHqf4j6H6L+h6j/Iep/iPofov6HqP8h6n+I+h+i/oeo/yHqf4j6H6L+h6j/Iep/
-	iPofov6HqP8h6n+I+h+i/oeo/yHqf4j6H6L+h6j/Iep/iPofov6HqP/xC7hYgrPPrvyrz0G/+25t3az+R2tLS+X3380tEfH9909y
-	/eofwJnPUydN1s5Qz70J07qCckEnOSUnpyVFbWr6l87uA/HjRw/tC7x7/r+6Oj/6sDN+8MDRDw90x503e4ObBgcuBHz9nd+/DsOL
-	rsPgtxw6FD/40YcHqgfHp3uD7+I/Fc4Pjtl1OP67rqPQyzsILiXQ1MR9oziPEuzcRYssKGlyggTTpKKL40j9x4Gj3V0fHQ6QU78h
-	ZkbWaAEGjAts0R7ayaoh0+a5vKKZabJD0zV5BzxJK00XmpryclY35Qpo3BgHjO8gJcyyctgn9eS3v91x5A87mpQsJirQQIjz2+g3
-	mtJ5PUsKeVVVEiEn54W/hqeYMNPURHPf+N1O6BSS8r1nTkRP7SZ4nq8XzH0tu4hkYO5STtcMeS9dBGYrkn0s8qLqUmqn83pXE13f
-	TmwQ6pXNnTyLKLCbBAraaQ3DdLt2NR35A100GF48LsRXzBJPzGwOfsNf2Lqd2dOmnM2R2PvhlHwmrBVUlXzyCeFPg6Y/zrcLUU1z
-	/nbks2wjYZjADnL0wLHjRw/DS0+wyoPUcnQqQII67wWta5PyvnLPADlZ1az7911H4uBzH9wX3eztfx7tPHLkwNGaDf79eNeBY9Wk
-	Th/vDUYusCmRER04AZXJbAq7RPcGmV0M5J+UDBlawJsAUZBU2ZtdPiqsH4zc4WvL4lzMAf9x5d6vDWgAE+ysYCW6B54ZPAnhnl5e
-	fmEdNuG9vOxWUfDznWcKaj27gTEPZNWs6R2OQwocWGf+WkGUKkA8jNpAZ8q1/K4+82JaNHCvw7VH4LapiafpedjP2IlvvOy7i+Zl
-	0cj+TllL6viB7r5AwUwH9yD/0cgPjMCdKMqo9JmPT5sAJbzlPhJwE6jK27szXU6mAry7+VQ/roycV1GelIffQY8c5NSO3eTEqV27
-	LgClPXOMw1GYSlb9k/mjT75JK+d007+qhwGnM5fbonvp9Xfgo9O+jnir0dCeesbWVkaLg7i8rpuBXX60MFp0qf48a39iB7bdcepC
-	AEUgpwAvDf7mN/APS3RjfPrHgiKb+yJlAgUmj+0NghCA1QWD9HUlNbI+Ue+4VK46DLpvU55lstrbzq+XKqWww4CcYnbsCngB9Y9G
-	IXZIi5zC7ps0etcHbeXqsBNfNrSN8qFcUVA3J9AjG/xz8LHls4pJIl7EbTHb9U+LEy+qkxbpPCT4Pqk9W/Wy6Vy11QCf3aMry5TC
-	UlQYpYBOYvaO31gPcHIinFiIZwdj778XxeWY+QKzTeSzVMxwCA51Hv7geOcHB/adyzQuoMl772Grsw2J34qtlc/Kycb6ARf8897Y
-	BZ/8pr35IYrvPUXVP/r1HnrV3yFn1jp8IZ84SPuEoxh38f33Yk0ukcSckWVDSjYJN1Fc4hKXuMQlLnGJS1ziEpe4xCUucYlLXOIS
-	l7jE9TO7/herVrj8APAAAA==
+	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
+	rCuVycR7e7q7k5lUIpfp6U6qqXh3NpvN5XKZvAq/5BNKZ17JJXsTyWQ+lemNJZI9iS6lR433EP4X4X8R/hc9P+v1/yeA/5Wk9Z/wv9rD/0qugP/VvudA+F+E
+	/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E
+	/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/9dPA/+j8CeF/dXUT/scvCv+r82eC/xVX
+	U52pTCoV70n2Zjt7cqnOHrU3mehK9PSkEt3JZDyVScYy+R61O9vbm8zl4/lkqieTz8W78109mZ4k4X8R/hfhf9Hzs17/fwL4X520/hP+V3v4X52E/0X4X4T/
+	RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/
+	RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfvwT8D2G/fyL4X8lkLEn4H78c/C+5mftzwP/q
+	zSaTiqok46m8mkxlervjuUyPmognUr2JRKcSV7Kx7nhPVs0lE91qLJeIZXoSancslezOdPd0ZbsJ/4vwvwj/i56f9fr/f43/lUzGY7T+E/5XG/hfrmtB+F+E
+	/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E
+	/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/RfhfhP9F+F+E/0X4X4T/9TN9xAWXgGP7g/eBoB7dqdRK+F+pZDLV
+	gP8R74olCP/jx3h+9Q/RilnmUaKqH+Gpgw48pBlWKwYraSU1r2iFjo7fb9u/I/3uvt1bQ78+/p+7tr3z9rb0zh373t6xP+2+2RJeMTtxIhSo737+TRRe7NoD
+	gdPu3emd77y9o7lx/HVL+Nf4pyH6wjZ37Un/Ydc+qOVvBIcS6uiQwVlapik2buLYR1qeHWThPGuo4kZy/75j3/5d7+wJsUO/ZdaAqnNcJExMrFEeyqkFU+XF
+	S2UNggS2QTd0dQP8ktc6TnR0lNWiYakN1HhJFmjfZUpUnLETkCrsd7/bsPePGzq0Ih594ZkY97M5aHbky0aRVcqFgpaJuCfY5Gv4FY+/dXTwk6zy20aoFFHK
+	/UcOxg9tZnhCxKhYW5ObmGK6x77ULXwQePaYbRWpn4Kh5Da6rzd18PFtxAKRftXaKM8EhjazUEU/rGOecNOmjr1/5IMGH0kmpuSIxVEmq1iCz/AvTN3G4mFL
+	LZZY4o1oTj0S1SuFAvvgAyZ/DVvBROMmZDU/wbuhXBQTCc2ENrB9Ow68u28PvPRly3xMrafHQixsyFpQurUob63XDLH3mortf2vX3jQE/Tu3xld6+x/7tu3d
+	u2NfywL/9u6uHQeaRZ3/vCUcOyG6REV06QRWZos5rBLfEhYuLIh/VjFVKAFvQkxDURVvNgWkcPVs6IZAWZFoExmA75/f+I0JBaCDjQ2qxOfA14PvTomvll9f
+	RIUVdA8iaRdFJ6h3vi64o+tl5nyUNaumvzlJKWjgKv23yuI0EeJT1DYqc62V31ZXXrzkANrrau1e+NrRIQ/d+tTP3Ihv/Oq7iZ/043tFG1U9ayBAw9ZQxcqH
+	e1D/eOoJWpDxDldU/ltATzuAJbLkVhbyjuTVp3djvn48D/jundD7/vno8QLak3rzG/gGhprbsJkdPLRp0wmQtC9cP24MulILwc6C6a9Ap419egcKm5uB+LBU
+	WqN67ek3EE7zuq55a1HQmfpCjK3OFpdxZcOwQpuCbBGy6En9cVH+4AYsu+HQiRCaQCkBfhn87W/hjzg6KfT0zxVNtbbG6gIKSp7YEgYjAKMLh/nrRmkUdeL+
+	drlddRV064o6K2y1v1xwXWq0wq4CSonZsCnkJzTYGqfYFS12CKuvUOjXAWobR4eV5LChbFw25ZmCVU+Z+mxDsA/ZtnpMs1jMz7g1erv4YfXC4+ZjsLwfFn6D
+	te6tedi8r9bLgOzdt1bWJUUcehKSAmuS8HeCznpIihOTwsJ8M5h44/U4DscqV4Rvoh7jZkZSsHvbnjff3fbmjq3vD7RvoNnrr2OpY22Z34apVY+p2fbqgRb8
+	85bEiYD95rXlLk7gPWfVPwbXPQyAv0HNbLX7wz5wmfaBZDHO4huvJzo8IUm4LaumkiVkS3rooYceeuihhx566KGHHnrooYceeuihhx566KGHHnrooYceeuih
+	hx566KGHHnrooYceen4qz/8AoBowzQBoAQA=
 """
 with open(sys.argv[1], "wb") as f:
     f.write(base64.b64decode(DATA))
@@ -255,6 +248,9 @@ package_dir_for_version() {
   local payload_root="$1"
   local version="$2"
   case "$version" in
+    0.15.*)
+      printf '%s\n' "$payload_root/packages/0.15.x/zh-CN"
+      ;;
     0.14.*)
       printf '%s\n' "$payload_root/packages/0.14.x/zh-CN"
       ;;
@@ -270,6 +266,7 @@ package_dir_for_version() {
 compat_for_version() {
   local version="$1"
   case "$version" in
+    0.15.*) printf '0.15.x' ;;
     0.14.*) printf '0.14.x' ;;
     0.13.*) printf '0.13.x' ;;
     *) printf 'legacy' ;;
@@ -1210,6 +1207,9 @@ basic_replacements = {
 	        ("'brainstorming'", "'发散中'"),
 	    ],
 	    "ui-tui/src/components/branding.tsx": [
+		        ("const TAG_FULL = 'Nous Research · Messenger of the Digital Gods'", "const TAG_FULL = '爱马仕机器人 · 中文增强版'"),
+		        ("const TAG_MID = 'Messenger of the Digital Gods'", "const TAG_MID = '中文增强版'"),
+		        ("const TAG_TINY = 'Nous Research'", "const TAG_TINY = '爱马仕机器人'"),
 		        ('{t.brand.icon} NOUS HERMES', '{t.brand.icon} 爱马仕机器人'),
 		        ('{t.brand.icon} Nous Research · Messenger of the Digital Gods', '{t.brand.icon} 爱马仕机器人 · 中文增强版'),
 		        ('<Text color={t.color.muted}> · Nous Research</Text>', '<Text color={t.color.muted}> · Nous Research</Text>'),
@@ -1217,6 +1217,7 @@ basic_replacements = {
 		        ("label={title === 'Tools' ? 'discovering tools' : 'scanning skills'}", "label={title === 'Tools' ? '正在发现工具' : '正在扫描技能'}"),
 		        ("'more toolsets…'", "'个工具集…'"),
 		        ("'more…'", "'项…'"),
+		        ("suffix={skillsCatCount > 0 ? `in ${skillsCatCount} categor${skillsCatCount === 1 ? 'y' : 'ies'}` : undefined}", "suffix={skillsCatCount > 0 ? `共 ${skillsCatCount} 个分类` : undefined}"),
 		        ('title="System Prompt"', 'title="系统提示词"'),
 		        ('suffix={`— ${sysPromptLen.toLocaleString()} chars`}', 'suffix={`— ${sysPromptLen.toLocaleString()} 字符`}'),
 		        ('title="MCP Servers"', 'title="MCP 服务"'),
@@ -1229,7 +1230,9 @@ basic_replacements = {
 		        ('failed', '失败'),
 		        ("{toolsTotal} tools", "{toolsTotal} 个工具"),
 		        ("{skillsTotal} skills", "{skillsTotal} 个技能"),
+		        ("! {info.update_behind} {info.update_behind === 1 ? 'commit' : 'commits'} behind", "! 落后 {info.update_behind} {info.update_behind === 1 ? '次提交' : '次提交'}"),
 		        ("'commit' : 'commits'", "'次提交' : '次提交'"),
+		        ("! {info.update_behind} {info.update_behind === 1 ? '次提交' : '次提交'} behind", "! 落后 {info.update_behind} {info.update_behind === 1 ? '次提交' : '次提交'}"),
 		        ("- run", "- 运行"),
 		        ("to update", "更新"),
 		        ('title="Available Tools"', 'title="可用工具"'),
@@ -3399,6 +3402,250 @@ gateway_text_replacements = {
 for rel, replacements in gateway_text_replacements.items():
     basic_replacements.setdefault(rel, []).extend(replacements)
 # END XIAOMA 2026-05-26 GATEWAY TEXT PATCH
+
+# BEGIN XIAOMA 2026-05-29 HERMES 0.15 PATCH
+hermes_015_replacements = {
+    "hermes_cli/bundles.py": [
+        ("No bundles installed yet. Create one with:", "还没有安装技能包。可用下面命令创建："),
+        ("Bundles directory:", "技能包目录："),
+        ('"Skill Bundles ({len(bundles)})"', '"技能包（{len(bundles)}）"'),
+        ('"Command"', '"命令"'),
+        ('"Name"', '"名称"'),
+        ('"Skills"', '"技能"'),
+        ('"Description"', '"说明"'),
+        ("Bundle {args.name!r} not found.", "未找到技能包 {args.name!r}。"),
+        ("File:", "文件："),
+        ("Instruction:", "说明："),
+        ("No skills passed via --skill. Enter one skill name per line.", "未通过 --skill 传入技能。请每行输入一个技能名。"),
+        ("Submit an empty line to finish.", "输入空行结束。"),
+        ("Cancelled.", "已取消。"),
+        ("A bundle must reference at least one skill.", "技能包至少需要引用一个技能。"),
+        ("Pass --force to overwrite.", "如需覆盖请加 --force。"),
+        ("Created bundle:", "已创建技能包："),
+        ("Invoke with:", "调用命令："),
+        ("loads", "加载"),
+        ("skills)", "个技能）"),
+        ("Deleted bundle:", "已删除技能包："),
+        ("Added (", "新增（"),
+        ("Removed (", "移除（"),
+        ("No changes.", "没有变化。"),
+        ("bundle(s) loaded.", "个技能包已加载。"),
+        ("Total bundles now:", "当前技能包总数："),
+        ('help="List installed skill bundles"', 'help="列出已安装技能包"'),
+        ('help="Show one bundle\\\'s contents"', 'help="查看某个技能包内容"'),
+        ('help="Bundle name"', 'help="技能包名称"'),
+        ('help="Create a new skill bundle"', 'help="创建新技能包"'),
+        ("Create a new bundle. Skills can be passed via --skill (repeat for multiple) or entered interactively when omitted.", "创建新技能包。可通过 --skill 多次传入技能；省略时进入交互输入。"),
+        ('help="Bundle name (becomes the /slash command)"', 'help="技能包名称（会成为 / 斜杠命令）"'),
+        ('help="Skill name to include (repeat for multiple)"', 'help="要加入的技能名（可重复）"'),
+        ('help="Human-readable description shown in /help and `hermes bundles list`"', 'help="显示在 /help 和 `hermes bundles list` 中的说明"'),
+        ('help="Extra guidance prepended to the loaded skill content"', 'help="加载技能内容前附加的额外说明"'),
+        ('help="Overwrite an existing bundle with the same name"', 'help="覆盖同名技能包"'),
+        ('help="Delete a skill bundle"', 'help="删除技能包"'),
+        ('help="Re-scan the bundles directory and report changes"', 'help="重新扫描技能包目录并报告变化"'),
+    ],
+    "agent/skill_bundles.py": [
+        ("Load {len(skills)} skills as a bundle", "把 {len(skills)} 个技能作为技能包加载"),
+        ('[Loaded as part of the "', '[作为技能包 "'),
+        ('" skill bundle.]', '" 的一部分加载。]'),
+        ('[IMPORTANT: The user has invoked the "', '[重要：用户调用了技能包 "'),
+        ('" skill bundle, loading', '"，正在同时加载'),
+        ("skills together. Treat every skill below as active guidance for this turn.]", "个技能。请把下方每个技能都视为本轮有效指导。]"),
+        ("Bundle:", "技能包："),
+        ("Skills loaded:", "已加载技能："),
+        ("Skills missing (skipped):", "缺失技能（已跳过）："),
+        ("Bundle instruction:", "技能包说明："),
+        ("User instruction:", "用户说明："),
+        ("Bundle name is required", "技能包名称不能为空"),
+        ("Bundle must reference at least one skill", "技能包至少需要引用一个技能"),
+        ("Bundle already exists at", "技能包已存在："),
+        ("No bundle at", "未找到技能包："),
+    ],
+    "hermes_cli/mcp_picker.py": [
+        ('_STATUS_NOT_INSTALLED = "available"', '_STATUS_NOT_INSTALLED = "可安装"'),
+        ('_STATUS_DISABLED = "installed (disabled)"', '_STATUS_DISABLED = "已安装（未启用）"'),
+        ('_STATUS_ENABLED = "enabled"', '_STATUS_ENABLED = "已启用"'),
+        ('_STATUS_CUSTOM_ENABLED = "custom — enabled"', '_STATUS_CUSTOM_ENABLED = "自定义 — 已启用"'),
+        ('_STATUS_CUSTOM_DISABLED = "custom — disabled"', '_STATUS_CUSTOM_DISABLED = "自定义 — 未启用"'),
+        ('"(no transport)"', '"（未配置传输）"'),
+        ("is not installed.", "尚未安装。"),
+        ("'enabled' if enable else 'disabled'", "'已启用' if enable else '已停用'"),
+        ("Start a new Hermes session for changes to take effect.", "请新开 Hermes 会话使变更生效。"),
+        ("Remove '{name}' from mcp_servers?", "是否从 mcp_servers 移除 '{name}'？"),
+        ("✓ Removed", "✓ 已移除"),
+        ("Configure tools (probe server + re-pick)", "配置工具（探测服务后重新选择）"),
+        ("Remove from config", "从配置移除"),
+        ("Action for", "操作"),
+        ("is already enabled.", "已经启用。"),
+        ("Disable (keep config, stop loading on next session)", "停用（保留配置，下次会话不加载）"),
+        ("Uninstall (remove config and any cloned files)", "卸载（移除配置和已克隆文件）"),
+        ("Reinstall (re-clone, re-prompt for credentials)", "重新安装（重新克隆并重新输入凭据）"),
+        ("Credentials in .env preserved — delete manually if no longer needed.", ".env 中的凭据已保留；不再需要时请手动删除。"),
+        ("was not installed", "尚未安装"),
+        ("reinstall failed:", "重新安装失败："),
+        ("No MCPs in the catalog or configured.", "目录和配置中都没有 MCP。"),
+        ("MCP Catalog + configured servers:", "MCP 目录和已配置服务："),
+        ("Name", "名称"),
+        ("Status", "状态"),
+        ("Description", "说明"),
+        ("Install: hermes mcp install <name>    Picker: hermes mcp", "安装：hermes mcp install <name>    选择器：hermes mcp"),
+        ("requires a newer Hermes — run `hermes update` to install this entry.", "需要更新版 Hermes。请运行 `hermes update` 后再安装。"),
+        ("MCP Catalog  —  ↑↓ navigate  ENTER act on entry  ESC/q quit", "MCP 目录  —  ↑↓ 选择  ENTER 操作  ESC/q 退出"),
+        ("is not in the catalog. Run `hermes mcp catalog` to see available entries.", "不在目录中。运行 `hermes mcp catalog` 查看可用条目。"),
+        ("install failed:", "安装失败："),
+    ],
+    "hermes_cli/secrets_cli.py": [
+        ('help="Interactive wizard: install bws, store access token, pick project"', 'help="交互式向导：安装 bws、保存访问令牌、选择项目"'),
+        ('help="Pre-select a project UUID instead of prompting"', 'help="预先指定项目 UUID，不再交互询问"'),
+        ('help="Provide the access token non-interactively (will be stored in .env)"', 'help="非交互提供访问令牌（会保存到 .env）"'),
+        ("Bitwarden region / self-hosted endpoint.", "Bitwarden 区域或自托管地址。"),
+        ("Skips the interactive region prompt.", "跳过区域交互选择。"),
+        ('help="Show config + binary + last fetch"', 'help="显示配置、二进制文件和最近拉取结果"'),
+        ('help="Fetch secrets now and report what changed"', 'help="立即拉取密钥并报告变化"'),
+        ("Actually export the secrets into the current shell's env (default: dry-run)", "实际导出到当前 shell 环境变量（默认演练）"),
+        ('help="Turn off the Bitwarden integration"', 'help="关闭 Bitwarden 集成"'),
+        ("Download and verify the pinned bws binary", "下载并校验固定版本 bws 二进制文件"),
+        ('help="Re-download even if a managed copy already exists"', 'help="即使已存在托管副本也重新下载"'),
+        ("Bitwarden Secrets Manager setup", "Bitwarden Secrets Manager 配置"),
+        ("Need an access token? In the Bitwarden web app:", "需要访问令牌？请在 Bitwarden 网页端操作："),
+        ("Copy the token", "复制令牌"),
+        ("it cannot be retrieved later.", "之后无法再次查看。"),
+        ("Step 1", "步骤 1"),
+        ("Install the bws CLI", "安装 bws CLI"),
+        ("No bws on PATH — downloading…", "PATH 中没有 bws，正在下载…"),
+        ("Could not install bws:", "无法安装 bws："),
+        ("Manual install:", "手动安装："),
+        ("Step 2", "步骤 2"),
+        ("Provide your access token", "提供访问令牌"),
+        ("Paste access token", "粘贴访问令牌"),
+        ("Empty token, aborting.", "令牌为空，已中止。"),
+        ("Warning: token doesn't start with '0.'", "警告：令牌不是以 '0.' 开头"),
+        ("stored in", "已保存到"),
+        ("Step 3", "步骤 3"),
+        ("Pick a Bitwarden region", "选择 Bitwarden 区域"),
+        ("using bws default", "使用 bws 默认值"),
+        ("Step 4", "步骤 4"),
+        ("Pick a project", "选择项目"),
+        ("No projects visible to this machine account.", "此机器账号看不到任何项目。"),
+        ("and grant it access to at least one project.", "并授予它至少一个项目的访问权限。"),
+        ('table.add_column("ID", style="dim")', 'table.add_column("ID", style="dim")'),
+        ("Select project", "选择项目"),
+        ("Enter a number.", "请输入数字。"),
+        ("Out of range — pick", "超出范围，请选择"),
+        ("Test fetch", "测试拉取"),
+        ("Fetch failed:", "拉取失败："),
+        ("Fetch succeeded but the project has no secrets.", "拉取成功，但项目中没有密钥。"),
+        ("bootstrap token — never overrides itself", "引导令牌，不会覆盖自身"),
+        ("already set in env (will be overwritten)", "环境变量中已存在（会被覆盖）"),
+        ("warning:", "警告："),
+        ("Bitwarden Secrets Manager is enabled.", "Bitwarden Secrets Manager 已启用。"),
+        ("Secrets will be pulled at the start of every Hermes process.", "每次 Hermes 进程启动时都会拉取密钥。"),
+        ("Status:", "状态："),
+        ("Refresh:", "刷新："),
+        ("Disable:", "停用："),
+        ("Enabled", "已启用"),
+        ("Token env var", "令牌环境变量"),
+        ("Token in env", "环境中有令牌"),
+        ("Project ID", "项目 ID"),
+        ("Server URL", "服务地址"),
+        ("Override existing", "覆盖已有值"),
+        ("Cache TTL (s)", "缓存 TTL（秒）"),
+        ("Auto-install", "自动安装"),
+        ("not installed", "未安装"),
+        ("Run [cyan]hermes secrets bitwarden setup[/cyan] to enable.", "运行 [cyan]hermes secrets bitwarden setup[/cyan] 启用。"),
+        ("Enabled but", "已启用，但"),
+        ("is not set", "未设置"),
+        ("no project_id", "没有 project_id"),
+        ("nothing to fetch", "没有可拉取内容"),
+        ("Bitwarden integration is disabled.", "Bitwarden 集成已停用。"),
+        ("No project_id configured.", "未配置 project_id。"),
+        ("No secrets in project.", "项目中没有密钥。"),
+        ("skip (bootstrap token)", "跳过（引导令牌）"),
+        ("skip (already set)", "跳过（已设置）"),
+        ("exported", "已导出"),
+        ("would export", "将导出"),
+        ("This was a dry-run", "这是一次演练"),
+        ("Exported {applied} secret(s) into current process.", "已向当前进程导出 {applied} 个密钥。"),
+        ("Disabled.", "已停用。"),
+        ("Bitwarden secrets will NOT be pulled on the next Hermes invocation.", "下次调用 Hermes 时不会拉取 Bitwarden 密钥。"),
+        ("Install failed:", "安装失败："),
+        ("version unknown", "版本未知"),
+        ("Couldn't list projects:", "无法列出项目："),
+        ("bws project list failed:", "bws project list 失败："),
+        ("This usually means the access token is wrong or revoked.", "这通常表示访问令牌错误或已撤销。"),
+        ("bws returned non-JSON:", "bws 返回了非 JSON 内容："),
+        ("Region / endpoint", "区域 / 地址"),
+        ("Self-hosted / custom URL", "自托管 / 自定义地址"),
+        ("Select region", "选择区域"),
+        ("Enter your Bitwarden server URL", "输入你的 Bitwarden 服务地址"),
+        ("Empty URL, aborting.", "地址为空，已中止。"),
+    ],
+    "agent/secret_sources/bitwarden.py": [
+        ("secrets.bitwarden.enabled is true but", "secrets.bitwarden.enabled 为 true，但"),
+        ("not set.  Run `hermes secrets bitwarden setup`.", "未设置。请运行 `hermes secrets bitwarden setup`。"),
+        ("secrets.bitwarden.project_id is empty.", "secrets.bitwarden.project_id 为空。"),
+        ("bws binary not available and auto-install is disabled.", "bws 二进制文件不可用，且自动安装已关闭。"),
+        ("Run `hermes secrets bitwarden setup` to install.", "请运行 `hermes secrets bitwarden setup` 安装。"),
+        ("Unsupported platform for bws auto-install:", "当前平台不支持自动安装 bws："),
+        ("No checksum entry for", "未找到校验项："),
+        ("Bitwarden access token is empty", "Bitwarden 访问令牌为空"),
+        ("Bitwarden project_id is empty", "Bitwarden project_id 为空"),
+        ("bws exited", "bws 已退出"),
+        ("bws returned no output (empty project?)", "bws 没有返回内容（项目为空？）"),
+        ("bws returned unexpected shape:", "bws 返回结构异常："),
+        ("bws auto-install failed:", "bws 自动安装失败："),
+    ],
+    "hermes_cli/migrate.py": [
+        ("usage: hermes migrate xai [--apply] [--no-backup]", "用法：hermes migrate xai [--apply] [--no-backup]"),
+        ("◆ xAI Model Retirement Migration", "◆ xAI 模型退役迁移"),
+        ("No retired xAI models in config — nothing to migrate.", "配置中没有已退役的 xAI 模型，无需迁移。"),
+        ("Found", "发现"),
+        ("retired xAI model reference(s):", "处已退役 xAI 模型引用："),
+        ("Migration guide:", "迁移指南："),
+        ("Dry-run mode — no changes written.", "演练模式：不会写入更改。"),
+        ("Re-run with `hermes migrate xai --apply` to rewrite", "重新运行 `hermes migrate xai --apply` 可改写"),
+        ("in-place (backup created automatically).", "原文件（会自动创建备份）。"),
+        ("Could not locate config.yaml", "未找到 config.yaml"),
+        ("Migration failed:", "迁移失败："),
+        ("No changes written.", "没有写入更改。"),
+        ("Backup:", "备份："),
+        ("Updated", "已更新"),
+        ("slot(s) in", "处配置："),
+        ("Run `hermes doctor` to confirm no retired xAI models remain.", "运行 `hermes doctor` 确认没有残留的已退役 xAI 模型。"),
+    ],
+    "plugins/platforms/ntfy/plugin.yaml": [
+        ("ntfy push-notification gateway adapter for Hermes Agent.", "Hermes Agent 的 ntfy 推送通知网关适配器。"),
+        ("Subscribes to a topic on ntfy.sh or any self-hosted ntfy server via", "通过 HTTP 流订阅 ntfy.sh 或任意自托管 ntfy 服务上的主题，"),
+        ("HTTP streaming, and publishes replies via HTTP POST. Lightweight —", "并通过 HTTP POST 发布回复。轻量化实现，"),
+        ("no external SDK, only httpx (already a Hermes dependency).", "无需额外 SDK，仅使用 httpx（Hermes 已依赖）。"),
+        ("Topic name to subscribe to (e.g. hermes-in)", "要订阅的主题名（例如 hermes-in）"),
+        ("ntfy subscribe topic", "ntfy 订阅主题"),
+        ("ntfy server URL (default: https://ntfy.sh)", "ntfy 服务地址（默认：https://ntfy.sh）"),
+        ("ntfy server URL", "ntfy 服务地址"),
+        ("Bearer token or 'user:pass' for Basic auth (optional)", "Bearer 令牌或 Basic 认证用的 user:pass（可选）"),
+        ("ntfy auth token (or empty)", "ntfy 认证令牌（可留空）"),
+        ("Topic to publish replies to (defaults to NTFY_TOPIC)", "回复发布主题（默认 NTFY_TOPIC）"),
+        ("ntfy publish topic (or empty)", "ntfy 发布主题（可留空）"),
+        ("Enable markdown formatting? (true/false)", "启用 Markdown 格式？（true/false）"),
+        ("Comma-separated topic names allowed (allowlist)", "允许的主题名，用逗号分隔"),
+        ("Allowed topic names (comma-separated)", "允许的主题名（逗号分隔）"),
+        ("Allow any topic to talk to the bot (dev only — disables allowlist)", "允许任意主题访问机器人（开发用途，会停用允许名单）"),
+        ("Allow all topics? (true/false)", "允许全部主题？（true/false）"),
+        ("Default topic for cron / notification delivery", "定时任务 / 通知投递的默认主题"),
+        ("Home channel topic (or empty)", "主频道主题（可留空）"),
+        ("Human label for the home channel (defaults to the topic name)", "主频道显示名称（默认使用主题名）"),
+        ("Home channel display name (or empty)", "主频道显示名称（可留空）"),
+    ],
+    "plugins/image_gen/krea/plugin.yaml": [
+        ("Krea image generation backend (Krea 2 Large + Krea 2 Medium foundation models).", "Krea 图像生成后端（Krea 2 Large 和 Krea 2 Medium 基础模型）。"),
+    ],
+    "plugins/web/xai/plugin.yaml": [
+        ("xAI Web Search — search the web via Grok's agentic web_search tool (Responses API). Requires xAI Grok OAuth (via `hermes auth`) or XAI_API_KEY (https://x.ai).", "xAI 网页搜索：通过 Grok 的 agentic web_search 工具（Responses API）搜索网页。需要通过 `hermes auth` 配置 xAI Grok OAuth，或设置 XAI_API_KEY（https://x.ai）。"),
+    ],
+}
+for rel, replacements in hermes_015_replacements.items():
+    basic_replacements.setdefault(rel, []).extend(replacements)
+# END XIAOMA 2026-05-29 HERMES 0.15 PATCH
 
 for rel, replacements in basic_replacements.items():
     path = root / rel

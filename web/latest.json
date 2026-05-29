@@ -1,16 +1,16 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.05.26.1",
+  "latest": "2026.05.29.1",
   "install": "https://useai.live/hermes/install.sh",
   "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
   "upstream": {
-    "latest_release": "v2026.5.16",
-    "latest_release_name": "Hermes Agent v0.14.0 (2026.5.16)",
-    "latest_release_date": "2026-05-16",
-    "main_commit": "52e3bfc2f4440186763a7840c0be669a2659c6dd",
-    "main_commit_date": "2026-05-18"
+    "latest_release": "v2026.5.29",
+    "latest_release_name": "Hermes Agent v0.15.1 (2026.5.29) — The Patch Release",
+    "latest_release_date": "2026-05-29",
+    "main_commit": "e71a2bd11b733f3be7cf99deafde0066c343d462",
+    "main_commit_date": "2026-05-29"
   },
   "version_detection": {
     "owner": "installer",
@@ -19,25 +19,32 @@
   },
   "packages": [
     {
+      "hermes": "0.15.x",
+      "version": "2026.05.29.1",
+      "manifest": "packages/0.15.x/zh-CN/manifest.json",
+      "package": "packages/0.15.x/zh-CN/zh-cn.min.json",
+      "sha256": "912a2b830ac226e65db680ff6c4c89969900783b41d3eed209caf971748b4b3f"
+    },
+    {
       "hermes": "0.14.x",
-      "version": "2026.05.26.1",
+      "version": "2026.05.29.1",
       "manifest": "packages/0.14.x/zh-CN/manifest.json",
       "package": "packages/0.14.x/zh-CN/zh-cn.min.json",
-      "sha256": "0024ed2c0ffa0916199eaf482e3ca51a7cf589ff1d04bbebad126fe19d02ab99"
+      "sha256": "f4065bb198774b52db874e517cccdddbfedb8f2a3fad49244f5b9024826a8e18"
     },
     {
       "hermes": "0.13.x",
-      "version": "2026.05.26.1",
+      "version": "2026.05.29.1",
       "manifest": "packages/0.13.x/zh-CN/manifest.json",
       "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
-      "sha256": "eeabce7aa230f3912f608a3d923e3b81008b29e4d4055e73b40d740ac90f4733"
+      "sha256": "1e535b551849c38d538e94262885274415b40bf8e7c994df1f458bfd17f68b84"
     },
     {
       "hermes": "legacy",
-      "version": "2026.05.26.1",
+      "version": "2026.05.29.1",
       "manifest": "packages/legacy/zh-CN/manifest.json",
       "package": "packages/legacy/zh-CN/zh-cn.min.json",
-      "sha256": "0c9276e02c20a665782eccd3fc01c0fa74a4be3da736d964985c67bf6b807a5b"
+      "sha256": "9c44aea415fe45b971db8e21259223a1ac0718ced427e0d20b82e70547b786c7"
     }
   ],
   "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh"

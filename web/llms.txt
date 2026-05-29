@@ -15,10 +15,10 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 
 ## 当前版本
 
-- 中文包：2026.05.26.1
-- 官方最新版：Hermes Agent v0.14.0，发布时间 2026-05-16。
-- 官方 main：已核对到 2026-05-18 提交。
-- 安装器支持 0.14.x、0.13.x 和 legacy 兼容包。
+- 中文包：2026.05.29.1
+- 官方最新版：Hermes Agent v0.15.1，发布时间 2026-05-29。
+- 官方 main：已核对到 2026-05-29 提交 e71a2bd。
+- 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
 
 ## 覆盖范围
 
@@ -29,6 +29,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 - 工具分类、技能分类、状态页、配置页、医生检查页中文化。
 - ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文化。
 - ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令和多平台配置提示中文化。
+- Hermes 0.15.1 的技能包、MCP 目录选择器、Bitwarden Secrets Manager、xAI 模型迁移、ntfy、Krea 和 xAI 网页搜索插件配置说明中文化。
 - 未安装 Hermes 时，安装器先安装官方 Hermes Agent，再安装中文补丁。
 - 旧版 Hermes、版本检测失败或超时时，使用 legacy 兼容包。
 

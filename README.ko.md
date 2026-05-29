@@ -29,8 +29,9 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 - 슬래시 명령 설명 중국어화.
 - 도구 분류와 스킬 분류 중국어화.
 - 주요 TUI 안내와 실행 진행 메시지 중국어화.
+- Hermes `0.15.x` 추가 기능(스킬 번들, MCP 카탈로그 선택기, Bitwarden Secrets Manager, ntfy, Krea, xAI 웹 검색/마이그레이션 문구) 지원.
 - Hermes `0.2`부터 `0.12`까지의 이전 버전 지원.
-- `0.14.x`, `0.13.x`, legacy 패키지 지원.
+- `0.15.x`, `0.14.x`, `0.13.x`, legacy 패키지 지원.
 
 ## 경계
 
@@ -44,6 +45,7 @@ curl -fsSL https://useai.live/hermes/install.sh | bash
 ```text
 web/install.sh               설치 프로그램
 web/latest.json              버전 정보
+web/packages/0.15.x/zh-CN/   Hermes 0.15.x 패키지
 web/packages/0.14.x/zh-CN/   Hermes 0.14.x 패키지
 web/packages/0.13.x/zh-CN/   Hermes 0.13.x 패키지
 web/packages/legacy/zh-CN/   이전 버전 호환 패키지

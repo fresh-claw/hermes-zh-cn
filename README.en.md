@@ -29,8 +29,9 @@ It sets `display.language=zh`, installs a Xiaoma AI helper skill, adds a startup
 - Slash command descriptions translated.
 - Tool categories and skill categories translated.
 - Common TUI prompts and runtime progress messages translated.
+- Hermes `0.15.x` release additions are covered, including skill bundles, MCP catalog picker, Bitwarden Secrets Manager, ntfy, Krea, and xAI web search/migration text.
 - Hermes `0.2` to `0.12` legacy versions are supported.
-- `0.14.x`, `0.13.x`, and legacy packages are supported.
+- `0.15.x`, `0.14.x`, `0.13.x`, and legacy packages are supported.
 
 ## Boundaries
 
@@ -44,6 +45,7 @@ It sets `display.language=zh`, installs a Xiaoma AI helper skill, adds a startup
 ```text
 web/install.sh               Installer
 web/latest.json              Version metadata
+web/packages/0.15.x/zh-CN/   Hermes 0.15.x package
 web/packages/0.14.x/zh-CN/   Hermes 0.14.x package
 web/packages/0.13.x/zh-CN/   Hermes 0.13.x package
 web/packages/legacy/zh-CN/   Legacy package

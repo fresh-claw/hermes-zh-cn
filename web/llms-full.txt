@@ -5,7 +5,7 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Agent 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.05.26.1
+Version: 2026.05.29.1
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
@@ -37,12 +37,13 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 当前版本
 
-- 中文包：2026.05.26.1
-- 官方最新版：Hermes Agent v0.14.0，发布时间 2026-05-16。
-- 官方 main：已核对到 2026-05-18 提交 52e3bfc2f4440186763a7840c0be669a2659c6dd。
-- 安装器支持 0.14.x、0.13.x 和 legacy 兼容包。
+- 中文包：2026.05.29.1
+- 官方最新版：Hermes Agent v0.15.1，发布时间 2026-05-29。
+- 官方 main：已核对到 2026-05-29 提交 e71a2bd11b733f3be7cf99deafde0066c343d462。
+- 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
 - 本次补充 ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文。
 - 2026.05.26.1 补齐主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理等用户可见中文。
+- 2026.05.29.1 新增 0.15.x 分流，补齐 0.15.1 的 TUI 品牌组件、技能包、MCP 目录选择器、Bitwarden Secrets Manager、xAI 模型迁移、ntfy、Krea 和 xAI 网页搜索插件中文。
 - 深层补充 ACP 权限按钮、Discord/Slack/Telegram/飞书审批结果、网关允许名单、配对命令和多平台配置提示中文。
 
 ## 安装流程
@@ -51,7 +52,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 2. Hermes 或用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
 3. 安装器检测本机 Hermes。
 4. 未检测到 Hermes 时，安装器执行官方安装脚本。
-5. 安装器检测 Hermes 版本，0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
+5. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
 6. 安装器校验 SHA256。
 7. 安装器设置 `display.language=zh`。
 8. 安装器写入中文增强技能。
@@ -64,16 +65,25 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 - `hermes_cli/skin_engine.py`
 - `hermes_cli/tips.py`
 - `hermes_cli/commands.py`
+- `hermes_cli/bundles.py`
+- `hermes_cli/mcp_picker.py`
+- `hermes_cli/secrets_cli.py`
+- `hermes_cli/migrate.py`
 - `hermes_cli/status.py`
 - `hermes_cli/doctor.py`
 - `hermes_cli/setup.py`
 - `cli.py`
 - `run_agent.py`
 - `agent/display.py`
+- `agent/skill_bundles.py`
+- `agent/secret_sources/bitwarden.py`
 - `acp_adapter/*.py`
 - `gateway/platforms/api_server.py`
 - `plugins/platforms/teams/adapter.py`
 - `plugins/memory/hindsight/__init__.py`
+- `plugins/platforms/ntfy/plugin.yaml`
+- `plugins/image_gen/krea/plugin.yaml`
+- `plugins/web/xai/plugin.yaml`
 - `toolsets.py`
 - `batch_runner.py`
 - `ui-tui/src/**/*.ts`
