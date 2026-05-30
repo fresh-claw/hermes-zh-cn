@@ -826,12 +826,10 @@ pre {
   z-index: 1;
   width: min(340px, 78%);
   aspect-ratio: 1;
-  padding: 10px;
-  background: var(--ink);
-  border: 1px solid rgba(13, 7, 24, 0.16);
-  box-shadow:
-    0 18px 60px rgba(0, 0, 0, 0.28),
-    0 0 0 8px rgba(255, 240, 220, 0.06);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   transform: rotate(-1.5deg);
 }
 
@@ -839,7 +837,7 @@ pre {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .beginner-guide {
