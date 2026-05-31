@@ -826,10 +826,13 @@ pre {
   z-index: 1;
   width: min(340px, 78%);
   aspect-ratio: 1;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 246, 225, 0.98), rgba(245, 205, 145, 0.94));
+  border: 1px solid rgba(255, 122, 26, 0.5);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 244, 223, 0.22) inset;
   transform: rotate(-1.5deg);
 }
 
