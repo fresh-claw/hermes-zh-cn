@@ -5113,10 +5113,11 @@ html[data-theme="orange"] .install-side {
 
 html[data-theme="orange"] .install-card {
   display: grid;
-  align-content: start;
-  gap: 11px;
-  min-height: 226px;
-  padding: 14px;
+  grid-template-rows: auto auto auto;
+  align-content: center;
+  gap: 15px;
+  min-height: 218px;
+  padding: 16px;
 }
 
 html[data-theme="orange"] .install-card-primary {
@@ -5128,7 +5129,7 @@ html[data-theme="orange"] .install-card-primary {
 
 html[data-theme="orange"] .install-card-copy {
   display: grid;
-  gap: 8px;
+  gap: 5px;
   min-width: 0;
   margin: 0;
 }
@@ -5149,7 +5150,7 @@ html[data-theme="orange"] .install-card h2 {
   margin: 0;
   color: #fff2df;
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 1.38vw, 1.45rem);
+  font-size: clamp(1.26rem, 1.46vw, 1.56rem);
   line-height: 1.05;
   letter-spacing: 0;
   text-transform: none;
@@ -5166,7 +5167,8 @@ html[data-theme="orange"] .install-card p {
 
 html[data-theme="orange"] .install-card-points {
   display: grid;
-  gap: 5px;
+  grid-template-columns: 1fr;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -5262,7 +5264,7 @@ html[data-theme="orange"] .install-stub {
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -5294,14 +5296,19 @@ html[data-theme="orange"] .install-stub b {
 
 html[data-theme="orange"] .install-stub img {
   display: block;
-  width: clamp(146px, 11.23vw, 168px);
-  height: clamp(146px, 11.23vw, 168px);
+  width: clamp(170px, 12.86vw, 196px);
+  height: clamp(170px, 12.86vw, 196px);
   padding: 0;
   border: 0;
   border-radius: 0;
   object-fit: contain;
   background: transparent;
-  filter: brightness(1.62) saturate(0.48) contrast(0.8);
+  filter:
+    brightness(1.82)
+    saturate(0.38)
+    contrast(0.72)
+    drop-shadow(0 1px 0 rgba(255, 236, 205, 0.18))
+    drop-shadow(0 -1px 0 rgba(60, 13, 0, 0.42));
   box-shadow: none;
 }
 
