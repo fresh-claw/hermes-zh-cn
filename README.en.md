@@ -13,7 +13,7 @@ Users can send this sentence to Hermes:
 Hermes can read the public page, find the installation instruction, and run the installer:
 
 ```bash
-curl -fsSL https://useai.live/hermes/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-desktop-zh-cn/main/install.sh | bash
 ```
 
 ## What It Does
