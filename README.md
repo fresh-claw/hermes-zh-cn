@@ -1,6 +1,6 @@
 # 小马AI Hermes 中文增强包
 
-面向中文用户的 Hermes Agent 汉化补丁。适合刚开始用 Hermes、看不懂英文启动页和快捷指令、或者安装后仍有部分界面没有变成中文的人。
+面向中文用户的 Hermes Desktop 桌面版、Hermes Agent TUI 和 CLI 汉化补丁。适合刚开始用 Hermes、看不懂英文启动页和快捷指令、或者安装后仍有部分界面没有变成中文的人。
 
 官网入口：[useai.live/hermes](https://useai.live/hermes/)
 
@@ -13,6 +13,18 @@
 ```
 
 Hermes 读取页面说明后，直接执行安装命令。安装器会先检测本机 Hermes；未安装时自动执行官方安装脚本，安装完成后继续安装中文补丁。随后检测版本，0.15.x、0.14.x、0.13.x 使用对应中文包，失败或超时时使用 legacy 兼容包，并把 Hermes 静态界面语言设置为 `zh`，加入小马AI中文增强说明和启动更新辅助脚本，备份后修改启动界面、快捷指令、分类、网关、ACP、权限按钮、配对配置和审批相关文案。
+
+Windows 桌面版用户可直接运行：
+
+```powershell
+iwr https://useai.live/hermes/install.ps1 -UseBasicParsing | iex
+```
+
+macOS、Linux 和 WSL2 用户运行：
+
+```bash
+curl -fsSL https://useai.live/hermes/install.sh | bash
+```
 
 ## 机制
 
@@ -34,7 +46,10 @@ web/
   details.html               # 详细说明页
   agent.json                 # Hermes 读取的任务清单
   latest.json                # 版本入口
+  platforms.json             # Windows/macOS/Linux 入口和桌面版策略
   install.sh                 # 一键安装器
+  install.ps1                # Windows PowerShell 一键入口
+  install.command            # macOS 双击入口
   tools/xiaoma-hermes        # 更新与状态辅助脚本
   packages/0.15.x/zh-CN/     # Hermes 0.15.x 中文增强包
   packages/0.14.x/zh-CN/     # Hermes 0.14.x 中文增强包

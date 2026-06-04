@@ -149,7 +149,7 @@ copyButtons.forEach((button) => {
 });
 
 const commandTarget = document.querySelector("#typed-command");
-const commandText = "请访问 useai.live/hermes 安装汉化补丁";
+const commandText = "请访问 useai.live/hermes 安装桌面版或 TUI 汉化补丁";
 const installCountTarget = document.querySelector("[data-install-count]");
 
 const formatCount = (value) => {

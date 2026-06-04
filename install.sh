@@ -496,6 +496,7 @@ if real_hermes:
         add_from_python(first_line[2:].strip().split()[0])
 
 add_candidate(home / ".hermes" / "hermes-agent")
+add_candidate(hermes_home / "hermes-agent")
 add_candidate(Path("/usr/local/lib/hermes-agent"))
 add_candidate(Path("/opt/hermes-agent"))
 add_candidate(Path("/usr/local/hermes-agent"))

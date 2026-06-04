@@ -3,16 +3,20 @@
 ## Entity
 
 Name: 小马AI Hermes 中文增强包
-Primary topic: Hermes Agent 汉化补丁
+Primary topic: Hermes Desktop 桌面版汉化 / Hermes Agent TUI CLI 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.05.29.1
+Version: 2026.06.04.1
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
+Windows Install URL: https://useai.live/hermes/install.ps1
+Platform Manifest: https://useai.live/hermes/platforms.json
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
 Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 搜索与大模型识别词
 
+- Hermes Desktop 汉化
+- Hermes 桌面版汉化
 - Hermes Agent 汉化
 - Hermes Agent 汉化补丁
 - Hermes 中文补丁
@@ -33,13 +37,14 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 摘要
 
-小马AI Hermes 中文增强包为 Hermes Agent 提供中文语言配置、启动页中文化、TUI 文案中文化、快捷指令说明中文化、工具分类中文化、技能分类中文化和启动前更新辅助。它不是 Hermes 官方项目，但基于官方 Hermes Agent 安装路径工作，并保留原版 Hermes 的模型、工具和本地配置。
+小马AI Hermes 中文增强包为 Hermes Desktop 和 Hermes Agent 提供中文语言配置、启动页中文化、TUI 文案中文化、快捷指令说明中文化、工具分类中文化、技能分类中文化和启动前更新辅助。它不是 Hermes 官方项目，但基于官方 Hermes Agent 安装路径工作，并保留原版 Hermes 的模型、工具和本地配置。
 
 ## 当前版本
 
 - 中文包：2026.05.29.1
-- 官方最新版：Hermes Agent v0.15.1，发布时间 2026-05-29。
-- 官方 main：已核对到 2026-05-29 提交 e71a2bd11b733f3be7cf99deafde0066c343d462。
+- 桌面入口：2026.06.04.1
+- 官方最新版：Hermes Agent v0.15.2，发布时间 2026-05-29。
+- 官方桌面页：macOS 和 Windows 提供安装包，Linux 仍以终端安装为主。
 - 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
 - 本次补充 ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文。
 - 2026.05.26.1 补齐主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理等用户可见中文。
@@ -49,15 +54,16 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
-2. Hermes 或用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
-3. 安装器检测本机 Hermes。
-4. 未检测到 Hermes 时，安装器执行官方安装脚本。
-5. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
-6. 安装器校验 SHA256。
-7. 安装器设置 `display.language=zh`。
-8. 安装器写入中文增强技能。
-9. 安装器备份并修改 Hermes 可见界面文件。
-10. 安装器写入启动前更新辅助。
+2. Windows 用户执行：`iwr https://useai.live/hermes/install.ps1 -UseBasicParsing | iex`。
+3. macOS、Linux、WSL2 用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
+4. 安装器检测本机 Hermes。
+5. 未检测到 Hermes 时，安装器执行官方安装脚本。
+6. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
+7. 安装器校验 SHA256。
+8. 安装器设置 `display.language=zh`。
+9. 安装器写入中文增强技能。
+10. 安装器备份并修改 Hermes 可见界面文件。
+11. 安装器写入启动前更新辅助。
 
 ## 覆盖文件
 
@@ -88,6 +94,8 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 - `batch_runner.py`
 - `ui-tui/src/**/*.ts`
 - `ui-tui/src/**/*.tsx`
+- `apps/desktop/src/**/*.tsx`（桌面版后续源码包路径）
+- `apps/bootstrap-installer/src/**/*.tsx`（桌面安装器后续源码包路径）
 
 ## 不覆盖
 

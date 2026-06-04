@@ -1,0 +1,59 @@
+{
+  "version": "2026.06.04.1",
+  "updated_at": "2026-06-04",
+  "locale": "zh-CN",
+  "upstream": {
+    "desktop_page": "https://hermes-ai.net/desktop/",
+    "agent_repo": "https://github.com/NousResearch/hermes-agent",
+    "agent_release": "v2026.5.29.2",
+    "agent_version": "0.15.2"
+  },
+  "packages": {
+    "core_tui": "packages/0.15.x/zh-CN/zh-cn.min.json",
+    "macos_linux_installer": "install.sh",
+    "macos_click_installer": "install.command",
+    "windows_installer": "install.ps1"
+  },
+  "platforms": [
+    {
+      "id": "windows",
+      "label": "Windows",
+      "recommended": "powershell",
+      "command": "iwr https://useai.live/hermes/install.ps1 -UseBasicParsing | iex",
+      "method": "PowerShell 先安装官方 Hermes，再调用 Git Bash 应用中文增强。",
+      "desktop": "补 Hermes 核心、TUI、网关、配置；桌面壳跟随同一 Hermes 配置。"
+    },
+    {
+      "id": "macos",
+      "label": "macOS",
+      "recommended": "command_file_or_terminal",
+      "command": "curl -fsSL https://useai.live/hermes/install.sh | bash",
+      "method": "保留官方 App 签名，使用脚本补中文内容。",
+      "desktop": "不改官方签名包，优先补同一 Hermes 核心和 TUI。"
+    },
+    {
+      "id": "linux",
+      "label": "Linux",
+      "recommended": "terminal",
+      "command": "curl -fsSL https://useai.live/hermes/install.sh | bash",
+      "method": "沿用官方终端安装流，补中文内容。",
+      "desktop": "Linux 官方仍以终端安装为主，中文包同源应用。"
+    }
+  ],
+  "localization_surface": [
+    "official locale: locales/zh.yaml",
+    "CLI: hermes_cli/*.py",
+    "TUI: ui-tui/src/**/*.ts and ui-tui/src/**/*.tsx",
+    "gateway: gateway/platforms/*.py",
+    "ACP: acp_adapter/*.py",
+    "platform plugins: plugins/platforms/*",
+    "desktop bootstrap: apps/bootstrap-installer",
+    "desktop renderer: apps/desktop/src",
+    "desktop main process: apps/desktop/electron"
+  ],
+  "repackage_policy": {
+    "default": "patch_after_official_install",
+    "reason": "macOS 和 Windows 官方安装包带签名和更新链路；直接改包会增加启动失败和更新失效风险。",
+    "future": "若官方桌面源码发布稳定 tag，再基于源码构建未签名中文测试包。"
+  }
+}

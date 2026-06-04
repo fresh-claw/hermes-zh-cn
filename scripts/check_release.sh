@@ -4,10 +4,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 bash -n "$ROOT/web/install.sh"
+bash -n "$ROOT/web/install.command"
 bash -n "$ROOT/web/tools/xiaoma-hermes"
 
 python3 -m json.tool "$ROOT/web/agent.json" >/dev/null
 python3 -m json.tool "$ROOT/web/latest.json" >/dev/null
+python3 -m json.tool "$ROOT/web/platforms.json" >/dev/null
 python3 -m json.tool "$ROOT/web/api/resolve" >/dev/null
 python3 -m json.tool "$ROOT/web/api/resolve.sample.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.15.x/zh-CN/manifest.json" >/dev/null
@@ -27,6 +29,7 @@ from pathlib import Path
 
 root = Path(sys.argv[1])
 latest = json.loads((root / "web/latest.json").read_text(encoding="utf-8"))
+platforms = json.loads((root / "web/platforms.json").read_text(encoding="utf-8"))
 resolve = json.loads((root / "web/api/resolve.sample.json").read_text(encoding="utf-8"))
 
 compats = ("0.15.x", "0.14.x", "0.13.x", "legacy")
@@ -45,6 +48,14 @@ if resolve["sha256"] != latest["packages"][0]["sha256"]:
     raise SystemExit("resolve sha256 不一致")
 if resolve["legacy_sha256"] != latest["packages"][-1]["sha256"]:
     raise SystemExit("resolve legacy_sha256 不一致")
+
+windows_command = platforms["platforms"][0]["command"]
+if "install.ps1" not in windows_command or "iex" not in windows_command:
+    raise SystemExit("Windows 一键命令缺失")
+if platforms["upstream"]["agent_version"] != "0.15.2":
+    raise SystemExit("官方版本记录需为 0.15.2")
+if not (root / "web/install.ps1").exists():
+    raise SystemExit("缺少 install.ps1")
 
 skill = json.loads((root / "web/packages/0.15.x/zh-CN/zh-cn.min.json").read_text(encoding="utf-8")).get("skill_markdown", "")
 if "name: xiaoma-hermes-zh" not in skill:

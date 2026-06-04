@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-label="Hermes ticket frame">
+  <defs>
+    <linearGradient id="dark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080200"/>
+      <stop offset=".55" stop-color="#120602"/>
+      <stop offset="1" stop-color="#050100"/>
+    </linearGradient>
+    <linearGradient id="copper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a20"/>
+      <stop offset=".45" stop-color="#b84708"/>
+      <stop offset="1" stop-color="#5b1800"/>
+    </linearGradient>
+    <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+      <path d="M0 0V10" stroke="#ff8a20" stroke-opacity=".11" stroke-width="1"/>
+    </pattern>
+    <filter id="glow" x="-8%" y="-12%" width="116%" height="124%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1  0 .45 0 0 .32  0 0 .08 0 .04  0 0 0 .65 0" result="warm"/>
+      <feMerge>
+        <feMergeNode in="warm"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="ticket">
+      <path d="M38 24H822C826 47 844 62 866 62C888 62 906 47 910 24H1162C1162 53 1183 72 1190 76V160C1156 164 1138 185 1138 215C1138 245 1156 266 1190 270V354C1183 358 1162 377 1162 406H910C906 383 888 368 866 368C844 368 826 383 822 406H38C36 378 16 359 10 354V270C42 266 62 245 62 215C62 185 42 164 10 160V76C16 71 36 52 38 24Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#ticket)">
+    <rect width="1200" height="430" fill="url(#dark)"/>
+    <rect x="874" width="326" height="430" fill="url(#copper)" opacity=".96"/>
+    <rect width="1200" height="430" fill="url(#hatch)"/>
+    <ellipse cx="700" cy="55" rx="390" ry="68" fill="#ff8a20" opacity=".06"/>
+    <ellipse cx="1000" cy="220" rx="210" ry="260" fill="#ffb15f" opacity=".13"/>
+    <path d="M96 122H780M96 326H780" stroke="#ff7a1a" stroke-opacity=".52" stroke-width="1.5"/>
+    <path d="M594 326H686M514 122H606" stroke="#ffd08b" stroke-opacity=".65" stroke-width="1.2"/>
+    <path d="M884 24V406" stroke="#ff7a1a" stroke-opacity=".72" stroke-width="2" stroke-dasharray="9 8"/>
+  </g>
+  <path d="M38 24H822C826 47 844 62 866 62C888 62 906 47 910 24H1162C1162 53 1183 72 1190 76V160C1156 164 1138 185 1138 215C1138 245 1156 266 1190 270V354C1183 358 1162 377 1162 406H910C906 383 888 368 866 368C844 368 826 383 822 406H38C36 378 16 359 10 354V270C42 266 62 245 62 215C62 185 42 164 10 160V76C16 71 36 52 38 24Z" fill="none" stroke="#ff7a1a" stroke-width="2.2" filter="url(#glow)"/>
+  <path d="M53 42H806C815 65 837 81 866 81C895 81 917 65 926 42H1144M1144 388H926C917 365 895 349 866 349C837 349 815 365 806 388H53" fill="none" stroke="#ffb36a" stroke-opacity=".42" stroke-width="1"/>
+</svg>

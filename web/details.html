@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hermes Agent 中文补丁详情｜汉化文件与版本说明</title>
+    <title>Hermes Desktop 与 TUI/CLI 中文补丁详情｜汉化文件与版本说明</title>
     <meta
       name="description"
       content="Hermes Agent 中文补丁详情：查看小马AI Hermes 中文增强包版本、汉化文件范围、GitHub 同步方式、legacy 兼容策略和爱马仕机器人补丁边界。"
@@ -103,9 +103,9 @@
 
       <section class="hero detail-hero grid">
         <div class="hero-inner">
-          <p class="kicker">版本 · 文件 · 更新</p>
+          <p class="kicker">桌面版 · TUI/CLI · 文件</p>
           <h1>详细介绍</h1>
-          <p class="lede">这里说明当前版本、翻译范围、更新记录和同步方式。</p>
+          <p class="lede">这里说明桌面版、TUI/CLI、三平台入口、翻译范围、更新记录和同步方式。</p>
         </div>
       </section>
 
@@ -118,8 +118,12 @@
           <p>2026.05.29.1</p>
         </article>
         <article class="feature">
+          <h3>桌面入口版本</h3>
+          <p>2026.06.04.1</p>
+        </article>
+        <article class="feature">
           <h3>适配 Hermes</h3>
-          <p>0.15.x、0.14.x、0.13.x；未安装 Hermes 时先自动安装官方 Hermes，版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。</p>
+          <p>0.15.x、0.14.x、0.13.x；未安装 Hermes 时先自动安装官方 Hermes，版本检测失败、超时或旧版 Hermes 使用 legacy 兼容包。官方最新核对到 Hermes Agent v0.15.2。</p>
         </article>
         <article class="feature">
           <h3>更新方式</h3>
@@ -132,6 +136,10 @@
           <h2 id="iteration-title">最近迭代</h2>
         </div>
         <article class="feature">
+          <h3>2026.06.04.1</h3>
+          <p>新增 Hermes Desktop 桌面版分区、Windows PowerShell 一键入口、macOS 双击入口和 platforms.json 平台清单。</p>
+        </article>
+        <article class="feature">
           <h3>2026.05.29.1</h3>
           <p>适配 Hermes Agent v0.15.1；补齐 TUI 0.15.1 品牌组件、技能包、MCP 目录选择器、Bitwarden Secrets Manager、xAI 模型迁移、ntfy、Krea 和 xAI 网页搜索插件中文。</p>
         </article>
@@ -141,7 +149,7 @@
         </article>
         <article class="feature">
           <h3>官方核对</h3>
-          <p>官方最新发布版为 v0.15.1（2026-05-29），官方 main 已核对到 2026-05-29 提交 e71a2bd。</p>
+          <p>官方最新发布版为 v0.15.2（2026-05-29），官方桌面页提供 macOS 与 Windows 下载，Linux 保持终端安装流。</p>
         </article>
         <article class="feature">
           <h3>兼容策略</h3>
@@ -161,7 +169,10 @@
           <ul>
             <li><b>agent.json</b><span>给 Hermes 读取的任务清单、版本判断和安装边界。</span></li>
             <li><b>latest.json</b><span>当前中文包版本、兼容范围和下载入口。</span></li>
+            <li><b>platforms.json</b><span>Windows、macOS、Linux 一键入口与桌面版汉化策略。</span></li>
             <li><b>install.sh</b><span>自包含安装器：未安装 Hermes 时先装官方 Hermes，再检测版本、校验文件、启用中文、应用启动界面、快捷指令、网关状态和分类补丁、安装更新辅助脚本。</span></li>
+            <li><b>install.ps1</b><span>Windows 一键入口：先安装官方 Hermes，再调用中文增强安装器。</span></li>
+            <li><b>install.command</b><span>macOS 双击入口：调用同一套中文增强安装器。</span></li>
             <li><b>xiaoma-hermes</b><span>状态查看、更新检查和启动前更新。</span></li>
             <li><b>manifest.json</b><span>中文包版本、SHA256 和文件清单。</span></li>
             <li><b>zh-cn.min.json</b><span>中文增强内容、安装动作和 Hermes 技能说明。</span></li>
@@ -197,7 +208,7 @@
             <strong>官方语言接口 + 小马AI增强</strong>
           </div>
           <pre>{
-  "已覆盖": ["display.language=zh", "中文增强技能", "启动前更新", "0.15.x/0.14.x/0.13.x/legacy 兼容安装", "启动界面补丁", "快捷指令说明", "工具集分类中文", "技能分类中文", "ACP 与网关状态提示", "技能包/MCP/Bitwarden/xAI/ntfy/Krea 提示", "目标和推理提示", "默认模型设置提示"],
+  "已覆盖": ["display.language=zh", "Windows/macOS/Linux 一键入口", "中文增强技能", "启动前更新", "0.15.x/0.14.x/0.13.x/legacy 兼容安装", "启动界面补丁", "快捷指令说明", "工具集分类中文", "技能分类中文", "ACP 与网关状态提示", "技能包/MCP/Bitwarden/xAI/ntfy/Krea 提示", "目标和推理提示", "默认模型设置提示"],
   "未覆盖": ["模型回复", "工具原始输出", "第三方工具返回文本", "异常栈"],
   "原因": "Hermes 原版并未把全部 TUI 文案接入语言配置",
   "处理方式": "安装器备份后修改启动界面与分类文案文件；升级 Hermes 后可重新运行安装命令"

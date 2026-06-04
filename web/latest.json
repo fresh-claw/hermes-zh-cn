@@ -3,13 +3,16 @@
   "brand": "小马AI版",
   "latest": "2026.05.29.1",
   "install": "https://useai.live/hermes/install.sh",
+  "install_windows": "https://useai.live/hermes/install.ps1",
+  "install_macos_click": "https://useai.live/hermes/install.command",
+  "platforms": "https://useai.live/hermes/platforms.json",
   "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
   "upstream": {
-    "latest_release": "v2026.5.29",
-    "latest_release_name": "Hermes Agent v0.15.1 (2026.5.29) — The Patch Release",
+    "latest_release": "v2026.5.29.2",
+    "latest_release_name": "Hermes Agent v0.15.2 (2026.5.29.2)",
     "latest_release_date": "2026-05-29",
-    "main_commit": "e71a2bd11b733f3be7cf99deafde0066c343d462",
+    "main_commit": "77a1650c78a4cb1813d8a81fa1da40a15b6a3ec5",
     "main_commit_date": "2026-05-29"
   },
   "version_detection": {
