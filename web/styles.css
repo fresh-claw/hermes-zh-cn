@@ -5322,11 +5322,11 @@ html[data-theme="orange"] .install-stub small {
 
 html[data-theme="orange"] .install-message {
   display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: minmax(230px, 0.34fr) minmax(0, 1fr);
+  gap: 16px;
   align-items: center;
   min-width: 0;
-  padding: 8px 0 0;
+  padding: 14px 0 0;
   border-top: 1px solid rgba(255, 122, 26, 0.22);
 }
 
@@ -5334,6 +5334,35 @@ html[data-theme="orange"] .install-message > div {
   display: block;
   min-width: 0;
   margin: 0;
+}
+
+html[data-theme="orange"] .install-message-copy {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+}
+
+html[data-theme="orange"] .install-message-copy small,
+html[data-theme="orange"] .install-message-copy b,
+html[data-theme="orange"] .install-message-copy span {
+  display: block;
+}
+
+html[data-theme="orange"] .install-message-copy b {
+  color: #fff2df;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1vw, 1.12rem);
+  line-height: 1.12;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-message-copy span {
+  color: rgba(255, 236, 210, 0.66);
+  font-size: clamp(0.72rem, 0.76vw, 0.82rem);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 @media (max-width: 1060px) {
