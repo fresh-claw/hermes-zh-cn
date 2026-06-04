@@ -3148,9 +3148,9 @@ html[data-theme="orange"] .topbar {
   position: relative;
   min-height: 88px;
   display: grid;
-  grid-template-columns: minmax(260px, 360px) 1fr minmax(240px, 360px);
+  grid-template-columns: minmax(168px, 240px) minmax(0, 1fr) minmax(168px, 250px);
   align-items: center;
-  padding: 0 28px;
+  padding: 0 clamp(18px, 2.2vw, 28px);
   border-bottom: 1px solid rgba(255, 121, 25, 0.55);
   background:
     linear-gradient(90deg, rgba(255, 121, 25, 0.04), transparent 38%),
@@ -3179,13 +3179,15 @@ html[data-theme="orange"] .brand span:last-child {
 html[data-theme="orange"] .nav {
   justify-self: center;
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: 10px 18px;
-  width: auto;
+  gap: clamp(8px, 1vw, 14px);
+  width: min(100%, 620px);
+  min-width: 0;
   border: 0;
   background: transparent;
+  overflow: hidden;
 }
 
 html[data-theme="orange"] .nav a,
@@ -3194,9 +3196,11 @@ html[data-theme="orange"] .nav-separator {
   padding: 0;
   color: rgba(255, 244, 223, 0.78);
   font-family: var(--font-display);
-  font-size: 0.9rem;
+  font-size: clamp(0.76rem, 0.82vw, 0.9rem);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 html[data-theme="orange"] .nav a:hover,
@@ -3214,9 +3218,28 @@ html[data-theme="orange"] .nav-separator {
 html[data-theme="orange"] .tools {
   justify-content: flex-end;
   align-items: center;
-  gap: 22px;
+  gap: 14px;
   padding: 0;
   border: 0;
+  min-width: 0;
+}
+
+@media (max-width: 1240px) {
+  html[data-theme="orange"] .topbar {
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) minmax(130px, 190px);
+  }
+
+  html[data-theme="orange"] .nav {
+    gap: 12px;
+  }
+
+  html[data-theme="orange"] .nav-separator {
+    display: none;
+  }
+
+  html[data-theme="orange"] .version-chip {
+    font-size: 0.78rem;
+  }
 }
 
 html[data-theme="orange"] .version-chip {
