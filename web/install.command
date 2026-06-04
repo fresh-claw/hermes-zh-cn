@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://raw.githubusercontent.com/fresh-claw/hermes-desktop-zh-cn/main}"
+BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://raw.githubusercontent.com/fresh-claw/hermes-cn/main}"
 BASE_URL="${BASE_URL%/}"
 export XIAOMA_HERMES_ENTRYPOINT="macos-command"
 

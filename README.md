@@ -17,13 +17,13 @@ Hermes 读取页面说明后，直接执行安装命令。安装器会先检测�
 Windows 桌面版用户可直接运行：
 
 ```powershell
-iwr https://raw.githubusercontent.com/fresh-claw/hermes-desktop-zh-cn/main/install.ps1 -UseBasicParsing | iex
+iwr https://raw.githubusercontent.com/fresh-claw/hermes-cn/main/install.ps1 -UseBasicParsing | iex
 ```
 
 macOS、Linux 和 WSL2 用户运行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-desktop-zh-cn/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-cn/main/install.sh | bash
 ```
 
 ## 机制
@@ -61,7 +61,7 @@ scripts/check_release.sh     # 本地自检
 ## 安装
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-desktop-zh-cn/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-cn/main/install.sh | bash
 ```
 
 本地测试时可以改成：
