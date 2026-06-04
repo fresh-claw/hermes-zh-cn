@@ -5294,15 +5294,15 @@ html[data-theme="orange"] .install-stub b {
 
 html[data-theme="orange"] .install-stub img {
   display: block;
-  width: clamp(122px, 9.36vw, 140px);
-  height: clamp(122px, 9.36vw, 140px);
-  padding: 6px;
-  border: 1px solid rgba(255, 181, 106, 0.34);
-  border-radius: 8px;
+  width: clamp(146px, 11.23vw, 168px);
+  height: clamp(146px, 11.23vw, 168px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   object-fit: contain;
-  background: rgba(255, 181, 106, 0.08);
-  filter: brightness(1.32) saturate(0.78) contrast(0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.06);
+  background: transparent;
+  filter: brightness(1.62) saturate(0.48) contrast(0.8);
+  box-shadow: none;
 }
 
 html[data-theme="orange"] .install-stub small {
