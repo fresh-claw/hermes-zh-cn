@@ -5035,6 +5035,485 @@ html[data-theme="orange"] .install-stub small {
   }
 }
 
+/* Install hub redesign */
+html[data-theme="orange"] .hero {
+  min-height: auto;
+}
+
+html[data-theme="orange"] .hero-inner {
+  width: min(1180px, calc(100% - 48px));
+  padding: clamp(20px, 2.5vw, 32px) 0 clamp(8px, 1.2vw, 14px);
+  gap: clamp(14px, 1.55vw, 18px);
+}
+
+html[data-theme="orange"] .hero .kicker {
+  margin-bottom: 10px;
+  font-size: clamp(0.74rem, 0.78vw, 0.84rem);
+}
+
+html[data-theme="orange"] h1 {
+  font-size: clamp(3.55rem, 5.05vw, 5.12rem);
+}
+
+html[data-theme="orange"] .lede {
+  margin-top: 10px;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+html[data-theme="orange"] .install-hub {
+  position: relative;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: clamp(16px, 1.55vw, 20px);
+  border: 1px solid rgba(255, 122, 26, 0.42);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 122, 26, 0.075), rgba(255, 122, 26, 0.02)),
+    rgba(9, 4, 1, 0.78);
+  box-shadow:
+    0 26px 80px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 241, 220, 0.08);
+  text-align: left;
+  backdrop-filter: blur(16px);
+}
+
+html[data-theme="orange"] .install-hub::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(255, 122, 26, 0.16);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+html[data-theme="orange"] .install-main {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(14px, 1.55vw, 18px);
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+}
+
+html[data-theme="orange"] .install-panel-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: 0 0 2px;
+  border: 0;
+}
+
+html[data-theme="orange"] .install-panel-head span {
+  margin: 0;
+  color: #fff2df;
+  font-family: var(--font-display);
+  font-size: clamp(1.58rem, 1.9vw, 2rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow:
+    0 2px 0 rgba(76, 24, 0, 0.82),
+    0 0 18px rgba(255, 122, 26, 0.24);
+}
+
+html[data-theme="orange"] .install-panel-head small {
+  color: rgba(255, 144, 42, 0.95);
+  font-size: clamp(0.68rem, 0.74vw, 0.8rem);
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+html[data-theme="orange"] .install-panel-head strong {
+  color: #ffad57;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+html[data-theme="orange"] .install-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(248px, 0.72fr);
+  gap: 10px;
+  min-width: 0;
+}
+
+html[data-theme="orange"] .install-card,
+html[data-theme="orange"] .install-side {
+  min-width: 0;
+  border: 1px solid rgba(255, 122, 26, 0.34);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 223, 0.055), rgba(255, 244, 223, 0.015)),
+    rgba(5, 2, 1, 0.52);
+  box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.055);
+}
+
+html[data-theme="orange"] .install-card {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  min-height: 226px;
+  padding: 14px;
+}
+
+html[data-theme="orange"] .install-card-primary {
+  border-color: rgba(255, 154, 55, 0.76);
+  background:
+    linear-gradient(180deg, rgba(255, 122, 26, 0.12), rgba(255, 122, 26, 0.025)),
+    rgba(7, 3, 1, 0.6);
+}
+
+html[data-theme="orange"] .install-card-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+html[data-theme="orange"] .install-card small,
+html[data-theme="orange"] .install-message small {
+  margin: 0;
+  color: #ff8f2d;
+  font-family: var(--font-display);
+  font-size: clamp(0.72rem, 0.74vw, 0.8rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+html[data-theme="orange"] .install-card h2 {
+  margin: 0;
+  color: #fff2df;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.38vw, 1.45rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-card p {
+  margin: 0;
+  color: rgba(255, 236, 210, 0.74);
+  font-size: clamp(0.78rem, 0.8vw, 0.86rem);
+  line-height: 1.42;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-card-points {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+html[data-theme="orange"] .install-card-points li {
+  position: relative;
+  min-width: 0;
+  padding-left: 16px;
+  color: rgba(255, 236, 210, 0.68);
+  font-size: clamp(0.72rem, 0.74vw, 0.8rem);
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-card-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #ff8f2d;
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.46);
+}
+
+html[data-theme="orange"] .install-hub .command-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(68px, 6.8vw, 78px);
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 122, 26, 0.58);
+  border-radius: 7px;
+  background: rgba(1, 0, 0, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.05);
+}
+
+html[data-theme="orange"] .install-hub code {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 8px 10px;
+  color: rgba(255, 242, 220, 0.94);
+  font-size: clamp(0.68rem, 0.7vw, 0.76rem);
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-hub button {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  border-left: 1px solid rgba(255, 122, 26, 0.5);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 154, 55, 0.18), rgba(255, 122, 26, 0.06)),
+    rgba(255, 122, 26, 0.08);
+  color: #fff1dd;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: clamp(0.78rem, 0.8vw, 0.88rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+html[data-theme="orange"] .install-hub button:hover,
+html[data-theme="orange"] .install-hub button:focus-visible {
+  color: #130601;
+  background: #ff9a37;
+  outline: 0;
+}
+
+html[data-theme="orange"] .install-side {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+html[data-theme="orange"] .install-stub {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff2df;
+  text-align: center;
+}
+
+html[data-theme="orange"] .install-stub b,
+html[data-theme="orange"] .install-stub img,
+html[data-theme="orange"] .install-stub small {
+  position: static;
+  left: auto;
+  width: auto;
+  transform: none;
+  text-align: center;
+}
+
+html[data-theme="orange"] .install-stub b {
+  color: #fff2df;
+  font-family: var(--font-display);
+  font-size: clamp(0.98rem, 1vw, 1.08rem);
+  line-height: 1.18;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .install-stub img {
+  display: block;
+  width: clamp(94px, 7.2vw, 108px);
+  height: clamp(94px, 7.2vw, 108px);
+  padding: 6px;
+  border: 1px solid rgba(255, 122, 26, 0.32);
+  border-radius: 8px;
+  object-fit: contain;
+  background: rgba(2, 0, 0, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.06);
+}
+
+html[data-theme="orange"] .install-stub small {
+  color: rgba(255, 236, 210, 0.68);
+  font-size: clamp(0.68rem, 0.72vw, 0.76rem);
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+html[data-theme="orange"] .ticket-downloads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  min-width: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(255, 122, 26, 0.22);
+}
+
+html[data-theme="orange"] .ticket-downloads span,
+html[data-theme="orange"] .ticket-downloads a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 1px solid rgba(255, 122, 26, 0.36);
+  border-radius: 7px;
+  color: rgba(255, 236, 210, 0.76);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+html[data-theme="orange"] .ticket-downloads span {
+  grid-column: 1 / -1;
+  min-height: 14px;
+  border: 0;
+  color: #ff8f2d;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+html[data-theme="orange"] .ticket-downloads a {
+  min-height: 24px;
+  padding: 0 8px;
+  font-size: 0.64rem;
+}
+
+html[data-theme="orange"] .ticket-downloads a:last-child {
+  grid-column: 1 / -1;
+}
+
+html[data-theme="orange"] .ticket-downloads a:hover,
+html[data-theme="orange"] .ticket-downloads a:focus-visible {
+  color: #fff2df;
+  border-color: rgba(255, 154, 55, 0.7);
+  background: rgba(255, 122, 26, 0.08);
+  outline: 0;
+}
+
+html[data-theme="orange"] .install-message {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(255, 122, 26, 0.22);
+}
+
+html[data-theme="orange"] .install-message > div {
+  display: block;
+  min-width: 0;
+  margin: 0;
+}
+
+@media (max-width: 1060px) {
+  html[data-theme="orange"] .install-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme="orange"] .install-side {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(210px, 0.45fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  html[data-theme="orange"] .ticket-downloads {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 0 0 16px;
+    border-top: 0;
+    border-left: 1px solid rgba(255, 122, 26, 0.22);
+  }
+
+  html[data-theme="orange"] .ticket-downloads span {
+    grid-column: 1 / -1;
+  }
+
+  html[data-theme="orange"] .ticket-downloads a:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  html[data-theme="orange"] .hero-inner {
+    width: min(100% - 28px, 640px);
+    padding: 28px 0 56px;
+    gap: 18px;
+  }
+
+  html[data-theme="orange"] h1 {
+    font-size: clamp(3.25rem, 15vw, 4.8rem);
+  }
+
+  html[data-theme="orange"] .install-hub {
+    padding: 18px;
+  }
+
+  html[data-theme="orange"] .install-panel-head,
+  html[data-theme="orange"] .install-layout,
+  html[data-theme="orange"] .install-side,
+  html[data-theme="orange"] .install-message {
+    grid-template-columns: 1fr;
+  }
+
+  html[data-theme="orange"] .install-panel-head {
+    gap: 7px;
+  }
+
+  html[data-theme="orange"] .install-panel-head small {
+    white-space: normal;
+  }
+
+  html[data-theme="orange"] .install-card {
+    min-height: 0;
+  }
+
+  html[data-theme="orange"] .install-card,
+  html[data-theme="orange"] .install-side {
+    padding: 14px;
+  }
+
+  html[data-theme="orange"] .ticket-downloads {
+    grid-template-columns: 1fr;
+    padding: 14px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 122, 26, 0.22);
+  }
+
+  html[data-theme="orange"] .ticket-downloads a:last-child {
+    grid-column: auto;
+  }
+
+  html[data-theme="orange"] .install-message {
+    align-items: start;
+  }
+}
+
+@media (max-width: 420px) {
+  html[data-theme="orange"] .install-hub {
+    padding: 14px;
+  }
+
+  html[data-theme="orange"] .install-hub .command-input {
+    grid-template-columns: minmax(0, 1fr) 66px;
+  }
+
+  html[data-theme="orange"] .install-hub code {
+    padding: 10px;
+    font-size: 0.72rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

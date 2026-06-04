@@ -118,34 +118,59 @@ const selectCommandText = (button) => {
   return true;
 };
 
-copyButtons.forEach((button) => {
-  button.addEventListener("click", async () => {
-    const value = button.getAttribute("data-copy") || "";
-    const old = button.textContent;
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(value);
-      } else if (!fallbackCopy(value)) {
-        throw new Error("copy failed");
-      }
-      button.textContent = "已复制";
-      setTimeout(() => {
-        button.textContent = old || "复制";
-      }, 1200);
-    } catch {
-      if (selectCommandText(button)) {
-        button.textContent = "已选中";
-        setTimeout(() => {
-          button.textContent = old || "复制";
-        }, 1400);
-        return;
-      }
-      button.textContent = "请长按";
-      setTimeout(() => {
-        button.textContent = old || "复制";
-      }, 1400);
+const withTimeout = (promise, timeout = 700) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error("copy timeout")), timeout);
+    }),
+  ]);
+
+const restoreButton = (button, label, delay) => {
+  window.setTimeout(() => {
+    button.textContent = label || "复制";
+    button.dataset.copyState = "";
+  }, delay);
+};
+
+const handleCopyButton = async (button) => {
+  if (button.dataset.copyState === "busy") {
+    return;
+  }
+
+  const value = button.getAttribute("data-copy") || "";
+  const old = button.textContent;
+  button.dataset.copyState = "busy";
+  button.textContent = "复制中";
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await withTimeout(navigator.clipboard.writeText(value));
+    } else if (!fallbackCopy(value)) {
+      throw new Error("copy failed");
     }
-  });
+    button.textContent = "已复制";
+    restoreButton(button, old, 1200);
+  } catch {
+    if (selectCommandText(button)) {
+      button.textContent = "已选中";
+      restoreButton(button, old, 1400);
+      return;
+    }
+    button.textContent = "请长按";
+    restoreButton(button, old, 1400);
+  }
+};
+
+window.__xiaomaCopyReady = copyButtons.length;
+
+document.addEventListener("click", (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+  const button = target?.closest("[data-copy]");
+  if (!button) {
+    return;
+  }
+  handleCopyButton(button);
 });
 
 const commandTarget = document.querySelector("#typed-command");

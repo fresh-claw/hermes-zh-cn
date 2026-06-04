@@ -184,7 +184,7 @@
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/site-logo-32.png?v=20260521" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/site-logo-180.png?v=20260521" />
-    <link rel="stylesheet" href="./styles.css?v=20260604-nav-tight" />
+    <link rel="stylesheet" href="./styles.css?v=20260604-install-hub" />
   </head>
   <body>
     <script type="application/x-xiaoma-hermes-agent+json" id="xiaoma-hermes-agent">
@@ -402,43 +402,58 @@
             </p>
           </div>
 
-          <div class="steps install-panel install-ticket" id="desktop" aria-label="桌面版与 TUI CLI 汉化入口">
+          <div class="steps install-hub" id="desktop" aria-label="桌面版与 TUI/CLI 汉化入口">
             <div class="install-main">
               <div class="install-panel-head">
-                <span>安装汉化补丁</span>
+                <span>选择系统，开始安装</span>
                 <small>已有 <strong data-install-count>10,000</strong>+ 人安装</small>
               </div>
-              <div class="ticket-platforms">
-                <article class="ticket-platform ticket-platform-primary">
-                  <div class="ticket-platform-copy">
+              <div class="install-layout">
+                <article class="install-card install-card-primary">
+                  <div class="install-card-copy">
                     <small>桌面版汉化 · Windows</small>
                     <h2>Windows一键安装</h2>
-                    <p>PowerShell 自动安装官方 Hermes，再应用中文增强包。</p>
+                    <p>PowerShell 获取官方 Hermes，随后写入中文增强包。</p>
                   </div>
+                  <ul class="install-card-points" aria-label="Windows 安装说明">
+                    <li>缺少 Hermes 时先装官方版</li>
+                    <li>完成后重新打开即生效</li>
+                  </ul>
                   <div class="command-input" role="group" aria-label="Windows PowerShell 一键安装">
                     <code>iwr https://useai.live/<wbr />hermes/<wbr />install.ps1 -UseBasicParsing | iex</code>
                     <button type="button" data-copy="$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}" aria-label="复制 Windows 命令">复制</button>
                   </div>
                 </article>
-                <article class="ticket-platform" id="tui-cli">
-                  <div class="ticket-platform-copy">
+                <article class="install-card" id="tui-cli">
+                  <div class="install-card-copy">
                     <small>macOS / Linux · TUI/CLI</small>
                     <h2>macOS / Linux 一键安装</h2>
-                    <p>保留官方安装与更新链路，补启动页、TUI 和网关提示。</p>
+                    <p>保留官方更新链路，补启动页、TUI 和网关提示。</p>
                   </div>
+                  <ul class="install-card-points" aria-label="macOS Linux 安装说明">
+                    <li>支持 macOS、Linux、WSL2</li>
+                    <li>补齐 TUI、CLI、网关中文</li>
+                  </ul>
                   <div class="command-input" role="group" aria-label="macOS Linux 一键安装">
                     <code>curl -fsSL https://useai.live/<wbr />hermes/<wbr />install.sh | bash</code>
                     <button type="button" data-copy="(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash" aria-label="复制 macOS Linux 命令">复制</button>
                   </div>
                 </article>
+                <aside class="install-side" aria-label="下载和社群">
+                  <a class="install-stub" href="#community-title" aria-label="查看 Hermes 交流答疑群">
+                    <b>Hermes 交流答疑群</b>
+                    <img src="./assets/qr-seal-orange.png?v=20260530" alt="Hermes交流答疑群二维码" loading="lazy" />
+                    <small>安装问题 · 业务落地</small>
+                  </a>
+                  <div class="ticket-downloads" aria-label="安装文件下载">
+                    <span>下载文件</span>
+                    <a href="./install.ps1" download>install.ps1</a>
+                    <a href="./install.sh" download>install.sh</a>
+                    <a href="./install.command" download>install.command</a>
+                  </div>
+                </aside>
               </div>
-              <div class="ticket-downloads" aria-label="安装文件下载">
-                <span>下载文件</span>
-                <a href="./install.ps1" download>install.ps1</a>
-                <a href="./install.sh" download>install.sh</a>
-                <a href="./install.command" download>install.command</a>
-              </div>
-              <article class="ticket-message">
+              <article class="install-message">
                 <div>
                   <small>发送给 Hermes</small>
                 </div>
@@ -448,11 +463,6 @@
                 </div>
               </article>
             </div>
-            <a class="install-stub" href="#community-title" aria-label="查看 Hermes 交流答疑群">
-              <b>Hermes<br />交流答疑群</b>
-              <img src="./assets/qr-seal-orange.png?v=20260530" alt="Hermes交流答疑群二维码" loading="lazy" />
-              <small>业务落地 · 疑难杂症</small>
-            </a>
           </div>
         </div>
       </section>
@@ -688,8 +698,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=20260522-ui1"></script>
+    <script src="./app.js?v=20260604-copy-feedback"></script>
   </body>
 </html>
-        "Hermes Desktop 汉化",
-        "Hermes 桌面版汉化",
