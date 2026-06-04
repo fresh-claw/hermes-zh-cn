@@ -54,8 +54,8 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
-2. Windows 用户执行：`iwr https://useai.live/hermes/install.ps1 -UseBasicParsing | iex`。
-3. macOS、Linux、WSL2 用户执行：`curl -fsSL https://useai.live/hermes/install.sh | bash`。
+2. Windows 用户执行：`$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}`。
+3. macOS、Linux、WSL2 用户执行：`(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash`。
 4. 安装器检测本机 Hermes。
 5. 未检测到 Hermes 时，安装器执行官方安装脚本。
 6. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。

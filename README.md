@@ -17,13 +17,13 @@ Hermes 读取页面说明后，直接执行安装命令。安装器会先检测�
 Windows 桌面版用户可直接运行：
 
 ```powershell
-iwr https://useai.live/hermes/install.ps1 -UseBasicParsing | iex
+$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}
 ```
 
 macOS、Linux 和 WSL2 用户运行：
 
 ```bash
-curl -fsSL https://useai.live/hermes/install.sh | bash
+(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
 ```
 
 ## 机制
@@ -61,7 +61,7 @@ scripts/check_release.sh     # 本地自检
 ## 安装
 
 ```bash
-curl -fsSL https://useai.live/hermes/install.sh | bash
+(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
 ```
 
 本地测试时可以改成：

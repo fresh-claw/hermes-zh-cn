@@ -1,5 +1,6 @@
 param(
   [string]$BaseUrl = $env:XIAOMA_HERMES_BASE_URL,
+  [string]$FallbackBaseUrl = $env:XIAOMA_HERMES_FALLBACK_BASE_URL,
   [switch]$SkipOfficial
 )
 
@@ -9,6 +10,10 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
   $BaseUrl = "https://useai.live/hermes"
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
+if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main"
+}
+$FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $officialInstallUrl = $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URL
 if ([string]::IsNullOrWhiteSpace($officialInstallUrl)) {
   $officialInstallUrl = "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1"
@@ -69,6 +74,20 @@ function Convert-ToBashPath([string]$Path, [string]$BashPath) {
   return ($converted | Select-Object -First 1).Trim()
 }
 
+function Download-Installer([string]$PrimaryBaseUrl, [string]$BackupBaseUrl, [string]$OutFile) {
+  try {
+    Invoke-WebRequest -Uri "$PrimaryBaseUrl/install.sh" -OutFile $OutFile -UseBasicParsing
+    return $PrimaryBaseUrl
+  } catch {
+    if (-not [string]::IsNullOrWhiteSpace($BackupBaseUrl) -and $BackupBaseUrl -ne $PrimaryBaseUrl) {
+      Write-Step "网站下载受限，改用备用入口。"
+      Invoke-WebRequest -Uri "$BackupBaseUrl/install.sh" -OutFile $OutFile -UseBasicParsing
+      return $BackupBaseUrl
+    }
+    throw
+  }
+}
+
 Invoke-OfficialInstall
 
 $bash = Find-Bash
@@ -82,10 +101,11 @@ $installer = Join-Path $tempDir "install.sh"
 
 try {
   Write-Step "下载中文增强安装器。"
-  Invoke-WebRequest -Uri "$BaseUrl/install.sh" -OutFile $installer -UseBasicParsing
+  $activeBaseUrl = Download-Installer -PrimaryBaseUrl $BaseUrl -BackupBaseUrl $FallbackBaseUrl -OutFile $installer
 
   $env:XIAOMA_HERMES_PLATFORM = "windows"
   $env:XIAOMA_HERMES_ENTRYPOINT = "windows-powershell"
+  $env:XIAOMA_HERMES_BASE_URL = $activeBaseUrl
   if (-not [string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
     $hermesHomeWin = Join-Path $env:LOCALAPPDATA "hermes"
     $env:HERMES_HOME = Convert-ToBashPath -Path $hermesHomeWin -BashPath $bash

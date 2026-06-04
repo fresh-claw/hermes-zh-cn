@@ -9,7 +9,7 @@
 3. 如果看不懂英文界面，再安装小马AI Hermes 中文增强包：
 
 ```bash
-curl -fsSL https://useai.live/hermes/install.sh | bash
+(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
 ```
 
 也可以在 Hermes 对话里发送：

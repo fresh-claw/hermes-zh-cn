@@ -8,7 +8,7 @@
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "f4065bb198774b52db874e517cccdddbfedb8f2a3fad49244f5b9024826a8e18",
+      "sha256": "54ae960e7efdafae12a870a448ba0cf6e1e1be331fef5986e6e5748d0a2ad9fe",
       "bytes": 16683,
       "purpose": "中文增强包、安装动作、Hermes 技能说明、0.14/0.13/legacy 分流、启动/TUI/命令/状态页/网关/ACP/审批/OAuth/贴纸/技能同步、目标、推理、默认模型、Copilot ACP 与重启提示补丁、当前皮肤切换、记忆/MCP 设置与网关服务状态提示补丁、ACP 权限、平台审批结果、允许名单与配对配置提示补丁、主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理补丁、0.15.1 TUI 品牌、技能包、MCP 目录、Bitwarden、xAI 迁移、ntfy、Krea 与 xAI 搜索补丁",
       "size": 16683

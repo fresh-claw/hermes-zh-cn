@@ -24,7 +24,7 @@ Hermes 看到命令可能修改本机文件、执行脚本、调用解释器、�
 小马AI中文增强包的安装入口是：
 
 ```bash
-curl -fsSL https://useai.live/hermes/install.sh | bash
+(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
 ```
 
 仓库入口是：
