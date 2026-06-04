@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-  $BaseUrl = "https://raw.githubusercontent.com/fresh-claw/hermes-cn/main"
+  $BaseUrl = "https://useai.live/hermes"
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 $officialInstallUrl = $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URL

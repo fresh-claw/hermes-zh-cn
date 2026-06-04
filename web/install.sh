@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://raw.githubusercontent.com/fresh-claw/hermes-cn/main}"
+BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
 PACKAGE_VERSION="2026.05.29.1"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
@@ -411,7 +411,7 @@ fi
 if [ -f "\$HOME/.hermes/hermes-agent/hermes" ]; then
   exec python3 "\$HOME/.hermes/hermes-agent/hermes" "\$@"
 fi
-printf '未找到原版 Hermes，请重新执行：curl -fsSL https://raw.githubusercontent.com/fresh-claw/hermes-cn/main/install.sh | bash\\n' >&2
+printf '未找到原版 Hermes，请重新执行：curl -fsSL https://useai.live/hermes/install.sh | bash\\n' >&2
 exit 127
 EOF_WRAPPER
   chmod +x "$BIN_DIR/hermes"
