@@ -3042,6 +3042,10 @@ html[data-theme="orange"] .service-links a:hover {
     font-size: 2rem;
   }
 
+  html[data-theme="orange"] .brand:hover {
+    transform: none;
+  }
+
   html[data-theme="orange"] .brand span:last-child {
     font-size: 1.08rem;
   }
@@ -5058,25 +5062,12 @@ html[data-theme="orange"] .install-main {
 
 html[data-theme="orange"] .install-panel-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: end;
-  padding: 0 0 2px;
+  grid-template-columns: 1fr;
+  justify-items: end;
+  gap: 0;
+  align-items: center;
+  padding: 0;
   border: 0;
-}
-
-html[data-theme="orange"] .install-panel-head span {
-  margin: 0;
-  color: #fff2df;
-  font-family: var(--font-display);
-  font-size: clamp(1.58rem, 1.9vw, 2rem);
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0;
-  text-transform: none;
-  text-shadow:
-    0 2px 0 rgba(76, 24, 0, 0.82),
-    0 0 18px rgba(255, 122, 26, 0.24);
 }
 
 html[data-theme="orange"] .install-panel-head small {
@@ -5398,10 +5389,6 @@ html[data-theme="orange"] .install-message-copy span {
   html[data-theme="orange"] .install-side,
   html[data-theme="orange"] .install-message {
     grid-template-columns: 1fr;
-  }
-
-  html[data-theme="orange"] .install-panel-head {
-    gap: 7px;
   }
 
   html[data-theme="orange"] .install-panel-head small {
