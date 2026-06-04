@@ -126,6 +126,12 @@ const withTimeout = (promise, timeout = 700) =>
     }),
   ]);
 
+const getCopyValue = (button) => {
+  const commandText = button.closest(".command-input")?.querySelector("code");
+  const visibleValue = commandText?.textContent?.replace(/\s+/g, " ").trim();
+  return visibleValue || button.getAttribute("data-copy") || "";
+};
+
 const restoreButton = (button, label, delay) => {
   window.setTimeout(() => {
     button.textContent = label || "复制";
@@ -138,7 +144,7 @@ const handleCopyButton = async (button) => {
     return;
   }
 
-  const value = button.getAttribute("data-copy") || "";
+  const value = getCopyValue(button);
   const old = button.textContent;
   button.dataset.copyState = "busy";
   button.textContent = "复制中";

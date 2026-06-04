@@ -5294,13 +5294,14 @@ html[data-theme="orange"] .install-stub b {
 
 html[data-theme="orange"] .install-stub img {
   display: block;
-  width: clamp(94px, 7.2vw, 108px);
-  height: clamp(94px, 7.2vw, 108px);
+  width: clamp(122px, 9.36vw, 140px);
+  height: clamp(122px, 9.36vw, 140px);
   padding: 6px;
-  border: 1px solid rgba(255, 122, 26, 0.32);
+  border: 1px solid rgba(255, 181, 106, 0.34);
   border-radius: 8px;
   object-fit: contain;
-  background: rgba(2, 0, 0, 0.42);
+  background: rgba(255, 181, 106, 0.08);
+  filter: brightness(1.32) saturate(0.78) contrast(0.92);
   box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.06);
 }
 
