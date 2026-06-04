@@ -4673,42 +4673,6 @@ html[data-theme="orange"] .ticket-platform p {
   text-transform: none;
 }
 
-html[data-theme="orange"] .ticket-downloads {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
-  padding: 0;
-}
-
-html[data-theme="orange"] .ticket-downloads span,
-html[data-theme="orange"] .ticket-downloads a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  border: 1px solid rgba(255, 122, 26, .42);
-  border-radius: 999px;
-  padding: 0 12px;
-  color: rgba(255, 236, 210, .78);
-  font-size: clamp(.7rem, .74vw, .78rem);
-  line-height: 1;
-  letter-spacing: .08em;
-  text-transform: none;
-  white-space: nowrap;
-}
-
-html[data-theme="orange"] .ticket-downloads span {
-  border-color: transparent;
-  padding-left: 0;
-  color: rgba(255, 136, 30, .94);
-}
-
-html[data-theme="orange"] .ticket-downloads a:hover {
-  color: #fff2df;
-  border-color: rgba(255, 122, 26, .72);
-  background: rgba(255, 122, 26, .08);
-}
-
 html[data-theme="orange"] .ticket-message {
   max-width: min(100%, 720px);
 }
@@ -4873,11 +4837,6 @@ html[data-theme="orange"] .install-stub small {
   html[data-theme="orange"] .ticket-platform p {
     min-height: 0;
     font-size: .82rem;
-  }
-
-  html[data-theme="orange"] .ticket-downloads {
-    flex-wrap: wrap;
-    gap: 8px;
   }
 
   html[data-theme="orange"] .install-panel-head {
@@ -5353,57 +5312,6 @@ html[data-theme="orange"] .install-stub small {
   text-transform: none;
 }
 
-html[data-theme="orange"] .ticket-downloads {
-  display: grid;
-  grid-template-columns: 132px repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  align-items: center;
-  min-width: 0;
-  padding: 8px 0 0;
-  border-top: 1px solid rgba(255, 122, 26, 0.22);
-}
-
-html[data-theme="orange"] .ticket-downloads span,
-html[data-theme="orange"] .ticket-downloads a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  border: 1px solid rgba(255, 122, 26, 0.36);
-  border-radius: 7px;
-  color: rgba(255, 236, 210, 0.76);
-  line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: none;
-  white-space: nowrap;
-}
-
-html[data-theme="orange"] .ticket-downloads span {
-  justify-content: flex-start;
-  min-height: 28px;
-  border: 0;
-  color: #ff8f2d;
-  font-family: var(--font-display);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-html[data-theme="orange"] .ticket-downloads a {
-  min-height: 28px;
-  padding: 0 8px;
-  font-size: 0.7rem;
-}
-
-html[data-theme="orange"] .ticket-downloads a:hover,
-html[data-theme="orange"] .ticket-downloads a:focus-visible {
-  color: #fff2df;
-  border-color: rgba(255, 154, 55, 0.7);
-  background: rgba(255, 122, 26, 0.08);
-  outline: 0;
-}
-
 html[data-theme="orange"] .install-message {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr);
@@ -5431,17 +5339,6 @@ html[data-theme="orange"] .install-message > div {
     min-height: 190px;
   }
 
-  html[data-theme="orange"] .ticket-downloads {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 8px 0 0;
-    border-top: 1px solid rgba(255, 122, 26, 0.22);
-    border-left: 0;
-  }
-
-  html[data-theme="orange"] .ticket-downloads span {
-    grid-column: 1 / -1;
-    justify-content: center;
-  }
 }
 
 @media (max-width: 760px) {
@@ -5481,17 +5378,6 @@ html[data-theme="orange"] .install-message > div {
   html[data-theme="orange"] .install-card,
   html[data-theme="orange"] .install-side {
     padding: 14px;
-  }
-
-  html[data-theme="orange"] .ticket-downloads {
-    grid-template-columns: 1fr;
-    padding: 14px 0 0;
-    border-left: 0;
-    border-top: 1px solid rgba(255, 122, 26, 0.22);
-  }
-
-  html[data-theme="orange"] .ticket-downloads a:last-child {
-    grid-column: auto;
   }
 
   html[data-theme="orange"] .install-message {
