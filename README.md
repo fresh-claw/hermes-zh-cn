@@ -17,20 +17,20 @@ Hermes 读取页面说明后，直接执行安装命令。Windows 入口会检�
 Windows 桌面版用户可直接运行：
 
 ```powershell
-irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1 | iex
+irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex
 ```
 
 macOS、Linux 和 WSL2 用户运行：
 
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop
 ```
 
 ## 机制
 
 1. `useai.live/hermes` 同时服务两类内容：人看的页面，以及 Hermes 可读取的正文、`agent.json` 和 `latest.json`。
 2. Hermes 执行一条安装命令；不要在安装前反复读取 JSON 或探测版本。
-3. 安装器自包含当前中文包；Windows 会补官方桌面端，macOS、Linux 和 WSL2 会在缺少 Hermes 时先调用官方安装脚本，再继续中文补丁安装。
+3. 安装器自包含当前中文包；Windows、macOS、Linux 和 WSL2 都会补官方桌面端，再继续中文补丁安装。
 4. 安装器 4 秒内检测本机 Hermes 版本，0.15.x、0.14.x、0.13.x 使用对应包，失败时使用 legacy 兼容包。
 5. 安装器校验包文件的 SHA256 后，把中文增强内容安装到 `~/.xiaoma-hermes/current`。
 6. 安装器设置 `display.language=zh`，旧版 Hermes 命令不可用时直接更新 `~/.hermes/config.yaml`。
@@ -61,7 +61,7 @@ scripts/check_release.sh     # 本地自检
 ## 安装
 
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop
 ```
 
 本地测试时可以改成：

@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-FALLBACK_BASE_URL="${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main}"
+FALLBACK_BASE_URL="${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2}"
 FALLBACK_BASE_URL="${FALLBACK_BASE_URL%/}"
 export XIAOMA_HERMES_ENTRYPOINT="macos-command"
 
@@ -14,7 +14,7 @@ fi
 
 run_installer() {
   local base_url="$1"
-  curl -fsSL "$base_url/install.sh" | XIAOMA_HERMES_BASE_URL="$base_url" bash
+  curl -fsSL "$base_url/install.sh" | XIAOMA_HERMES_BASE_URL="$base_url" bash -s -- --include-desktop
 }
 
 if ! run_installer "$BASE_URL"; then

@@ -10,6 +10,23 @@ HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
 BIN_DIR="$INSTALL_HOME/bin"
 RELEASES_DIR="$INSTALL_HOME/releases"
 TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t xiaoma-hermes)"
+INCLUDE_DESKTOP="${XIAOMA_HERMES_INCLUDE_DESKTOP:-0}"
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --include-desktop|--desktop)
+      INCLUDE_DESKTOP="1"
+      ;;
+    --no-desktop)
+      INCLUDE_DESKTOP="0"
+      ;;
+    *)
+      printf '未知参数：%s\n' "$1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -115,11 +132,44 @@ find_real_hermes() {
   printf '\n'
 }
 
+find_hermes_desktop() {
+  case "$(uname -s)" in
+    Darwin)
+      for item in \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac/Hermes.app" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/mac/Hermes.app"; do
+        if [ -d "$item" ]; then
+          printf '%s\n' "$item"
+          return
+        fi
+      done
+      ;;
+    Linux)
+      for item in \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/linux-unpacked/Hermes" \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/linux-unpacked/hermes" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/linux-unpacked/Hermes" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/linux-unpacked/hermes"; do
+        if [ -x "$item" ]; then
+          printf '%s\n' "$item"
+          return
+        fi
+      done
+      ;;
+  esac
+  printf '\n'
+}
+
 ensure_official_hermes() {
   if [ -n "${XIAOMA_HERMES_SOURCE_ROOT:-}" ]; then
     return
   fi
-  if [ -n "$(find_real_hermes)" ]; then
+  local real_hermes desktop_app
+  real_hermes="$(find_real_hermes)"
+  desktop_app="$(find_hermes_desktop)"
+  if [ -n "$real_hermes" ] && { [ "$INCLUDE_DESKTOP" != "1" ] || [ -n "$desktop_app" ]; }; then
     return
   fi
   if [ "${XIAOMA_HERMES_SKIP_OFFICIAL_INSTALL:-0}" = "1" ]; then
@@ -127,11 +177,24 @@ ensure_official_hermes() {
   fi
 
   need_cmd curl
-  say "未检测到 Hermes，正在先安装官方 Hermes Agent。"
-  curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash
+  if [ "$INCLUDE_DESKTOP" = "1" ]; then
+    if [ -n "$real_hermes" ]; then
+      say "检测到 Hermes 命令行，正在补官方桌面端。"
+    else
+      say "未检测到 Hermes，正在安装官方 Hermes 桌面端。"
+    fi
+    curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash -s -- --include-desktop
+  else
+    say "未检测到 Hermes，正在先安装官方 Hermes Agent。"
+    curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash
+  fi
 
   if [ -z "$(find_real_hermes)" ]; then
     printf '官方 Hermes 安装后仍未检测到 hermes 命令，请打开新终端后重试。\\n' >&2
+    exit 1
+  fi
+  if [ "$INCLUDE_DESKTOP" = "1" ] && [ -z "$(find_hermes_desktop)" ]; then
+    printf '官方 Hermes 桌面端未生成，请确认 Node.js 可用后重试。\\n' >&2
     exit 1
   fi
 }

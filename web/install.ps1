@@ -11,7 +11,7 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $officialInstallUrl = $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URL
