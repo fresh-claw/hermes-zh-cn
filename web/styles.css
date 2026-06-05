@@ -5459,6 +5459,51 @@ html[data-theme="orange"] .install-stub img:hover {
     drop-shadow(0 9px 20px rgba(255, 122, 26, 0.14));
 }
 
+html[data-theme="orange"] .install-panel-head {
+  justify-items: end;
+}
+
+html[data-theme="orange"] .install-panel-head small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 10px 5px;
+  border: 1px solid rgba(255, 122, 26, 0.5);
+  border-radius: 2px;
+  background:
+    linear-gradient(135deg, rgba(255, 122, 26, 0.16), rgba(255, 199, 122, 0.06)),
+    rgba(19, 8, 2, 0.52);
+  color: #ffad57;
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 0.92vw, 1.02rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow:
+    0 0 14px rgba(255, 122, 26, 0.5),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 190, 0.08),
+    0 0 22px rgba(255, 122, 26, 0.12);
+}
+
+html[data-theme="orange"] .install-panel-head strong {
+  color: #ffd09a;
+  font-size: 1.08em;
+}
+
+@media (max-width: 760px) {
+  html[data-theme="orange"] .install-panel-head {
+    justify-items: center;
+  }
+
+  html[data-theme="orange"] .install-panel-head small {
+    white-space: nowrap;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
