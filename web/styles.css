@@ -5430,6 +5430,35 @@ html[data-theme="orange"] .install-message-copy span {
   }
 }
 
+html[data-theme="orange"] .install-stub img {
+  opacity: 0.74;
+  mix-blend-mode: screen;
+  filter:
+    invert(1)
+    sepia(0.72)
+    saturate(0.42)
+    hue-rotate(332deg)
+    brightness(1.18)
+    contrast(0.68)
+    drop-shadow(-1px -1px 0 rgba(255, 244, 218, 0.48))
+    drop-shadow(1px 1px 0 rgba(56, 17, 0, 0.62))
+    drop-shadow(0 8px 18px rgba(255, 122, 26, 0.12));
+}
+
+html[data-theme="orange"] .install-stub img:hover {
+  opacity: 0.8;
+  filter:
+    invert(1)
+    sepia(0.72)
+    saturate(0.42)
+    hue-rotate(332deg)
+    brightness(1.24)
+    contrast(0.7)
+    drop-shadow(-1px -1px 0 rgba(255, 244, 218, 0.52))
+    drop-shadow(1px 1px 0 rgba(56, 17, 0, 0.6))
+    drop-shadow(0 9px 20px rgba(255, 122, 26, 0.14));
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
