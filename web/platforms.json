@@ -1,6 +1,6 @@
 {
-  "version": "2026.06.04.1",
-  "updated_at": "2026-06-04",
+  "version": "2026.06.05.1",
+  "updated_at": "2026-06-05",
   "locale": "zh-CN",
   "upstream": {
     "desktop_page": "https://hermes-ai.net/desktop/",
@@ -19,15 +19,15 @@
       "id": "windows",
       "label": "Windows",
       "recommended": "powershell",
-      "command": "$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}",
-      "method": "PowerShell 先安装官方 Hermes，再调用 Git Bash 应用中文增强。",
-      "desktop": "补 Hermes 核心、TUI、网关、配置；桌面壳跟随同一 Hermes 配置。"
+      "command": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1 | iex",
+      "method": "PowerShell 调用官方桌面安装参数，再调用 Git Bash 应用中文增强。",
+      "desktop": "生成官方 Hermes.exe，并补 Hermes 核心、TUI、网关和配置。"
     },
     {
       "id": "macos",
       "label": "macOS",
       "recommended": "command_file_or_terminal",
-      "command": "(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
+      "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash",
       "method": "保留官方 App 签名，使用脚本补中文内容。",
       "desktop": "不改官方签名包，优先补同一 Hermes 核心和 TUI。"
     },
@@ -35,7 +35,7 @@
       "id": "linux",
       "label": "Linux",
       "recommended": "terminal",
-      "command": "(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
+      "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash",
       "method": "沿用官方终端安装流，补中文内容。",
       "desktop": "Linux 官方仍以终端安装为主，中文包同源应用。"
     }

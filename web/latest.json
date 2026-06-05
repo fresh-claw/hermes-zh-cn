@@ -5,6 +5,8 @@
   "install": "https://useai.live/hermes/install.sh",
   "install_windows": "https://useai.live/hermes/install.ps1",
   "install_macos_click": "https://useai.live/hermes/install.command",
+  "official_hermes_install_windows": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1",
+  "official_windows_desktop_args": "-IncludeDesktop -NonInteractive",
   "platforms": "https://useai.live/hermes/platforms.json",
   "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",

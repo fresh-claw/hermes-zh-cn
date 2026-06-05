@@ -5086,8 +5086,8 @@ html[data-theme="orange"] .install-panel-head strong {
 
 html[data-theme="orange"] .install-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(248px, 0.72fr);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(230px, 0.62fr);
+  gap: 12px;
   min-width: 0;
 }
 
@@ -5106,9 +5106,9 @@ html[data-theme="orange"] .install-card {
   display: grid;
   grid-template-rows: auto auto auto;
   align-content: center;
-  gap: 15px;
-  min-height: 218px;
-  padding: 16px;
+  gap: 18px;
+  min-height: 318px;
+  padding: 18px;
 }
 
 html[data-theme="orange"] .install-card-primary {
@@ -5120,7 +5120,7 @@ html[data-theme="orange"] .install-card-primary {
 
 html[data-theme="orange"] .install-card-copy {
   display: grid;
-  gap: 5px;
+  gap: 8px;
   min-width: 0;
   margin: 0;
 }
@@ -5132,7 +5132,7 @@ html[data-theme="orange"] .install-message small {
   font-family: var(--font-display);
   font-size: clamp(0.72rem, 0.74vw, 0.8rem);
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.38;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -5142,7 +5142,7 @@ html[data-theme="orange"] .install-card h2 {
   color: #fff2df;
   font-family: var(--font-display);
   font-size: clamp(1.26rem, 1.46vw, 1.56rem);
-  line-height: 1.05;
+  line-height: 1.14;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -5159,7 +5159,7 @@ html[data-theme="orange"] .install-card p {
 html[data-theme="orange"] .install-card-points {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -5171,7 +5171,7 @@ html[data-theme="orange"] .install-card-points li {
   padding-left: 16px;
   color: rgba(255, 236, 210, 0.68);
   font-size: clamp(0.72rem, 0.74vw, 0.8rem);
-  line-height: 1.35;
+  line-height: 1.55;
   letter-spacing: 0.02em;
   text-transform: none;
 }
@@ -5188,12 +5188,14 @@ html[data-theme="orange"] .install-card-points li::before {
   box-shadow: 0 0 10px rgba(255, 122, 26, 0.46);
 }
 
-html[data-theme="orange"] .install-hub .command-input {
+html[data-theme="orange"] .steps.install-hub article.install-card > .command-input,
+html[data-theme="orange"] .install-hub .install-message .command-input {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(68px, 6.8vw, 78px);
+  grid-template-columns: minmax(0, 1fr) clamp(60px, 5.8vw, 68px);
   align-items: stretch;
   width: 100%;
-  min-height: 48px;
+  height: auto;
+  min-height: 92px;
   margin: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 122, 26, 0.58);
@@ -5202,25 +5204,27 @@ html[data-theme="orange"] .install-hub .command-input {
   box-shadow: inset 0 1px 0 rgba(255, 241, 220, 0.05);
 }
 
-html[data-theme="orange"] .install-hub code {
+html[data-theme="orange"] .steps.install-hub article.install-card > .command-input code,
+html[data-theme="orange"] .install-hub .install-message .command-input code {
   display: flex;
   align-items: center;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 11px 12px;
   color: rgba(255, 242, 220, 0.94);
   font-size: clamp(0.68rem, 0.7vw, 0.76rem);
-  line-height: 1.45;
+  line-height: 1.58;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
   text-transform: none;
 }
 
-html[data-theme="orange"] .install-hub button {
+html[data-theme="orange"] .steps.install-hub article.install-card > .command-input button,
+html[data-theme="orange"] .install-hub .install-message .command-input button {
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 12px;
+  padding: 0 8px;
   border: 0;
   border-left: 1px solid rgba(255, 122, 26, 0.5);
   border-radius: 0;
@@ -5237,8 +5241,10 @@ html[data-theme="orange"] .install-hub button {
   transition: background 160ms ease, color 160ms ease;
 }
 
-html[data-theme="orange"] .install-hub button:hover,
-html[data-theme="orange"] .install-hub button:focus-visible {
+html[data-theme="orange"] .steps.install-hub article.install-card > .command-input button:hover,
+html[data-theme="orange"] .steps.install-hub article.install-card > .command-input button:focus-visible,
+html[data-theme="orange"] .install-hub .install-message .command-input button:hover,
+html[data-theme="orange"] .install-hub .install-message .command-input button:focus-visible {
   color: #130601;
   background: #ff9a37;
   outline: 0;

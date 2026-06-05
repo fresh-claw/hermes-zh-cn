@@ -12,25 +12,25 @@
 请访问 useai.live/hermes 安装汉化补丁
 ```
 
-Hermes 读取页面说明后，直接执行安装命令。安装器会先检测本机 Hermes；未安装时自动执行官方安装脚本，安装完成后继续安装中文补丁。随后检测版本，0.15.x、0.14.x、0.13.x 使用对应中文包，失败或超时时使用 legacy 兼容包，并把 Hermes 静态界面语言设置为 `zh`，加入小马AI中文增强说明和启动更新辅助脚本，备份后修改启动界面、快捷指令、分类、网关、ACP、权限按钮、配对配置和审批相关文案。
+Hermes 读取页面说明后，直接执行安装命令。Windows 入口会检测官方桌面端；缺少时调用官方桌面安装参数，然后继续安装中文补丁。macOS、Linux 和 WSL2 入口会先检测本机 Hermes；未安装时自动执行官方安装脚本，安装完成后继续安装中文补丁。随后检测版本，0.15.x、0.14.x、0.13.x 使用对应中文包，失败或超时时使用 legacy 兼容包，并把 Hermes 静态界面语言设置为 `zh`，加入小马AI中文增强说明和启动更新辅助脚本，备份后修改启动界面、快捷指令、分类、网关、ACP、权限按钮、配对配置和审批相关文案。
 
 Windows 桌面版用户可直接运行：
 
 ```powershell
-$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}
+irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1 | iex
 ```
 
 macOS、Linux 和 WSL2 用户运行：
 
 ```bash
-(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash
 ```
 
 ## 机制
 
 1. `useai.live/hermes` 同时服务两类内容：人看的页面，以及 Hermes 可读取的正文、`agent.json` 和 `latest.json`。
 2. Hermes 执行一条安装命令；不要在安装前反复读取 JSON 或探测版本。
-3. 安装器自包含当前中文包；若本机没有 Hermes，会先调用官方安装脚本，再继续中文补丁安装。
+3. 安装器自包含当前中文包；Windows 会补官方桌面端，macOS、Linux 和 WSL2 会在缺少 Hermes 时先调用官方安装脚本，再继续中文补丁安装。
 4. 安装器 4 秒内检测本机 Hermes 版本，0.15.x、0.14.x、0.13.x 使用对应包，失败时使用 legacy 兼容包。
 5. 安装器校验包文件的 SHA256 后，把中文增强内容安装到 `~/.xiaoma-hermes/current`。
 6. 安装器设置 `display.language=zh`，旧版 Hermes 命令不可用时直接更新 `~/.hermes/config.yaml`。
@@ -61,7 +61,7 @@ scripts/check_release.sh     # 本地自检
 ## 安装
 
 ```bash
-(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh | bash
 ```
 
 本地测试时可以改成：
