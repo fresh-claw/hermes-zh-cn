@@ -5545,6 +5545,10 @@ html[data-theme="orange"] .install-panel-head strong {
   font-size: 1.08em;
 }
 
+html[data-theme="orange"] .install-panel-head > span {
+  display: none !important;
+}
+
 @media (max-width: 760px) {
   html[data-theme="orange"] .install-panel-head {
     justify-items: center;
