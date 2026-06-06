@@ -31,7 +31,7 @@
       "id": "macos",
       "label": "macOS",
       "recommended": "download_zip",
-      "download": "https://useai.live/hermes/hermes-macos-installer.zip",
+      "download": "https://useai.live/hermes/hermes-macos-installer.zip?v=20260606-mac-2",
       "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.sh | bash -s -- --include-desktop",
       "method": "下载 zip，解压后打开 install.command；高级用户可用终端命令。",
       "desktop": "生成官方桌面端，并补 Hermes 核心、TUI、网关和配置。"

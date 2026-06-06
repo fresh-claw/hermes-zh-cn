@@ -11,7 +11,7 @@ Install URL: https://useai.live/hermes/install.sh
 Windows Install URL: https://useai.live/hermes/install.ps1
 Windows EXE Installer: https://useai.live/hermes/Hermes-zh-CN-Setup.exe
 Windows Click Installer: https://useai.live/hermes/install-windows.cmd
-macOS Zip Installer: https://useai.live/hermes/hermes-macos-installer.zip
+macOS Zip Installer: https://useai.live/hermes/hermes-macos-installer.zip?v=20260606-mac-2
 Platform Manifest: https://useai.live/hermes/platforms.json
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
 Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
@@ -58,7 +58,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
 2. Windows 新手下载 `https://useai.live/hermes/Hermes-zh-CN-Setup.exe` 后运行；高级用户可执行：`irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.ps1 | iex`。
-3. macOS 新手下载 `https://useai.live/hermes/hermes-macos-installer.zip`，解压后打开 `install.command`。
+3. macOS 新手下载 `https://useai.live/hermes/hermes-macos-installer.zip?v=20260606-mac-2`，解压后打开 `install.command`。
 4. Linux、WSL2 用户执行：`curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.sh | bash -s -- --include-desktop`。
 5. 安装器检测本机 Hermes。
 6. 未检测到 Hermes 时，安装器执行官方安装脚本。

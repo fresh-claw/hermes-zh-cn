@@ -5,7 +5,7 @@
 Canonical URL: https://useai.live/hermes/
 Details URL: https://useai.live/hermes/details.html
 Windows download: https://useai.live/hermes/Hermes-zh-CN-Setup.exe
-macOS download: https://useai.live/hermes/hermes-macos-installer.zip
+macOS download: https://useai.live/hermes/hermes-macos-installer.zip?v=20260606-mac-2
 Linux command: `curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.sh | bash -s -- --include-desktop`
 Platform manifest: https://useai.live/hermes/platforms.json
 Repository: https://github.com/fresh-claw/hermes-zh-cn
@@ -44,7 +44,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 
 Windows：下载 https://useai.live/hermes/Hermes-zh-CN-Setup.exe 后运行。
 
-macOS：下载 https://useai.live/hermes/hermes-macos-installer.zip，解压后打开 `install.command`。
+macOS：下载 https://useai.live/hermes/hermes-macos-installer.zip?v=20260606-mac-2，解压后打开 `install.command`。
 
 Linux：
 
