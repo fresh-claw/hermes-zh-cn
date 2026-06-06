@@ -1,7 +1,7 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.05.29.1",
+  "latest": "2026.06.06.1",
   "install": "https://useai.live/hermes/install.sh",
   "install_windows": "https://useai.live/hermes/install.ps1",
   "install_windows_exe": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",

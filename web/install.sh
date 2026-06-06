@@ -3,7 +3,8 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.05.29.1"
+PACKAGE_VERSION="2026.06.06.1"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.06.1}"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -11,6 +12,10 @@ BIN_DIR="$INSTALL_HOME/bin"
 RELEASES_DIR="$INSTALL_HOME/releases"
 TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t xiaoma-hermes)"
 INCLUDE_DESKTOP="${XIAOMA_HERMES_INCLUDE_DESKTOP:-0}"
+CURL_CONNECT_TIMEOUT="${XIAOMA_HERMES_CONNECT_TIMEOUT:-8}"
+CURL_MAX_TIME="${XIAOMA_HERMES_MAX_TIME:-180}"
+CURL_SPEED_LIMIT="${XIAOMA_HERMES_SPEED_LIMIT:-1024}"
+CURL_SPEED_TIME="${XIAOMA_HERMES_SPEED_TIME:-20}"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -50,6 +55,112 @@ need_cmd() {
     printf '缺少命令：%s\n' "$1" >&2
     exit 1
   }
+}
+
+append_url_once() {
+  local url="$1"
+  local seen_file="$2"
+  url="${url%/}"
+  if [ -z "$url" ]; then
+    return
+  fi
+  if ! grep -Fx "$url" "$seen_file" >/dev/null 2>&1; then
+    printf '%s\n' "$url" >> "$seen_file"
+    printf '%s\n' "$url"
+  fi
+}
+
+installer_base_urls() {
+  local seen_file="$TMP_DIR/installer-url-seen"
+  : > "$seen_file"
+  if [ -n "${XIAOMA_HERMES_BASE_URLS:-}" ]; then
+    printf '%s\n' "$XIAOMA_HERMES_BASE_URLS" | tr ',' '\n' | while IFS= read -r item; do
+      append_url_once "$item" "$seen_file"
+    done
+    return
+  fi
+  append_url_once "$BASE_URL" "$seen_file"
+  append_url_once "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}" "$seen_file"
+  append_url_once "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}" "$seen_file"
+  append_url_once "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}" "$seen_file"
+  append_url_once "https://raw.githubusercontent.com/fresh-claw/hermes-cn/${PINNED_VERSION}" "$seen_file"
+}
+
+official_install_urls() {
+  local seen_file="$TMP_DIR/official-url-seen"
+  : > "$seen_file"
+  if [ -n "${XIAOMA_HERMES_OFFICIAL_INSTALL_URLS:-}" ]; then
+    printf '%s\n' "$XIAOMA_HERMES_OFFICIAL_INSTALL_URLS" | tr ',' '\n' | while IFS= read -r item; do
+      append_url_once "$item" "$seen_file"
+    done
+    return
+  fi
+  append_url_once "$OFFICIAL_HERMES_INSTALL_URL" "$seen_file"
+  append_url_once "https://cdn.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.sh" "$seen_file"
+  append_url_once "https://fastly.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.sh" "$seen_file"
+  append_url_once "https://gcore.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.sh" "$seen_file"
+}
+
+curl_to_file() {
+  local url="$1"
+  local out_file="$2"
+  curl -fsSL \
+    --connect-timeout "$CURL_CONNECT_TIMEOUT" \
+    --max-time "$CURL_MAX_TIME" \
+    --speed-limit "$CURL_SPEED_LIMIT" \
+    --speed-time "$CURL_SPEED_TIME" \
+    "$url" -o "$out_file"
+}
+
+download_script_from_urls() {
+  local out_file="$1"
+  shift
+  local label="$1"
+  shift
+  local url
+  for url in "$@"; do
+    if [ -z "$url" ]; then
+      continue
+    fi
+    say "正在下载${label}：$url"
+    if curl_to_file "$url" "$out_file" && head -n 1 "$out_file" | grep -Eq '^#!.*(bash|sh)'; then
+      printf '%s\n' "$url"
+      return 0
+    fi
+    say "当前入口不可用或过慢，正在切换下一个入口。"
+  done
+  return 1
+}
+
+download_install_sh() {
+  local out_file="$1"
+  local urls=()
+  local base_url
+  while IFS= read -r base_url; do
+    if [ -z "$base_url" ]; then
+      continue
+    fi
+    if [ "${base_url##*/}" = "install.sh" ]; then
+      urls+=("$base_url")
+    else
+      urls+=("${base_url%/}/install.sh")
+    fi
+  done <<EOF_INSTALLER_URLS
+$(installer_base_urls)
+EOF_INSTALLER_URLS
+  download_script_from_urls "$out_file" "中文增强安装器" "${urls[@]}"
+}
+
+download_official_installer() {
+  local out_file="$1"
+  local urls=()
+  local url
+  while IFS= read -r url; do
+    urls+=("$url")
+  done <<EOF_OFFICIAL_URLS
+$(official_install_urls)
+EOF_OFFICIAL_URLS
+  download_script_from_urls "$out_file" "官方 Hermes 安装器" "${urls[@]}"
 }
 
 detect_hermes_version() {
@@ -136,6 +247,8 @@ find_hermes_desktop() {
   case "$(uname -s)" in
     Darwin)
       for item in \
+        "/Applications/Hermes.app" \
+        "$HOME/Applications/Hermes.app" \
         "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
         "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac/Hermes.app" \
         "$HOME/.hermes/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
@@ -162,6 +275,35 @@ find_hermes_desktop() {
   printf '\n'
 }
 
+find_hermes_desktops() {
+  case "$(uname -s)" in
+    Darwin)
+      for item in \
+        "/Applications/Hermes.app" \
+        "$HOME/Applications/Hermes.app" \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/mac/Hermes.app" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/mac/Hermes.app"; do
+        if [ -d "$item" ]; then
+          printf '%s\n' "$item"
+        fi
+      done | awk '!seen[$0]++'
+      ;;
+    Linux)
+      for item in \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/linux-unpacked/Hermes" \
+        "$HERMES_HOME_DIR/hermes-agent/apps/desktop/release/linux-unpacked/hermes" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/linux-unpacked/Hermes" \
+        "$HOME/.hermes/hermes-agent/apps/desktop/release/linux-unpacked/hermes"; do
+        if [ -x "$item" ]; then
+          printf '%s\n' "$item"
+        fi
+      done | awk '!seen[$0]++'
+      ;;
+  esac
+}
+
 ensure_official_hermes() {
   if [ -n "${XIAOMA_HERMES_SOURCE_ROOT:-}" ]; then
     return
@@ -183,10 +325,20 @@ ensure_official_hermes() {
     else
       say "未检测到 Hermes，正在安装官方 Hermes 桌面端。"
     fi
-    curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash -s -- --include-desktop
+    local official_installer="$TMP_DIR/official-hermes-install.sh"
+    if ! download_official_installer "$official_installer" >/dev/null; then
+      printf '官方 Hermes 安装器下载失败，请稍后重试。\\n' >&2
+      exit 1
+    fi
+    bash "$official_installer" --include-desktop
   else
     say "未检测到 Hermes，正在先安装官方 Hermes Agent。"
-    curl -fsSL "$OFFICIAL_HERMES_INSTALL_URL" | bash
+    local official_installer="$TMP_DIR/official-hermes-install.sh"
+    if ! download_official_installer "$official_installer" >/dev/null; then
+      printf '官方 Hermes 安装器下载失败，请稍后重试。\\n' >&2
+      exit 1
+    fi
+    bash "$official_installer"
   fi
 
   if [ -z "$(find_real_hermes)" ]; then
@@ -4023,6 +4175,3329 @@ else:
 PY_PATCH
 }
 
+find_asar_cli() {
+  for item in \
+    "$HERMES_HOME_DIR/hermes-agent/node_modules/@electron/asar/bin/asar.js" \
+    "$HOME/.hermes/hermes-agent/node_modules/@electron/asar/bin/asar.js" \
+    "$PWD/node_modules/@electron/asar/bin/asar.js"; do
+    if [ -f "$item" ]; then
+      printf '%s\n' "$item"
+      return
+    fi
+  done
+  printf '\n'
+}
+
+apply_desktop_app_patch() {
+  if [ "${XIAOMA_HERMES_SKIP_DESKTOP_PATCH:-0}" = "1" ]; then
+    say "桌面端补丁：已按环境变量跳过。"
+    return
+  fi
+
+  local node_cmd asar_cli
+  node_cmd="$(command -v node 2>/dev/null || true)"
+  asar_cli="$(find_asar_cli)"
+  if [ -z "$node_cmd" ] || [ -z "$asar_cli" ]; then
+    say "桌面端补丁：缺少 Node.js 或 asar 工具，暂未处理桌面应用资源。"
+    return
+  fi
+
+  local app found_any patched_any
+  found_any="0"
+  patched_any="0"
+  while IFS= read -r app; do
+    if [ -z "$app" ]; then
+      continue
+    fi
+    found_any="1"
+
+    local asar_file plist_file work_dir new_asar safe_name backup_dir marker_file
+    if [ -d "$app/Contents/Resources" ]; then
+      asar_file="$app/Contents/Resources/app.asar"
+      plist_file="$app/Contents/Info.plist"
+    else
+      say "桌面端补丁：不支持的路径，已跳过：$app"
+      continue
+    fi
+    if [ ! -f "$asar_file" ]; then
+      say "桌面端补丁：未找到 app.asar，已跳过：$app"
+      continue
+    fi
+
+    safe_name="$(printf '%s' "$app" | tr '/ ' '__')"
+    backup_dir="$INSTALL_HOME/backups/$PACKAGE_VERSION/desktop-apps/$safe_name"
+    work_dir="$TMP_DIR/desktop-app-$safe_name"
+    new_asar="$TMP_DIR/$safe_name.app.asar"
+    marker_file="$work_dir/.xiaoma-desktop-changed"
+    rm -rf "$work_dir"
+    mkdir -p "$work_dir" "$backup_dir"
+
+    if [ ! -f "$backup_dir/app.asar" ]; then
+      cp "$asar_file" "$backup_dir/app.asar"
+    fi
+    if [ -f "$plist_file" ] && [ ! -f "$backup_dir/Info.plist" ]; then
+      cp "$plist_file" "$backup_dir/Info.plist"
+    fi
+
+    if ! "$node_cmd" "$asar_cli" extract "$asar_file" "$work_dir" >/dev/null 2>&1; then
+      say "桌面端补丁：解包失败，已跳过：$app"
+      continue
+    fi
+
+    python3 - "$work_dir" "$marker_file" <<'PY_DESKTOP_PATCH'
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+marker = Path(sys.argv[2])
+
+replacements = [
+    ("`Drop files to attach`", "`拖放文件即可添加`"),
+    ("`Attach`", "`添加`"),
+    ("`Files`", "`文件`"),
+    ("`Folders`", "`文件夹`"),
+    ("`Images`", "`图片`"),
+    ("`URL`", "`链接`"),
+    ("`Send`", "`发送`"),
+    ("`Cancel`", "`取消`"),
+    ("`Run`", "`运行`"),
+    ("`Search`", "`搜索`"),
+    ("`Sessions`", "`会话`"),
+    ("`Tools`", "`工具`"),
+    ("`Toolsets`", "`工具集`"),
+    ("`Skills & Tools`", "`技能与工具`"),
+    ("`Models`", "`模型`"),
+    ("`Model`", "`模型`"),
+    ("`Terminal`", "`终端`"),
+    ("`Browser`", "`浏览器`"),
+    ("`Preview`", "`预览`"),
+    ("`Close`", "`关闭`"),
+    ("`Save`", "`保存`"),
+    ("`Archive`", "`归档`"),
+    ("`Copy`", "`复制`"),
+    ("`Retry`", "`重试`"),
+    ("`Resume`", "`继续`"),
+    ("`Branch`", "`分支`"),
+    ("`Pinned`", "`已固定`"),
+    ("`Loading…`", "`正在加载…`"),
+    ("`Loading`", "`正在加载`"),
+    ("`Ready`", "`就绪`"),
+    ("`Connected`", "`已连接`"),
+    ("`Disconnected`", "`已断开`"),
+    ("`Running`", "`运行中`"),
+    ("`Details`", "`详情`"),
+    ("`Advanced`", "`高级`"),
+    ("`Cron`", "`定时任务`"),
+    ("`Context`", "`上下文`"),
+    ("`Session`", "`会话`"),
+    ("`Message`", "`消息`"),
+    ("`New session`", "`新建会话`"),
+    ("`Search sessions`", "`搜索会话`"),
+    ("`Search sessions…`", "`搜索会话…`"),
+    ("`Clear search`", "`清空搜索`"),
+    ("`Shift-click a chat to pin · drag to reorder`", "`Shift 点击会话可固定，拖动可排序`"),
+    ("`Load ${n} more`", "`再加载 ${n} 条`"),
+    ("`Load more`", "`加载更多`"),
+    ("`Open settings`", "`打开设置`"),
+    ("`Search settings...`", "`搜索设置...`"),
+    ("`About Hermes Desktop`", "`关于 Hermes 桌面版`"),
+    ("`Gateway connection...`", "`网关连接...`"),
+    ("`Search API keys...`", "`搜索 API 密钥...`"),
+    ("`Search MCP servers...`", "`搜索 MCP 服务...`"),
+    ("`Search archived sessions...`", "`搜索已归档会话...`"),
+    ("`Main model`", "`主模型`"),
+    ("`Loading model configuration...`", "`正在加载模型配置...`"),
+    ("`Applies to new sessions. Use the model picker in the composer to hot-swap the active chat.`", "`应用于新会话。可在输入区模型选择器中临时切换当前会话模型。`"),
+    ("`Provider`", "`模型服务`"),
+    ("`Auxiliary models`", "`辅助模型`"),
+    ("`Reset all to main`", "`全部重置为主模型`"),
+    ("`Helper tasks run on the main model by default. Assign a dedicated model to any task to override.`", "`辅助任务默认使用主模型。可为任意任务指定专用模型。`"),
+    ("`Set to main`", "`设为主模型`"),
+    ("`Change`", "`更改`"),
+    ("`Page summarization`", "`页面摘要`"),
+    ("`Compression`", "`压缩`"),
+    ("`Context compaction`", "`上下文压缩`"),
+    ("`Session search`", "`会话搜索`"),
+    ("`Recall queries`", "`回忆查询`"),
+    ("`Skills hub`", "`技能中心`"),
+    ("`Skill search`", "`技能搜索`"),
+    ("`Approval`", "`审批`"),
+    ("`Smart auto-approve`", "`智能自动批准`"),
+    ("`MCP tool routing`", "`MCP 工具路由`"),
+    ("`Title gen`", "`标题生成`"),
+    ("`Session titles`", "`会话标题`"),
+    ("`Curator`", "`整理器`"),
+    ("`Skill-usage review`", "`技能使用复核`"),
+    ("O9=e=>e.replace(/_/g,` `).replace(/\\b\\w/g,e=>e.toUpperCase())", "O9=e=>({apple:`苹果`,autonomous_ai_agents:`自主智能体`,creative:`创意`,data_science:`数据科学`,devops:`开发运维`,email:`邮件`,gaming:`游戏`,general:`通用`,github:`GitHub`,mcp:`MCP`,media:`媒体`,mlops:`MLOps`,note_taking:`笔记`,productivity:`效率`,red_teaming:`红队`,research:`研究`,smart_home:`智能家居`,social_media:`社交媒体`,software_development:`软件开发`}[e]??e.replace(/_/g,` `).replace(/\\b\\w/g,e=>e.toUpperCase()))"),
+    ("children:[`All `,(0,Q9.jsx)(N5,{children:E})]", "children:[`全部 `,(0,Q9.jsx)(N5,{children:E})]"),
+    ("`Search skills...`", "`搜索技能...`"),
+    ("`Search toolsets...`", "`搜索工具集...`"),
+    ("`Refreshing skills`", "`正在刷新技能`"),
+    ("`Refresh skills`", "`刷新技能`"),
+    ("`Loading capabilities...`", "`正在加载能力...`"),
+    ("`Try a broader search or different category.`", "`换个关键词或分类试试。`"),
+    ("`No skills found`", "`未找到技能`"),
+    ("`No description.`", "`无说明。`"),
+    ("`Search messaging...`", "`搜索消息...`"),
+    ("`Run Hermes from Telegram DMs, groups, and topics.`", "`通过 Telegram 私信、群组和话题运行 Hermes。`"),
+    ("`Disabled`", "`已禁用`"),
+    ("`Needs setup`", "`需要设置`"),
+    ("`Messaging gateway stopped`", "`消息网关已停止`"),
+    ("`GET YOUR CREDENTIALS`", "`获取凭据`"),
+    ("`Open setup guide`", "`打开设置指南`"),
+    ("`REQUIRED`", "`必填`"),
+    ("`Bot token`", "`Bot 令牌`"),
+    ("`Create a bot with @BotFather, then paste the token it gives you.`", "`使用 @BotFather 创建 bot，然后粘贴它提供的令牌。`"),
+    ("`RECOMMENDED`", "`推荐`"),
+    ("`Allowed Telegram user IDs`", "`允许的 Telegram 用户 ID`"),
+    ("`Allowed Telegram user IDs (comma-separated)`", "`允许的 Telegram 用户 ID（用逗号分隔）`"),
+    ("`Recommended. Comma-separated numeric IDs from @userinfobot. Without this, anyone can DM your bot.`", "`推荐填写。来自 @userinfobot 的数字 ID，用逗号分隔。未填写时任何人都可私信你的 bot。`"),
+    ("`ADVANCED`", "`高级`"),
+    ("`Save changes`", "`保存更改`"),
+    ("`Search artifacts...`", "`搜索产物...`"),
+    ("`All `", "`全部 `"),
+    ("`Links`", "`链接`"),
+    ("`Images `", "`图片 `"),
+    ("`Files `", "`文件 `"),
+    ("`Links `", "`链接 `"),
+    ("bcn=e=>e===`link`?`links`:e===`file`?`files`:`items`", "bcn=e=>e===`link`?`链接`:e===`file`?`文件`:`项`"),
+    ("function icn(e,t,n){return e===0?`0`:`${(t-1)*n+1}-${Math.min(e,t*n)} of ${e}`}", "function icn(e,t,n){return e===0?`0`:`${(t-1)*n+1}-${Math.min(e,t*n)} / ${e}`}"),
+    ("`TITLE / NAME`", "`标题 / 名称`"),
+    ("`LOCATION`", "`位置`"),
+    ("`Location`", "`位置`"),
+    ("`Path`", "`路径`"),
+    ("`Prev`", "`上一页`"),
+    ("`Next`", "`下一页`"),
+    ("`Connection:`", "`连接：`"),
+    ("`RECENT ACTIVITY`", "`最近活动`"),
+    ("`View all logs →`", "`查看全部日志 →`"),
+    ("`Spawn tree`", "`子智能体树`"),
+    ("`Live subagent activity for the current turn.`", "`当前轮次的子智能体实时活动。`"),
+    ("`No live subagents`", "`暂无活动子智能体`"),
+    ("`When a turn delegates work, child agents stream their progress here.`", "`当前轮次委派工作时，子智能体进度会显示在这里。`"),
+    ("`No scheduled jobs yet`", "`暂无定时任务`"),
+    ("`Schedule a prompt to run on a cron expression. Hermes will run it and deliver results to the destination you pick.`", "`设置按 cron 表达式运行的提示词，Hermes 会执行并将结果发送到所选目标。`"),
+    ("`Create first cron`", "`创建第一个定时任务`"),
+    ("`Search and manage sessions`", "`搜索并管理会话`"),
+    ("`Usage`", "`用量`"),
+    ("`Personality`", "`助手风格`"),
+    ("`Default assistant style for new sessions.`", "`新会话默认助手风格。`"),
+    ("`Timezone`", "`时区`"),
+    ("`Used when Hermes needs local time context. Blank uses the system timezone.`", "`Hermes 需要本地时间上下文时使用。留空则使用系统时区。`"),
+    ("`Reasoning Blocks`", "`推理块`"),
+    ("`Show reasoning sections when the backend provides them.`", "`后端提供时显示推理部分。`"),
+    ("`Image Attachments`", "`图片附件`"),
+    ("`Controls how image attachments are sent to the model.`", "`控制图片附件如何发送给模型。`"),
+    ("`Not set`", "`未设置`"),
+    ("`Auto`", "`自动`"),
+    ("`Kawaii`", "`可爱`"),
+    ("`Color Mode`", "`颜色模式`"),
+    ("`Pick a fixed mode or let Hermes follow your system setting.`", "`选择固定模式，或让 Hermes 跟随系统设置。`"),
+    ("`Tool Call Display`", "`工具调用显示`"),
+    ("`Product`", "`产品`"),
+    ("`Human-friendly tool activity with concise summaries.`", "`以简洁摘要展示工具活动。`"),
+    ("`Technical`", "`技术`"),
+    ("`Include raw tool args/results and low-level details.`", "`显示原始工具参数、结果和底层细节。`"),
+    ("`Theme`", "`主题`"),
+    ("`Desktop palettes only. The selected mode is applied on top.`", "`桌面配色。所选模式会叠加应用。`"),
+    ("`Glass neutrals with Nous blue accents`", "`玻璃中性色搭配 Nous 蓝色点缀`"),
+    ("`Midnight`", "`午夜`"),
+    ("`Deep blue-violet with cool accents`", "`深蓝紫色搭配冷色点缀`"),
+    ("`Working Directory`", "`工作目录`"),
+    ("`Default project folder for tool and terminal work.`", "`工具和终端工作的默认项目文件夹。`"),
+    ("`Code Execution Mode`", "`代码执行模式`"),
+    ("`How strictly code execution is scoped to the current project.`", "`控制代码执行限制在当前项目内的严格程度。`"),
+    ("`Project`", "`项目`"),
+    ("`Persistent Shell`", "`持久 Shell`"),
+    ("`Keep shell state between commands when the backend supports it.`", "`后端支持时在命令之间保留 Shell 状态。`"),
+    ("`Environment Passthrough`", "`环境变量传递`"),
+    ("`Environment variables to pass into tool execution.`", "`传递给工具执行的环境变量。`"),
+    ("`comma-separated value`", "`逗号分隔值`"),
+    ("`File Read Limit`", "`文件读取限制`"),
+    ("`Maximum characters Hermes can read from one file request.`", "`Hermes 单次文件读取请求可读取的最大字符数。`"),
+    ("`Approval Mode`", "`审批模式`"),
+    ("`How Hermes handles commands that need explicit approval.`", "`Hermes 如何处理需要明确审批的命令。`"),
+    ("`Manual`", "`手动`"),
+    ("`Approval Timeout`", "`审批超时`"),
+    ("`How long approval prompts wait before timing out.`", "`审批提示超时前等待的时长。`"),
+    ("`Confirm MCP Reloads`", "`确认 MCP 重新加载`"),
+    ("`Command Allowlist`", "`命令允许列表`"),
+    ("`Redact Secrets`", "`隐藏密钥`"),
+    ("`Hide detected secrets from model-visible content when possible.`", "`尽可能从模型可见内容中隐藏检测到的密钥。`"),
+    ("`Allow Private URLs`", "`允许私有 URL`"),
+    ("`Browser Private URLs`", "`浏览器私有 URL`"),
+    ("`Local Browser For Private URLs`", "`私有 URL 使用本地浏览器`"),
+    ("`File Checkpoints`", "`文件检查点`"),
+    ("`Create rollback snapshots before file edits.`", "`修改文件前创建可回退快照。`"),
+    ("`Persistent Memory`", "`持久记忆`"),
+    ("`Save durable memories that can help future sessions.`", "`保存可帮助后续会话的持久记忆。`"),
+    ("`User Profile`", "`用户画像`"),
+    ("`Maintain a compact profile of user preferences.`", "`维护简洁的用户偏好画像。`"),
+    ("`Memory Budget`", "`记忆预算`"),
+    ("`Profile Budget`", "`画像预算`"),
+    ("`Memory Provider`", "`记忆服务`"),
+    ("`Memory provider plugin`", "`记忆服务插件`"),
+    ("`Context Engine`", "`上下文引擎`"),
+    ("`Strategy for managing long conversations near the context limit.`", "`接近上下文限制时管理长对话的策略。`"),
+    ("`Auto-Compression`", "`自动压缩`"),
+    ("`Summarize older context when conversations get large.`", "`对话变长时总结较早上下文。`"),
+    ("`Compression Threshold`", "`压缩阈值`"),
+    ("`Compression Target`", "`压缩目标`"),
+    ("`Protected Recent Messages`", "`受保护的最近消息`"),
+    ("`Text-To-Speech Provider`", "`文本转语音服务`"),
+    ("`Speech To Text`", "`语音转文字`"),
+    ("`Enable local or provider-backed speech transcription.`", "`启用本地或服务支持的语音转写。`"),
+    ("`Speech-To-Text Provider`", "`语音转文字服务`"),
+    ("`Read Responses Aloud`", "`朗读回复`"),
+    ("`Automatically speak assistant responses.`", "`自动朗读助手回复。`"),
+    ("`Edge Voice`", "`Edge 声音`"),
+    ("`OpenAI TTS Model`", "`OpenAI TTS 模型`"),
+    ("`OpenAI Voice`", "`OpenAI 声音`"),
+    ("`ElevenLabs Voice`", "`ElevenLabs 声音`"),
+    ("`ElevenLabs Model`", "`ElevenLabs 模型`"),
+    ("`Local Transcription Model`", "`本地转写模型`"),
+    ("`Transcription Language`", "`转写语言`"),
+    ("`ElevenLabs STT Model`", "`ElevenLabs STT 模型`"),
+    ("`ElevenLabs Scribe model`", "`ElevenLabs Scribe 模型`"),
+    ("`Enabled Toolsets`", "`已启用工具集`"),
+    ("`Execution Backend`", "`执行后端`"),
+    ("`Terminal execution backend`", "`终端执行后端`"),
+    ("`Command Timeout`", "`命令超时`"),
+    ("`Terminal Output Limit`", "`终端输出限制`"),
+    ("`File Page Limit`", "`文件页数限制`"),
+    ("`Line Length Limit`", "`行长度限制`"),
+    ("`Checkpoint Limit`", "`检查点限制`"),
+    ("`Max Agent Steps`", "`最大智能体步骤`"),
+    ("`Upper bound for tool-calling turns before Hermes stops a run.`", "`Hermes 停止运行前工具调用轮次的上限。`"),
+    ("`API Retries`", "`API 重试次数`"),
+    ("`Service Tier`", "`服务层级`"),
+    ("`API service tier (OpenAI/Anthropic)`", "`API 服务层级（OpenAI/Anthropic）`"),
+    ("`Tool-Use Enforcement`", "`工具使用约束`"),
+    ("`Subagent Model`", "`子智能体模型`"),
+    ("`Base`", "`基础`"),
+    ("`Compressor`", "`压缩器`"),
+    ("`(none)`", "`（无）`"),
+    ("`On`", "`开`"),
+    ("`Off`", "`关`"),
+    ("`Default Model`", "`默认模型`"),
+    ("`Context Window`", "`上下文窗口`"),
+    ("`Fallback Models`", "`备用模型`"),
+    ("`Voice Shortcut`", "`语音快捷键`"),
+    ("`Max Recording Length`", "`最长录音时长`"),
+    ("`ElevenLabs Language`", "`ElevenLabs 语言`"),
+    ("`Tag Audio Events`", "`标记音频事件`"),
+    ("`Speaker Diarization`", "`说话人分离`"),
+    ("`Subagent Provider`", "`子智能体服务`"),
+    ("`Subagent Turn Limit`", "`子智能体轮次限制`"),
+    ("`Parallel Subagents`", "`并行子智能体`"),
+    ("`Subagent Timeout`", "`子智能体超时`"),
+    ("`Subagent Reasoning Effort`", "`子智能体推理强度`"),
+    ("`Used for new chats unless you pick a different model in the composer.`", "`用于新会话，除非你在输入区选择其他模型。`"),
+    ("\"Leave at 0 to use the selected model's detected context window.\"", "\"填 0 时使用所选模型检测到的上下文窗口。\""),
+    ("`Backup provider:model entries to try if the default model fails.`", "`默认模型失败时尝试的备用 服务:模型 条目。`"),
+    ("`Optional ISO-639-3 language code. Blank lets ElevenLabs auto-detect.`", "`可选 ISO-639-3 语言代码。留空则由 ElevenLabs 自动检测。`"),
+    ("`Refreshing artifacts`", "`正在刷新产物`"),
+    ("`Refresh artifacts`", "`刷新产物`"),
+    ("`Indexing recent session artifacts`", "`正在索引最近会话产物`"),
+    ("`No artifacts found`", "`未找到产物`"),
+    ("`Generated images and file outputs will appear here as sessions produce them.`", "`会话生成的图片和文件输出会显示在这里。`"),
+    ("`Go to `", "`前往 `"),
+    ("` page `", "` 第 `"),
+    ("`Link title`", "`链接标题`"),
+    ("`Name`", "`名称`"),
+    ("`Title / name`", "`标题 / 名称`"),
+    ("`Common commands`", "`常用命令`"),
+    ("`Hotkeys`", "`快捷键`"),
+    ("`No speech detected`", "`未检测到语音`"),
+    ("`Try recording again.`", "`请重新录制。`"),
+    ("`Attachment-only turn`", "`仅附件轮次`"),
+    ("`Empty turn`", "`空轮次`"),
+    ("`Send queued turn now`", "`立即发送排队轮次`"),
+    ("`Desktop theme suggestions`", "`桌面主题建议`"),
+    ("`No matching themes.`", "`没有匹配主题。`"),
+    ("`Looking up…`", "`正在查找…`"),
+    ("`No matches.`", "`无匹配项。`"),
+    ("`Dictating`", "`正在听写`"),
+    ("`Failed to write image to disk.`", "`无法保存图片文件。`"),
+    ("`Clipboard`", "`剪贴板`"),
+    ("`No image found in clipboard`", "`剪贴板中未找到图片`"),
+    ("`Drop files`", "`拖放文件`"),
+    ("`Deselect entry`", "`取消选择条目`"),
+    ("`Select entry`", "`选择条目`"),
+    ("`Copy this entry`", "`复制此条目`"),
+    ("`Send this entry to chat`", "`发送此条目到会话`"),
+    ("`Sent to chat`", "`已发送到会话`"),
+    ("`Copy selected to clipboard`", "`复制所选内容到剪贴板`"),
+    ("`Copy all to clipboard`", "`复制全部到剪贴板`"),
+    ("`Clear console`", "`清空控制台`"),
+    ("`Click to select · shift-click to extend · drag to composer`", "`点击选择 · Shift 点击扩展选择 · 拖到输入区`"),
+    ("`Try again`", "`重试`"),
+    ("`Results`", "`结果`"),
+    ("`Show sessions as a single list`", "`以单列表显示会话`"),
+    ("`Unpin`", "`取消固定`"),
+    ("`Pin`", "`固定`"),
+    ("`Copy ID`", "`复制 ID`"),
+    ("`Export`", "`导出`"),
+    ("`Rename`", "`重命名`"),
+    ("`Delete`", "`删除`"),
+    ("`Renamed`", "`已重命名`"),
+    ("`Navigate`", "`导航`"),
+    ("`Unpin session`", "`取消固定会话`"),
+    ("`Pin session`", "`固定会话`"),
+    ("`Export session`", "`导出会话`"),
+    ("`Delete session`", "`删除会话`"),
+    ("`API calls`", "`API 调用`"),
+    ("`Tokens in/out`", "`输入/输出 Token`"),
+    ("`Est. cost`", "`预估费用`"),
+    ("`This desktop`", "`此桌面端`"),
+    ("`Daily`", "`每天`"),
+    ("`Weekdays`", "`工作日`"),
+    ("`Weekly`", "`每周`"),
+    ("`Monthly`", "`每月`"),
+    ("`Hourly`", "`每小时`"),
+    ("`Every 15 minutes`", "`每 15 分钟`"),
+    ("`Custom`", "`自定义`"),
+    ("`Cron resumed`", "`定时任务已恢复`"),
+    ("`Cron paused`", "`定时任务已暂停`"),
+    ("`Cron triggered`", "`定时任务已触发`"),
+    ("`Cron deleted`", "`定时任务已删除`"),
+    ("`Cron created`", "`定时任务已创建`"),
+    ("`Cron updated`", "`定时任务已更新`"),
+    ("`Search cron jobs...`", "`搜索定时任务...`"),
+    ("`Refreshing cron jobs`", "`正在刷新定时任务`"),
+    ("`Refresh cron jobs`", "`刷新定时任务`"),
+    ("`Loading cron jobs...`", "`正在加载定时任务...`"),
+    ("`No matches`", "`无匹配项`"),
+    ("`Resume cron`", "`恢复定时任务`"),
+    ("`Pause cron`", "`暂停定时任务`"),
+    ("`Pause`", "`暂停`"),
+    ("`Trigger now`", "`立即触发`"),
+    ("`Edit cron`", "`编辑定时任务`"),
+    ("`Edit`", "`编辑`"),
+    ("`Delete cron`", "`删除定时任务`"),
+    ("`Failed to save cron job`", "`保存定时任务失败`"),
+    ("`Edit cron job`", "`编辑定时任务`"),
+    ("`New cron job`", "`新建定时任务`"),
+    ("`Morning briefing`", "`晨间简报`"),
+    ("`Prompt`", "`提示词`"),
+    ("`Summarize my unread Slack threads and email me the top 5...`", "`总结我未读的 Slack 讨论，并通过邮件发送前 5 条...`"),
+    ("`Frequency`", "`频率`"),
+    ("`Deliver to`", "`发送到`"),
+    ("`Custom schedule`", "`自定义计划`"),
+    ("`0 9 * * * or weekdays at 9am`", "`0 9 * * * 或 工作日 9 点`"),
+    ("`Starting desktop connection`", "`正在启动桌面连接`"),
+    ("`Backend stopped`", "`后端已停止`"),
+    ("`Loading recent sessions`", "`正在加载最近会话`"),
+    ("`Unknown`", "`未知`"),
+    ("`Error`", "`错误`"),
+    ("`Restart needed`", "`需要重启`"),
+    ("`Retrying`", "`正在重试`"),
+    ("`Startup failed`", "`启动失败`"),
+    ("`Restart the gateway from the status bar to apply this change.`", "`请从状态栏重启网关以应用此更改。`"),
+    ("`Start the gateway from the status bar to connect.`", "`请从状态栏启动网关以连接。`"),
+    ("`Messaging platforms failed to load`", "`消息平台加载失败`"),
+    ("`Restart the gateway for this change to take effect.`", "`请重启网关以使此更改生效。`"),
+    ("`Restart the gateway to reconnect with the new credentials.`", "`请重启网关以使用新凭据重新连接。`"),
+    ("` setup saved`", "` 设置已保存`"),
+    ("` setup was updated.`", "` 设置已更新。`"),
+    ("`Failed to update `", "`更新失败：`"),
+    ("`Failed to save `", "`保存失败：`"),
+    ("`Failed to clear `", "`清除失败：`"),
+    ("`Loading messaging platforms...`", "`正在加载消息平台...`"),
+    ("`Credentials set`", "`凭据已设置`"),
+    ("`Get your credentials`", "`获取凭据`"),
+    ("`Required`", "`必填`"),
+    ("`This platform does not need a token here. Use the setup guide above, then enable it below.`", "`此平台无需在这里填写令牌。请使用上方设置指南，然后在下方启用。`"),
+    ("`Recommended`", "`推荐`"),
+    ("`Advanced (`", "`高级（`"),
+    ("`Enable `", "`启用 `"),
+    ("`Disable `", "`禁用 `"),
+    ("`Enabled`", "`已启用`"),
+    ("`Unsaved changes`", "`未保存更改`"),
+    ("`Saving...`", "`正在保存...`"),
+    ("`Proxy URL`", "`代理 URL`"),
+    ("`Only needed on networks where Telegram is blocked.`", "`在 Telegram 受限的网络环境中才需要。`"),
+    ("`Create an application in the Discord Developer Portal, add a bot, then paste its token.`", "`在 Discord 开发者门户创建应用、添加 bot，然后粘贴其令牌。`"),
+    ("`Allowed Discord user IDs`", "`允许的 Discord 用户 ID`"),
+    ("`Recommended. Comma-separated Discord user IDs.`", "`推荐填写。Discord 用户 ID，用逗号分隔。`"),
+    ("`Reply style`", "`回复方式`"),
+    ("`first, all, or off.`", "`first、all 或 off。`"),
+    ("`Slack bot token`", "`Slack bot 令牌`"),
+    ("`Starts with xoxb-. Found under OAuth & Permissions after installing your Slack app.`", "`以 xoxb- 开头。安装 Slack 应用后可在 OAuth & Permissions 下找到。`"),
+    ("`Slack app token`", "`Slack app 令牌`"),
+    ("`Starts with xapp-. Required for Socket Mode.`", "`以 xapp- 开头。Socket Mode 必填。`"),
+    ("`Allowed Slack user IDs`", "`允许的 Slack 用户 ID`"),
+    ("`Recommended. Comma-separated Slack user IDs.`", "`推荐填写。Slack 用户 ID，用逗号分隔。`"),
+    ("`Server URL`", "`服务器 URL`"),
+    ("`Allowed user IDs`", "`允许的用户 ID`"),
+    ("`Recommended. Comma-separated Mattermost user IDs.`", "`推荐填写。Mattermost 用户 ID，用逗号分隔。`"),
+    ("`Homeserver URL`", "`Homeserver URL`"),
+    ("`Homeserver URL`", "`主服务器 URL`"),
+    ("`Access token`", "`访问令牌`"),
+    ("`Bot user ID`", "`Bot 用户 ID`"),
+    ("`Allowed Matrix user IDs`", "`允许的 Matrix 用户 ID`"),
+    ("`Recommended. Comma-separated user IDs in @user:server format.`", "`推荐填写。@user:server 格式的用户 ID，用逗号分隔。`"),
+    ("`Signal bridge URL`", "`Signal 桥接 URL`"),
+    ("`URL of a running signal-cli REST bridge.`", "`正在运行的 signal-cli REST 桥接 URL。`"),
+    ("`Phone number`", "`手机号`"),
+    ("`The number registered with your signal-cli bridge.`", "`在 signal-cli 桥接中注册的号码。`"),
+    ("`Allowed Signal users`", "`允许的 Signal 用户`"),
+    ("`Recommended. Comma-separated Signal identifiers.`", "`推荐填写。Signal 标识符，用逗号分隔。`"),
+    ("`Enable WhatsApp bridge`", "`启用 WhatsApp 桥接`"),
+    ("`Set automatically by the toggle below. Leave alone unless you know you need it.`", "`由下方开关自动设置。不确定时保持默认。`"),
+    ("`Bridge mode`", "`桥接模式`"),
+    ("`Allowed WhatsApp users`", "`允许的 WhatsApp 用户`"),
+    ("`Recommended. Comma-separated phone numbers or WhatsApp IDs.`", "`推荐填写。手机号或 WhatsApp ID，用逗号分隔。`"),
+    ("`Replace current value`", "`替换当前值`"),
+    ("`Open docs`", "`打开文档`"),
+    ("`Clear `", "`清除 `"),
+    ("`Saved`", "`已保存`"),
+    ("`In Telegram, talk to @BotFather, run /newbot, and copy the token it gives you. Then grab your numeric user ID from @userinfobot.`", "`在 Telegram 中与 @BotFather 对话，运行 /newbot 并复制它提供的令牌。然后从 @userinfobot 获取你的数字用户 ID。`"),
+    ("`Open the Discord Developer Portal, create an application, add a Bot, then copy its token. Invite the bot to your server with the right scopes.`", "`打开 Discord 开发者门户，创建应用并添加 Bot，然后复制令牌。用合适权限邀请 bot 加入服务器。`"),
+    ("`Create a Slack app, enable Socket Mode, install it to your workspace, then copy the Bot token (xoxb-) and App-level token (xapp-).`", "`创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot token（xoxb-）和 App-level token（xapp-）。`"),
+    ("`创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot token（xoxb-）和 App-level token（xapp-）。`", "`创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot 令牌（xoxb-）和应用级令牌（xapp-）。`"),
+    ("`On your Mattermost server, create a bot account or personal access token, then paste the server URL and token here.`", "`在 Mattermost 服务器上创建 bot 账户或个人访问令牌，然后在此粘贴服务器 URL 和令牌。`"),
+    ("`Sign in to your homeserver with the bot account, then copy the access token, user ID, and homeserver URL.`", "`使用 bot 账户登录 homeserver，然后复制访问令牌、用户 ID 和 homeserver URL。`"),
+    ("`使用 bot 账户登录 homeserver，然后复制访问令牌、用户 ID 和 homeserver URL。`", "`使用 bot 账户登录主服务器，然后复制访问令牌、用户 ID 和主服务器地址。`"),
+    ("`Run a signal-cli REST bridge somewhere reachable, then point Hermes at the URL and the registered phone number.`", "`运行一个 Hermes 可访问的 signal-cli REST 桥接，然后填写 URL 和注册手机号。`"),
+    ("`Start the WhatsApp bridge that ships with Hermes, scan the QR code on first run, then enable the platform.`", "`启动 Hermes 附带的 WhatsApp 桥接，首次运行时扫码，然后启用该平台。`"),
+    ("`Run BlueBubbles Server on a Mac with iMessage, expose its API, then point Hermes at the URL with the server password.`", "`在启用 iMessage 的 Mac 上运行 BlueBubbles Server，开放 API，然后在 Hermes 中填写 URL 和服务器密码。`"),
+    ("`In Home Assistant, open your profile and create a long-lived access token. Paste it here along with your HA URL.`", "`在 Home Assistant 中打开个人资料，创建长期访问令牌，并连同 HA URL 一起粘贴到这里。`"),
+    ("`Use a dedicated mailbox. For Gmail/Workspace, create an app password and use imap.gmail.com / smtp.gmail.com.`", "`建议使用专用邮箱。Gmail/Workspace 请创建应用密码，并使用 imap.gmail.com / smtp.gmail.com。`"),
+    ("`Get your Twilio Account SID and Auth Token from the Twilio console, plus a phone number that can send SMS.`", "`从 Twilio 控制台获取 Account SID 和 Auth Token，并准备一个可发送短信的号码。`"),
+    ("`Create a DingTalk app in the developer console, then copy the Client ID (App key) and Client Secret here.`", "`在开发者控制台创建钉钉应用，然后复制 Client ID（App key）和 Client Secret 到这里。`"),
+    ("`Create a Feishu / Lark app, configure the bot capability, and copy the App ID, App secret, and event encryption keys.`", "`创建飞书 / Lark 应用，配置 bot 能力，然后复制 App ID、App secret 和事件加密密钥。`"),
+    ("`Add a group robot in WeCom and copy its webhook key as WECOM_BOT_ID. Send-only — use the WeCom (app) option for two-way.`", "`在企业微信中添加群机器人，并将 webhook key 作为 WECOM_BOT_ID。此方式仅发送；双向通信请使用 WeCom（app）。`"),
+    ("`Set up a WeCom self-built app, expose its callback URL, and provide the corp ID, secret, agent ID, and AES key.`", "`设置企业微信自建应用，开放回调 URL，并提供 corp ID、secret、agent ID 和 AES key。`"),
+    ("`Sign in to the WeChat Official Account platform, copy the AppID and Token, and point the message callback URL at Hermes.`", "`登录微信公众号平台，复制 AppID 和 Token，并将消息回调 URL 指向 Hermes。`"),
+    ("`Register an app on the QQ Open Platform (q.qq.com) and copy the App ID and Client Secret.`", "`在 QQ 开放平台（q.qq.com）注册应用，并复制 App ID 和 Client Secret。`"),
+    ("`Expose Hermes as an OpenAI-compatible API. Set an auth key, then point Open WebUI / LobeChat / etc. at the host:port.`", "`将 Hermes 暴露为 OpenAI 兼容 API。设置认证密钥后，将 Open WebUI / LobeChat 等指向该 host:port。`"),
+    ("`Run an HTTP server that other tools (GitHub, GitLab, custom apps) can POST to. Use the secret to verify signatures.`", "`运行一个可接收其他工具（GitHub、GitLab、自定义应用）POST 的 HTTP 服务，并使用 secret 验证签名。`"),
+    ("`Everything here is pinned. Unpin a chat to show it in recents.`", "`这里都是已固定会话。取消固定后会显示在最近会话中。`"),
+    ("`New session in `", "`在此新建会话：`"),
+    ("`New sessions start in this folder unless you pick another. Leave it unset to use your home directory.`", "`新会话会从此文件夹开始，除非另选位置。留空则使用用户目录。`"),
+    ("`Refreshing profiles`", "`正在刷新配置档`"),
+    ("`Refresh profiles`", "`刷新配置档`"),
+    ("`Profile created`", "`配置档已创建`"),
+    ("`Profile renamed`", "`配置档已重命名`"),
+    ("`Profile deleted`", "`配置档已删除`"),
+    ("`Failed to load profiles`", "`加载配置档失败`"),
+    ("`Loading profiles...`", "`正在加载配置档...`"),
+    ("`No profiles yet.`", "`暂无配置档。`"),
+    ("`Select a profile to view its details.`", "`选择配置档以查看详情。`"),
+    ("`Delete profile?`", "`删除配置档？`"),
+    ("`This will delete `", "`将删除 `"),
+    ("` directory. This cannot be undone.`", "` 目录。此操作无法撤销。`"),
+    ("`Default`", "`默认`"),
+    ("`Failed to copy setup command`", "`复制设置命令失败`"),
+    ("`Copying...`", "`正在复制...`"),
+    ("`Copy setup`", "`复制设置`"),
+    ("`Setup command copied`", "`设置命令已复制`"),
+    ("`Failed to load SOUL.md`", "`加载 SOUL.md 失败`"),
+    ("`SOUL.md saved`", "`SOUL.md 已保存`"),
+    ("`Failed to save SOUL.md`", "`保存 SOUL.md 失败`"),
+    ("`The system prompt and persona instructions baked into this profile.`", "`此配置档内置的系统提示词和人格说明。`"),
+    ("`Loading SOUL.md...`", "`正在加载 SOUL.md...`"),
+    ("`Save SOUL.md`", "`保存 SOUL.md`"),
+    ("`Empty SOUL.md — start writing the persona...`", "`SOUL.md 为空，请开始编写人格...`"),
+    ("`Failed to create profile`", "`创建配置档失败`"),
+    ("`Failed to rename profile`", "`重命名配置档失败`"),
+    ("`Change working directory`", "`更改工作目录`"),
+    ("`Right sidebar`", "`右侧栏`"),
+    ("`Open a folder`", "`打开文件夹`"),
+    ("`Open folder`", "`打开文件夹`"),
+    ("`Open a different folder`", "`打开其他文件夹`"),
+    ("`Collapse all folders`", "`折叠全部文件夹`"),
+    ("`Refresh tree`", "`刷新文件树`"),
+    ("`Unreadable`", "`无法读取`"),
+    ("`This folder is empty.`", "`此文件夹为空。`"),
+    ("`Empty`", "`空`"),
+    ("`The file tree hit an error rendering this folder.`", "`文件树渲染此文件夹时出错。`"),
+    ("`Tree error`", "`文件树错误`"),
+    ("`Return to split view`", "`返回分栏视图`"),
+    ("`Focus terminal view`", "`聚焦终端视图`"),
+    ("`Working directory staged`", "`工作目录更改已暂存`"),
+    ("`Restart the desktop backend to apply cwd changes to this active session.`", "`重启桌面后端以将工作目录更改应用到当前会话。`"),
+    ("`Hermes finished`", "`Hermes 已完成`"),
+    ("`dangerous command`", "`危险命令`"),
+    ("`Hermes reported an error`", "`Hermes 报告错误`"),
+    ("`Hermes error`", "`Hermes 错误`"),
+    ("`Session unavailable`", "`会话不可用`"),
+    ("`Could not create a new session`", "`无法创建新会话`"),
+    ("`Prompt failed`", "`提示词提交失败`"),
+    ("`YOLO armed for this chat`", "`此会话已启用 YOLO`"),
+    ("`YOLO off`", "`YOLO 已关闭`"),
+    ("`Could not toggle YOLO`", "`无法切换 YOLO`"),
+    ("`Nothing to branch`", "`没有可分支内容`"),
+    ("`Start or resume a chat before branching.`", "`请先开始或恢复会话再创建分支。`"),
+    ("`Session busy`", "`会话正忙`"),
+    ("`Stop the current turn before branching this chat.`", "`请先停止当前轮次再为此会话创建分支。`"),
+    ("`This message has no text to branch from.`", "`此消息没有可用于分支的文本。`"),
+    ("`Updates`", "`更新`"),
+    ("`Hermes checks for updates automatically in the background and lets you know when one is ready.`", "`Hermes 会在后台自动检查更新，并在可用时通知你。`"),
+    ("`Automatic updates`", "`自动更新`"),
+    ("`Product hides raw tool payloads; Technical shows full input/output.`", "`产品模式隐藏原始工具负载；技术模式显示完整输入/输出。`"),
+    ("`comma-separated values`", "`逗号分隔值`"),
+    ("`Config imported`", "`配置已导入`"),
+    ("`Saving…`", "`正在保存…`"),
+    ("`Loading Hermes configuration...`", "`正在加载 Hermes 配置...`"),
+    ("`Try a different search term or choose another section.`", "`换个搜索词或选择其他分区。`"),
+    ("`No matching settings`", "`没有匹配设置`"),
+    ("`Enter a remote URL and session token before switching to remote.`", "`切换到远程前请先填写远程 URL 和会话令牌。`"),
+    ("`Enter a remote URL and session token before testing.`", "`测试前请先填写远程 URL 和会话令牌。`"),
+    ("`Remote gateway reachable`", "`远程网关可访问`"),
+    ("`Loading gateway settings...`", "`正在加载网关设置...`"),
+    ("`Start a private Hermes backend on localhost. This is the default and works offline.`", "`在 localhost 启动私有 Hermes 后端。这是默认方式，可离线工作。`"),
+    ("`Local gateway`", "`本地网关`"),
+    ("`Connect this desktop shell to a remote Hermes backend using its session token.`", "`使用会话令牌将此桌面外壳连接到远程 Hermes 后端。`"),
+    ("`Remote gateway`", "`远程网关`"),
+    ("`Base URL for the remote dashboard backend. Path prefixes are supported, for example /hermes.`", "`远程控制台后端的基础 URL。支持路径前缀，例如 /hermes。`"),
+    ("`The dashboard session token used for REST and WebSocket access. Leave blank to keep the saved token.`", "`用于 REST 和 WebSocket 访问的控制台会话令牌。留空则保留已保存令牌。`"),
+    ("`Session token`", "`会话令牌`"),
+    ("`Reveal desktop.log in your file manager — useful when the gateway fails to start.`", "`在文件管理器中显示 desktop.log，适合排查网关启动失败。`"),
+    ("`Reset to defaults`", "`重置为默认值`"),
+    ("`Open provider docs`", "`打开服务文档`"),
+    ("`Hide value`", "`隐藏值`"),
+    ("`Reveal value`", "`显示值`"),
+    ("`Clear value`", "`清除值`"),
+    ("`Enter value`", "`输入值`"),
+    ("`Credential saved`", "`凭据已保存`"),
+    ("`Credential removed`", "`凭据已移除`"),
+    ("`Loading API keys and credentials...`", "`正在加载 API 密钥和凭据...`"),
+    ("`LLM providers`", "`LLM 服务`"),
+    ("`Loading MCP servers...`", "`正在加载 MCP 服务...`"),
+    ("`Name required`", "`需要名称`"),
+    ("`Give this MCP server a config key.`", "`请为此 MCP 服务填写配置键。`"),
+    ("`MCP server saved`", "`MCP 服务已保存`"),
+    ("`MCP servers`", "`MCP 服务`"),
+    ("`Add a stdio or HTTP server to expose MCP tools.`", "`添加 stdio 或 HTTP 服务以开放 MCP 工具。`"),
+    ("`No MCP servers`", "`暂无 MCP 服务`"),
+    ("`Loading archived sessions…`", "`正在加载已归档会话…`"),
+    ("`Archived sessions`", "`已归档会话`"),
+    ("`No archived chats match your search.`", "`没有匹配搜索的已归档会话。`"),
+    ("`Archive a chat to hide it here.`", "`归档会话后会在这里隐藏。`"),
+    ("`Nothing archived`", "`暂无归档`"),
+    ("`Default project directory updated`", "`默认项目目录已更新`"),
+    ("`Default project directory`", "`默认项目目录`"),
+    ("`Provider selected`", "`服务已选择`"),
+    ("`Open system panel`", "`打开系统面板`"),
+    ("`Update in progress`", "`更新进行中`"),
+    ("`Close Command Center`", "`关闭命令中心`"),
+    ("`Open Command Center`", "`打开命令中心`"),
+    ("`Low`", "`低`"),
+    ("`Medium`", "`中`"),
+    ("`High`", "`高`"),
+    ("`Max`", "`最高`"),
+    ("`Search models`", "`搜索模型`"),
+    ("`Unmute haptics`", "`打开触感反馈`"),
+    ("`Mute haptics`", "`关闭触感反馈`"),
+    ("`Window controls`", "`窗口控制`"),
+    ("`Pane controls`", "`面板控制`"),
+    ("`App controls`", "`应用控制`"),
+    ("`Skill enabled`", "`技能已启用`"),
+    ("`Skill disabled`", "`技能已禁用`"),
+    ("`Toolset enabled`", "`工具集已启用`"),
+    ("`Toolset disabled`", "`工具集已禁用`"),
+    ("`Try a broader search query.`", "`换个更宽泛的搜索词试试。`"),
+    ("`No toolsets found`", "`未找到工具集`"),
+    ("`Couldn’t check for updates`", "`无法检查更新`"),
+    ("`Update not available`", "`暂无可用更新`"),
+    ("`You’re all set`", "`已全部就绪`"),
+    ("`Updating Hermes…`", "`正在更新 Hermes…`"),
+    ("`No worries — nothing was lost. You can try again now.`", "`不用担心，内容没有丢失。现在可以重试。`"),
+    ("`Type your answer…`", "`输入你的回答…`"),
+    ("`Loading session`", "`正在加载会话`"),
+    ("`Hermes is loading a response`", "`Hermes 正在加载回复`"),
+    ("`Editable checkpoint`", "`可编辑检查点`"),
+    ("`Restore previous checkpoint`", "`恢复上一个检查点`"),
+    ("`Restore next checkpoint`", "`恢复下一个检查点`"),
+    ("`Send edited message`", "`发送已编辑消息`"),
+    ("`More approval options`", "`更多审批选项`"),
+    ("`Tool returned success=false.`", "`工具返回 success=false。`"),
+    ("`Copy output`", "`复制输出`"),
+    ("`Copy content`", "`复制内容`"),
+    ("`Copy URL`", "`复制 URL`"),
+    ("`Copy results`", "`复制结果`"),
+    ("`Copy query`", "`复制查询`"),
+    ("`Copy file`", "`复制文件`"),
+    ("`Copy path`", "`复制路径`"),
+    ("`Copy activity`", "`复制活动`"),
+    ("`Copy code`", "`复制代码`"),
+    ("`Copied!`", "`已复制！`"),
+    ("`Reload and retry`", "`重新加载并重试`"),
+    ("`Image saved`", "`图片已保存`"),
+    ("`Download started`", "`已开始下载`"),
+    ("`Open image`", "`打开图片`"),
+    ("`Saving image`", "`正在保存图片`"),
+    ("`Hosts hundreds of models behind a single key. Good default for new installs.`", "`一个密钥接入数百个模型，新安装推荐。`"),
+    ("`Direct access to OpenAI models.`", "`直接访问 OpenAI 模型。`"),
+    ("`Direct access to Google Gemini models.`", "`直接访问 Google Gemini 模型。`"),
+    ("`Direct access to xAI Grok models.`", "`直接访问 xAI Grok 模型。`"),
+    ("`one key, many models`", "`一个密钥，多种模型`"),
+    ("`GPT-class models`", "`GPT 类模型`"),
+    ("`Nous Portal`", "`Nous 门户`"),
+    ("`OpenAI OAuth (ChatGPT)`", "`OpenAI OAuth（ChatGPT）`"),
+    ("`Qwen Code`", "`通义灵码`"),
+    ("`Anthropic API Key`", "`Anthropic API 密钥`"),
+    ("`Anthropic OAuth: Required Extra Usage Credits to Use Subscription`", "`Anthropic OAuth：使用订阅需要额外额度`"),
+    ("`Could not save credential.`", "`无法保存凭据。`"),
+    ("`Paste API key`", "`粘贴 API 密钥`"),
+    ("`Filter providers and models...`", "`筛选服务和模型...`"),
+    ("`Could not load models`", "`无法加载模型`"),
+    ("`Input / Output price per million tokens`", "`每百万 Token 输入 / 输出价格`"),
+    ("`Notifications`", "`通知`"),
+    ("`Dismiss notification`", "`关闭通知`"),
+    ("`Go to previous page`", "`上一页`"),
+    ("`Go to next page`", "`下一页`"),
+    ("`What's new`", "`新增内容`"),
+    ("`Fixed`", "`已修复`"),
+    ("`Faster`", "`更快`"),
+    ("`Improved`", "`已改进`"),
+    ("`Other improvements`", "`其他改进`"),
+    ("`Branch the latest message into a new chat`", "`将最新消息分支到新会话`"),
+    ("`Retry the last user message`", "`重试上一条用户消息`"),
+    ("`Rename the current session`", "`重命名当前会话`"),
+    ("`Could not render math with KaTeX`", "`无法用 KaTeX 渲染数学公式`"),
+    ("`Starting Hermes Desktop…`", "`正在启动 Hermes Desktop…`"),
+    ("`Hermes Desktop is ready`", "`Hermes Desktop 已就绪`"),
+    ("`Token exchange failed.`", "`令牌交换失败。`"),
+    ("`Enter a value first.`", "`请先输入值。`"),
+    ("`Enter the endpoint URL first.`", "`请先输入端点 URL。`"),
+    ("`Could not reach that endpoint.`", "`无法访问该端点。`"),
+    ("`Update Hermes`", "`更新 Hermes`"),
+    ("`Your Hermes backend is older than this desktop build and may not work correctly. Update to align them.`", "`Hermes 后端版本低于当前桌面端，可能无法正常工作。请更新以保持一致。`"),
+    ("`Backend out of date`", "`后端版本过旧`"),
+    ("`See what's new`", "`查看新增内容`"),
+    ("`Update ready`", "`更新已就绪`"),
+    ("`Desktop bridge unavailable.`", "`桌面桥接不可用。`"),
+    ("`Starting update…`", "`正在开始更新…`"),
+    ("`New update available`", "`有新版本可用`"),
+    ("`A new version of Hermes is ready to install.`", "`Hermes 新版本已可安装。`"),
+    ("`This version of Hermes can’t update itself from inside the app.`", "`此版本的 Hermes 无法在应用内自行更新。`"),
+    ("`Transcribing dictation`", "`正在转写听写`"),
+    ("`Stop dictation`", "`停止听写`"),
+    ("`You're about to visit an external website.`", "`即将访问外部网站。`"),
+    ("`Copy link`", "`复制链接`"),
+    ("`Open link`", "`打开链接`"),
+    ("`Copied`", "`已复制`"),
+    ("`Export failed`", "`导出失败`"),
+    ("`Reset all settings to Hermes defaults?`", "`要将全部设置重置为 Hermes 默认值吗？`"),
+    ("`Remote gateway test failed`", "`远程网关测试失败`"),
+    ("`sudo password`", "`sudo 密码`"),
+    ("`YOLO on — auto-approving dangerous commands. Click to turn off.`", "`YOLO 开启：自动批准危险命令。点击关闭。`"),
+    ("`YOLO off — click to auto-approve dangerous commands.`", "`YOLO 关闭：点击后自动批准危险命令。`"),
+    ("`Show active desktop sessions and running tasks`", "`显示活动桌面会话和运行中任务`"),
+    ("`Run a prompt in the background`", "`在后台运行提示词`"),
+    ("`Compress this conversation context`", "`压缩当前对话上下文`"),
+    ("`Create a debug report`", "`创建调试报告`"),
+    ("`Manage the standing goal for this session`", "`管理此会话的常驻目标`"),
+    ("`Show desktop slash commands`", "`显示桌面端斜杠命令`"),
+    ("`Start a new desktop chat`", "`开始新的桌面会话`"),
+    ("`Queue a prompt for the next turn`", "`将提示词加入下一轮队列`"),
+    ("`Resume a saved session`", "`恢复已保存会话`"),
+    ("`List or restore filesystem checkpoints`", "`列出或恢复文件系统检查点`"),
+    ("`Switch desktop theme or cycle to the next one`", "`切换桌面主题或轮换到下一个`"),
+    ("`Show current session status`", "`显示当前会话状态`"),
+    ("`Steer the current run after the next tool call`", "`在下一次工具调用后引导当前运行`"),
+    ("`Stop running background processes`", "`停止运行中的后台进程`"),
+    ("`Remove the last user/assistant exchange`", "`移除上一组用户/助手对话`"),
+    ("`Show token usage for this session`", "`显示此会话 Token 用量`"),
+    ("`Toggle YOLO — auto-approve dangerous commands`", "`切换 YOLO：自动批准危险命令`"),
+    ("`New profile`", "`新建配置档`"),
+    ("`Profiles are independent Hermes environments: separate config, skills, and SOUL.md.`", "`配置档是独立 Hermes 环境：配置、技能和 SOUL.md 相互分开。`"),
+    ("`Lowercase letters, digits, hyphens, and underscores. Must start with a letter or digit.`", "`可用小写字母、数字、连字符和下划线。必须以字母或数字开头。`"),
+    ("`Invalid name. `", "`名称无效。`"),
+    ("`Name is required.`", "`名称必填。`"),
+    ("`New name`", "`新名称`"),
+    ("`Clone from default`", "`从默认配置复制`"),
+    ("`Copy config, skills, and SOUL.md from your default profile.`", "`从默认配置档复制配置、技能和 SOUL.md。`"),
+    ("`Creating...`", "`正在创建...`"),
+    ("`Create profile`", "`创建配置档`"),
+    ("`Rename profile`", "`重命名配置档`"),
+    ("`Renaming updates the profile directory and any wrapper scripts in `", "`重命名会更新配置档目录和其中的包装脚本：`"),
+    ("`Renaming...`", "`正在重命名...`"),
+    ("`Delete cron job?`", "`删除定时任务？`"),
+    ("`This will remove`", "`将删除`"),
+    ("`Prompt and schedule are required.`", "`提示词和计划必填。`"),
+    ("`Update the schedule, prompt, or delivery target. Changes apply on next run.`", "`更新计划、提示词或发送目标。更改将在下次运行时生效。`"),
+    ("`Schedule a prompt to run automatically. Use cron syntax or a natural phrase like \"every 15 minutes\".`", "`设置自动运行提示词。可使用 cron 语法，或类似“每 15 分钟”的自然语言。`"),
+    ("`Deleting...`", "`正在删除...`"),
+    ("`No logs loaded yet.`", "`尚未加载日志。`"),
+    ("`Daily tokens`", "`每日 Token`"),
+    ("`Hermes finished restarting the preview server`", "`Hermes 已完成预览服务重启`"),
+    ("Hermes finished restarting the preview server", "Hermes 已完成预览服务重启"),
+    ("`Server restart failed: `", "`服务重启失败：`"),
+    ("Server restart failed: ", "服务重启失败："),
+    ("`Add a provider credential before sending your first message.`", "`发送第一条消息前请先添加模型服务凭据。`"),
+    ("Add a provider credential before sending your first message.", "发送第一条消息前请先添加模型服务凭据。"),
+    ("`Right sidebar panels`", "`右侧栏面板`"),
+    ("`Archive failed`", "`归档失败`"),
+    ("`Archived chats are hidden from the sidebar but keep all their messages. Ctrl/⌘-click a chat in the sidebar to archive it without opening.`", "`已归档会话会从侧边栏隐藏，但保留全部消息。在侧边栏按 Ctrl/⌘ 点击会话可直接归档而无需打开。`"),
+    ("`Archived chats are hidden from the sidebar but keep all their messages. Ctrl/⌘-click a chat in the sidebar to archive it.`", "`已归档会话会从侧边栏隐藏，但保留全部消息。在侧边栏按 Ctrl/⌘ 点击会话可直接归档。`"),
+    ("`Included with a Nous subscription — sign in to Nous Portal to activate.`", "`包含在 Nous 订阅中，请登录 Nous 门户启用。`"),
+    ("`Ember`", "`余烬`"),
+    ("`Mono`", "`单色`"),
+    ("`Cyberpunk`", "`赛博朋克`"),
+    ("`Slate`", "`石板`"),
+    ("`Warm crimson and bronze — forge vibes`", "`暖红与青铜色，锻造氛围`"),
+    ("`Clean grayscale — minimal and focused`", "`干净灰阶，极简专注`"),
+    ("`Neon green on black — matrix terminal`", "`黑底霓虹绿，矩阵终端风格`"),
+    ("`Cool slate blue — focused developer theme`", "`冷调石板蓝，专注开发主题`"),
+    ("dwop yur ewwor message hewe! i'll find the cuwpwit, fix it, and weave a happy test suite behind me owo", "把错误信息发来，我会定位问题、修复它，并补好测试。"),
+    ("*tiny keyboard sounds*", "键盘轻响"),
+    ("`No workspace`", "`无工作区`"),
+    ("`No model`", "`未选择模型`"),
+    ("`no model`", "`未选择模型`"),
+    ("`Default model`", "`默认模型`"),
+    ("`Switch model`", "`切换模型`"),
+    ("`Open model picker`", "`打开模型选择器`"),
+    ("`Model · ${y}: ${v||`none`}`", "`模型 · ${y}: ${v||`未选择`}`"),
+    ("`Fast`", "`快速`"),
+    ("`Latest`", "`最新版`"),
+    ("var GZt={none:`Off`,minimal:`Min`,low:`Low`,medium:`Med`,high:`High`,xhigh:`Max`}", "var GZt={none:`关`,minimal:`极低`,low:`低`,medium:`中`,high:`高`,xhigh:`最高`}"),
+    ("var nsn=[{value:`minimal`,label:`Minimal`},{value:`low`,label:`Low`},{value:`medium`,label:`Medium`},{value:`high`,label:`High`},{value:`xhigh`,label:`Max`}]", "var nsn=[{value:`minimal`,label:`极低`},{value:`low`,label:`低`},{value:`medium`,label:`中`},{value:`high`,label:`高`},{value:`xhigh`,label:`最高`}]"),
+    ("`Pick a different provider`", "`选择其他模型服务`"),
+    ("`Local / custom endpoint`", "`本地 / 自定义端点`"),
+    ("`Free tier`", "`免费层级`"),
+    ("`Log file`", "`日志文件`"),
+    ("\"Log file\"", "\"日志文件\""),
+    ("`Add provider`", "`添加模型服务`"),
+    ("`Add provider…`", "`添加模型服务…`"),
+    ("`Add or switch inference provider.`", "`添加或切换推理模型服务。`"),
+    ("`Connect a model provider to start chatting. Most options take one click.`", "`连接模型服务后即可开始对话，大多数选项一步完成。`"),
+    ("`No inference provider is configured.`", "`尚未配置推理模型服务。`"),
+    ("`Connected, but Hermes still cannot resolve a usable provider.`", "`已连接，但 Hermes 还未找到可用模型服务。`"),
+    ("`connected. Picking a default model...`", "`已连接，正在选择默认模型...`"),
+    ("` connected. Picking a default model...`", "` 已连接，正在选择默认模型...`"),
+    ("`One subscription, 300+ frontier models — the recommended way to run Hermes`", "`一个订阅可用 300 多个前沿模型，这是推荐的 Hermes 运行方式`"),
+    ("`Point Hermes at a local or self-hosted OpenAI-compatible endpoint (vLLM, llama.cpp, Ollama, etc).`", "`将 Hermes 指向本地或自托管的 OpenAI 兼容端点（vLLM、llama.cpp、Ollama 等）。`"),
+    ("`Queue message`", "`消息排队`"),
+    ("`Delete queued turn`", "`删除排队消息`"),
+    ("`Edit queued turn`", "`编辑排队消息`"),
+    ("`Stop`", "`停止`"),
+    ("`Start voice conversation`", "`开始语音对话`"),
+    ("`Voice dictation`", "`语音输入`"),
+    ("`Stop listening and send`", "`停止聆听并发送`"),
+    ("`End voice conversation`", "`结束语音对话`"),
+    ("`Mute microphone`", "`关闭麦克风`"),
+    ("`Unmute microphone`", "`打开麦克风`"),
+    ("`Speaking`", "`正在说话`"),
+    ("`Transcribing`", "`正在转写`"),
+    ("`Thinking`", "`正在思考`"),
+    ("`Muted`", "`已静音`"),
+    ("`Listening`", "`正在聆听`"),
+    ("`Microphone permission was denied.`", "`麦克风权限被拒绝。`"),
+    ("`No microphone was found.`", "`未找到麦克风。`"),
+    ("`Microphone is already in use by another app.`", "`麦克风正被其他应用使用。`"),
+    ("`Microphone constraints are not supported by this device.`", "`当前设备不支持此麦克风参数。`"),
+    ("`Could not start microphone recording.`", "`无法开始麦克风录音。`"),
+    ("`Could not start voice session`", "`无法开始语音会话`"),
+    ("`Configure speech-to-text to use voice mode.`", "`配置语音转文字后可使用语音模式。`"),
+    ("`Microphone access denied.`", "`麦克风访问被拒绝。`"),
+    ("`Microphone failed`", "`麦克风异常`"),
+    ("`Voice playback failed`", "`语音播放失败`"),
+    ("`Voice recording failed`", "`语音录制失败`"),
+    ("`Voice transcription failed`", "`语音转写失败`"),
+    ("`Voice transcription is not available yet.`", "`语音转写暂不可用。`"),
+    ("`Voice unavailable`", "`语音不可用`"),
+    ("`This runtime does not support microphone recording.`", "`当前运行环境不支持麦克风录制。`"),
+    ("`Secret required`", "`需要密钥`"),
+    ("`Hermes needs a credential to continue.`", "`Hermes 需要凭据才能继续。`"),
+    ("`secret value`", "`密钥内容`"),
+    ("`Could not send secret`", "`无法发送密钥`"),
+    ("`Hermes gateway is not connected`", "`Hermes 网关未连接`"),
+    ("`Hermes gateway unavailable`", "`Hermes 网关不可用`"),
+    ("`Could not send approval response`", "`无法发送审批结果`"),
+    ("`Administrator password`", "`管理员密码`"),
+    ("`Could not send sudo password`", "`无法发送管理员密码`"),
+    ("`Hermes needs your sudo password to run a privileged command. It is sent only to your local agent.`", "`Hermes 需要管理员密码来运行特权命令。密码会发送给本机 agent。`"),
+    ("`Preview unavailable`", "`无法预览`"),
+    ("`Could not preview ${e.label}`", "`无法预览 ${e.label}`"),
+    ("`Close preview pane`", "`关闭预览面板`"),
+    ("`Download image`", "`下载图片`"),
+    ("`No inline preview`", "`无内嵌预览`"),
+    ("`Preview anyway`", "`仍然预览`"),
+    ("`Preview app failed to boot`", "`预览应用启动失败`"),
+    ("`Preview Console`", "`预览控制台`"),
+    ("`Preview console:`", "`预览控制台：`"),
+    ("`Preview failed to load`", "`预览加载失败`"),
+    ("`Preview restart failed`", "`预览重启失败`"),
+    ("`Preview server restarted`", "`预览服务已重启`"),
+    ("`Loading preview…`", "`正在加载预览…`"),
+    ("`Open preview DevTools`", "`打开预览开发者工具`"),
+    ("`Hide preview DevTools`", "`隐藏预览开发者工具`"),
+    ("`Show preview console`", "`显示预览控制台`"),
+    ("`Hide preview console`", "`隐藏预览控制台`"),
+    ("`Resize preview console`", "`调整预览控制台大小`"),
+    ("`Ask Hermes to restart the server`", "`请求 Hermes 重启服务`"),
+    ("`Hermes could not restart the server.`", "`Hermes 无法重启服务。`"),
+    ("`Hermes is restarting...`", "`Hermes 正在重启...`"),
+    ("`Hermes is still working, but no restart result has arrived yet. The server command may be running in the foreground.`", "`Hermes 仍在处理，但还没有收到重启结果。服务命令可能仍在前台运行。`"),
+    ("`Hermes is working in the background. Watch the preview console for progress.`", "`Hermes 正在后台处理，可在预览控制台查看进度。`"),
+    ("`Hermes will fetch the page and include it as context for this turn.`", "`Hermes 会获取该页面，并作为本轮上下文。`"),
+    ("`Restarting preview server`", "`正在重启预览服务`"),
+    ("`Reloading the preview now.`", "`正在重新加载预览。`"),
+    ("`The preview page could not be reached.`", "`无法访问预览页面。`"),
+    ("`Workspace changed, reloading preview`", "`工作区已变更，正在重新加载预览`"),
+    ("`Restart Hermes Desktop to save images`", "`重启 Hermes Desktop 后保存图片`"),
+    ("`Restart Hermes Desktop to use Save Image.`", "`重启 Hermes Desktop 后使用保存图片。`"),
+    ("`Settings`", "`设置`"),
+    ("`Command Center`", "`命令中心`"),
+    ("`Skills`", "`技能`"),
+    ("`Messaging`", "`消息`"),
+    ("`Artifacts`", "`产物`"),
+    ("`Profiles`", "`配置档`"),
+    ("`Agents`", "`智能体`"),
+    ("`Chat`", "`对话`"),
+    ("`Appearance`", "`外观`"),
+    ("`Workspace`", "`工作区`"),
+    ("`Safety`", "`安全`"),
+    ("`Memory & Context`", "`记忆与上下文`"),
+    ("`Voice`", "`语音`"),
+    ("`API Keys`", "`API 密钥`"),
+    ("`Archived Chats`", "`已归档会话`"),
+    ("`About`", "`关于`"),
+    ("`Light`", "`浅色`"),
+    ("`Dark`", "`深色`"),
+    ("`System`", "`跟随系统`"),
+    ("`Bright desktop surfaces`", "`明亮桌面界面`"),
+    ("`Low-glare workspace`", "`低眩光工作区`"),
+    ("`Follow OS appearance`", "`跟随系统外观`"),
+    ("`Advanced Hermes environments for separate personas, config, skills, and SOUL.md.`", "`为不同角色、配置、技能和 SOUL.md 准备的 Hermes 高级环境。`"),
+    ("`Manage profiles`", "`管理配置档`"),
+    ("`Export config`", "`导出配置`"),
+    ("`Import config`", "`导入配置`"),
+    ("`Reset config`", "`重置配置`"),
+    ("`Start a fresh session`", "`开始新会话`"),
+    ("`Configure Hermes desktop`", "`配置 Hermes 桌面端`"),
+    ("`Enable skills, toolsets, and providers`", "`启用技能、工具集和模型服务`"),
+    ("`Set up Telegram, Slack, Discord, and more`", "`设置 Telegram、Slack、Discord 等`"),
+    ("`Browse generated outputs`", "`浏览生成内容`"),
+    ("`Sessions panel`", "`会话面板`"),
+    ("`Search, pin, and manage sessions`", "`搜索、固定和管理会话`"),
+    ("`System panel`", "`系统面板`"),
+    ("`Gateway status, logs, restart/update`", "`网关状态、日志、重启和更新`"),
+    ("`Usage panel`", "`用量面板`"),
+    ("`Token, cost, and skill activity over time`", "`Token、费用和技能活动趋势`"),
+    ("`Activity`", "`活动`"),
+    ("`Add context`", "`添加上下文`"),
+    ("`Add files as context`", "`添加文件作为上下文`"),
+    ("`Add folders as context`", "`添加文件夹作为上下文`"),
+    ("`Attach a URL`", "`添加链接`"),
+    ("`Attach images`", "`添加图片`"),
+    ("`Files…`", "`文件…`"),
+    ("`Folder…`", "`文件夹…`"),
+    ("`Images…`", "`图片…`"),
+    ("`Paste image`", "`粘贴图片`"),
+    ("`URL…`", "`链接…`"),
+    ("`Image attach`", "`添加图片`"),
+    ("`Image attach failed`", "`添加图片失败`"),
+    ("`Image preview failed`", "`图片预览失败`"),
+    ("`This file is large`", "`文件较大`"),
+    ("`This looks like a binary file`", "`这看起来是二进制文件`"),
+    ("`Read file`", "`读取文件`"),
+    ("`Reading file`", "`正在读取文件`"),
+    ("`Edited file`", "`已编辑文件`"),
+    ("`Editing file`", "`正在编辑文件`"),
+    ("`Close ${e.label}`", "`关闭 ${e.label}`"),
+    ("`Could not attach ${e.name||`", "`无法添加 ${e.name||`"),
+    ("`Could not copy console output`", "`无法复制控制台输出`"),
+    ("`Could not copy session ID`", "`无法复制会话 ID`"),
+    ("`Could not export session`", "`无法导出会话`"),
+    ("`Could not change model`", "`无法切换模型`"),
+    ("`Copy detail`", "`复制详情`"),
+    ("`Copy command`", "`复制命令`"),
+    ("`copy selection or last assistant message`", "`复制所选内容或上一条助手消息`"),
+    ("`Could not reach ${n}.`", "`无法访问 ${n}。`"),
+    ("`We opened`", "`已打开`"),
+    ("`We opened `", "`已打开 `"),
+    ("`Open agents`", "`打开智能体`"),
+    ("`Close agents`", "`关闭智能体`"),
+    ("`Open cron jobs`", "`打开定时任务`"),
+    ("`Search sessions, views, and actions`", "`搜索会话、视图和操作`"),
+    ("`Hide sidebar`", "`隐藏侧边栏`"),
+    ("`Show sidebar`", "`显示侧边栏`"),
+    ("`Hide right sidebar`", "`隐藏右侧栏`"),
+    ("`Show right sidebar`", "`显示右侧栏`"),
+    ("`Group by workspace`", "`按工作区分组`"),
+    ("`Group sessions by workspace`", "`按工作区分组会话`"),
+    ("`Ungroup sessions`", "`取消会话分组`"),
+    ("`Session actions`", "`会话操作`"),
+    ("`Session exported`", "`会话已导出`"),
+    ("`Session running`", "`会话运行中`"),
+    ("`Rename session`", "`重命名会话`"),
+    ("`Untitled session`", "`未命名会话`"),
+    ("`start a new session`", "`新建会话`"),
+    ("`resume a prior session`", "`继续之前的会话`"),
+    ("`Searched session history`", "`已搜索会话历史`"),
+    ("`Searching session history`", "`正在搜索会话历史`"),
+    ("`Current turn elapsed`", "`当前轮次耗时`"),
+    ("`Context usage`", "`上下文用量`"),
+    ("`Runtime session elapsed`", "`运行会话耗时`"),
+    ("`Running command`", "`正在运行命令`"),
+    ("`Ran command`", "`已运行命令`"),
+    ("`Send follow-up`", "`发送后续消息`"),
+    ("`Terminal must be opened first`", "`需先打开终端`"),
+    ("`Shell Session`", "`Shell 会话`"),
+    ("`Tool Gateway enabled`", "`工具网关已启用`"),
+    ("`Use local gateway`", "`使用本地网关`"),
+    ("`Gateway`", "`网关`"),
+    ("`Hermes inference gateway status`", "`Hermes 推理网关状态`"),
+    ("`Gateway Connection`", "`网关连接`"),
+    ("`Gateway settings failed to load`", "`网关设置加载失败`"),
+    ("`Gateway connection restarting`", "`网关连接正在重启`"),
+    ("`Gateway settings saved`", "`网关设置已保存`"),
+    ("`Hermes Desktop will reconnect using the saved settings.`", "`Hermes 桌面版将使用已保存设置重新连接。`"),
+    ("`Saved for the next restart.`", "`已保存，将在下次重启时生效。`"),
+    ("`Could not apply gateway settings`", "`无法应用网关设置`"),
+    ("`Could not save gateway settings`", "`无法保存网关设置`"),
+    ("`Remote gateway incomplete`", "`远程网关信息不完整`"),
+    ("`Add a remote URL and token before switching to remote.`", "`切换到远程前，请先添加远程 URL 和令牌。`"),
+    ("`Gateway settings unavailable`", "`网关设置不可用`"),
+    ("`The desktop IPC bridge does not expose gateway settings.`", "`桌面 IPC 桥接未暴露网关设置。`"),
+    ("`Diagnostics`", "`诊断`"),
+    ("`Local`", "`本地`"),
+    ("`Remote`", "`远程`"),
+    ("`Remote URL`", "`远程 URL`"),
+    ("`Remote token`", "`远程令牌`"),
+    ("`Save for next restart`", "`保存到下次重启`"),
+    ("`Save and reconnect`", "`保存并重新连接`"),
+    ("`Test connection`", "`测试连接`"),
+    ("`Connection test failed`", "`连接测试失败`"),
+    ("`Connection test succeeded`", "`连接测试成功`"),
+    ("`Search API keys`", "`搜索 API 密钥`"),
+    ("`Search MCP servers`", "`搜索 MCP 服务`"),
+    ("`Archived chats`", "`已归档会话`"),
+    ("`Search archived chats`", "`搜索已归档会话`"),
+    ("`No archived chats`", "`没有已归档会话`"),
+    ("`No matching archived chats`", "`没有匹配的已归档会话`"),
+    ("`Restore`", "`恢复`"),
+    ("`Restored`", "`已恢复`"),
+    ("`Could not restore session`", "`无法恢复会话`"),
+    ("`Delete permanently`", "`永久删除`"),
+    ("`Could not delete session`", "`无法删除会话`"),
+    ("`MCP tools reloaded`", "`MCP 工具已重新加载`"),
+    ("`New tool schemas apply to fresh turns.`", "`新的工具结构将在新轮次中生效。`"),
+    ("`Gateway unavailable`", "`网关不可用`"),
+    ("`Reconnect the gateway before reloading MCP.`", "`重新加载 MCP 前请先连接网关。`"),
+    ("`MCP reload failed`", "`MCP 重新加载失败`"),
+    ("`Add MCP server`", "`添加 MCP 服务`"),
+    ("`Edit MCP server`", "`编辑 MCP 服务`"),
+    ("`Remove failed`", "`移除失败`"),
+    ("`Save failed`", "`保存失败`"),
+    ("`Connecting`", "`正在连接`"),
+    ("`Inference ready`", "`推理已就绪`"),
+    ("`Inference not ready`", "`推理未就绪`"),
+    ("`Checking inference`", "`正在检查推理服务`"),
+    ("o?.ready?`ready`:o?`needs setup`:`checking`:se?`connecting`:`offline`", "o?.ready?`就绪`:o?`需要设置`:`检查中`:se?`连接中`:`离线`"),
+    ("`Connecting live desktop gateway`", "`正在连接桌面网关`"),
+    ("`Reconnecting to Hermes…`", "`正在重新连接 Hermes…`"),
+    ("`Hermes is ready`", "`Hermes 已就绪`"),
+    ("`Hermes background process exited.`", "`Hermes 后台进程已退出。`"),
+    ("`Hermes background process exited during startup.`", "`Hermes 后台进程在启动时退出。`"),
+    ("`Hermes couldn't start`", "`Hermes 无法启动`"),
+    ("`Hermes is finishing install. This usually takes under a minute on first run.`", "`Hermes 正在完成安装，首次运行通常不到一分钟。`"),
+    ("`Hermes needs a one-time install`", "`Hermes 需要完成一次性安装`"),
+    ("children:[`Automated first-launch install isn`,`’`,`t available on `,n,` yet. Open Terminal and run the command below, then relaunch this app. Subsequent launches will skip this step.`]", "children:[`当前平台 `,n,` 暂不支持首次启动自动安装。请打开终端运行下面的命令，然后重新启动本应用。后续启动会跳过此步骤。`]"),
+    ("children:[`首次启动自动安装未`,`’`,`t available on `,n,` yet. Open Terminal and run the command below, then relaunch this app. Subsequent launches will skip this step.`]", "children:[`当前平台 `,n,` 暂不支持首次启动自动安装。请打开终端运行下面的命令，然后重新启动本应用。后续启动会跳过此步骤。`]"),
+    ("`Install command`", "`安装命令`"),
+    ("`Cancel install`", "`取消安装`"),
+    ("`Cancelling...`", "`正在取消...`"),
+    ("`Repair install`", "`修复安装`"),
+    ("`Open logs`", "`打开日志`"),
+    ("`View install docs`", "`查看安装文档`"),
+    ("`Will install to `", "`将安装到 `"),
+    ("children:[`I`,`’`,`ve run it -- retry`]", "children:[`我已运行，重试`]"),
+    ("`Setting up Hermes Agent`", "`正在设置 Hermes Agent`"),
+    ("`Starting Hermes...`", "`正在启动 Hermes...`"),
+    ("`Starting Hermes…`", "`正在启动 Hermes…`"),
+    ("`Loading Hermes settings`", "`正在加载 Hermes 设置`"),
+    ("`Let's get you setup with Hermes Agent`", "`开始设置 Hermes Agent`"),
+    ("`Authorize Hermes there.`", "`在那里授权 Hermes。`"),
+    ("`Back to sign in`", "`返回登录`"),
+    ("`Sign in with ${n}`", "`登录 ${n}`"),
+    ("`Continue`", "`继续`"),
+    ("`Waiting for you to authorize...`", "`正在等待授权...`"),
+    ("`Sign-in failed. Try again.`", "`登录失败，请重试。`"),
+    ("`Re-open sign-in page`", "`重新打开登录页面`"),
+    ("`Re-open verification page`", "`重新打开验证页面`"),
+    ("children:[`Verifying your code with `,n,`...`]", "children:[`正在用 `,n,` 验证代码...`]"),
+    ("`Sign in once in your terminal, then come back to chat`", "`在终端登录一次，然后返回对话`"),
+    ("`Opens a verification page in your browser — Hermes connects automatically`", "`会在浏览器打开验证页面，Hermes 将自动连接`"),
+    ("`Opens your browser to sign in — Hermes connects automatically`", "`会打开浏览器登录，Hermes 将自动连接`"),
+    ("`Opens your browser to sign in, then continues here`", "`打开浏览器登录，然后回到这里继续`"),
+    ("`in your browser.`", "`在浏览器中。`"),
+    ("`in your browser. Authorize Hermes there and you'll be connected automatically — nothing to copy or paste.`", "`在浏览器中。完成 Hermes 授权后会自动连接，无需复制或粘贴。`"),
+    ("` in your browser. Authorize Hermes there and you'll be connected automatically — nothing to copy or paste.`", "` 在浏览器中。完成 Hermes 授权后会自动连接，无需复制或粘贴。`"),
+    ("`in your browser. Enter this code there:`", "`在浏览器中。在那里输入此代码：`"),
+    ("` in your browser. Enter this code there:`", "` 在浏览器中。请在那里输入此代码：`"),
+    ("`signs in through its own CLI. Run this command in a terminal, then come back and pick \"I've signed in\":`", "`会通过自己的 CLI 登录。请在终端运行此命令，然后返回这里选择“我已登录”：`"),
+    ("` signs in through its own CLI. Run this command in a terminal, then come back and pick \"I've signed in\":`", "` 会通过自己的 CLI 登录。请在终端运行此命令，然后返回这里选择“我已登录”：`"),
+    ("`I've signed in`", "`我已登录`"),
+    ("` docs`", "` 文档`"),
+    ("`Persist globally`", "`全局保存`"),
+    ("`Persist globally (otherwise this session only)`", "`全局保存（否则仅本次会话）`"),
+    ("`The desktop backend rejected that request (405 Method Not Allowed). Try restarting Hermes Desktop.`", "`桌面后端拒绝了该请求（405 Method Not Allowed）。请尝试重启 Hermes Desktop。`"),
+    ("`The view hit an unexpected error. Your chats and settings are safe - try again, or reload the window.`", "`视图遇到异常。你的对话和设置仍安全，请重试或重新加载窗口。`"),
+    ("`The background gateway didn't come up. Try one of the recovery steps below — nothing here deletes your chats or settings.`", "`后台网关未启动。请尝试下面的恢复步骤；这里不会删除你的对话或设置。`"),
+    ("`Copy the authorization code and paste it below.`", "`复制授权码并粘贴到下方。`"),
+    ("`Paste authorization code`", "`粘贴授权码`"),
+    ("` in your browser.`", "` 在浏览器中。`"),
+    ("`Hide`", "`隐藏`"),
+    ("`Show`", "`显示`"),
+    ("` recent logs`", "`最近日志`"),
+    ("`Pending`", "`等待中`"),
+    ("`Installing`", "`安装中`"),
+    ("`Done`", "`完成`"),
+    ("`Skipped`", "`已跳过`"),
+    ("`Failed`", "`失败`"),
+    ("`Applying...`", "`正在应用...`"),
+    ("`Apply`", "`应用`"),
+    ("`Vision`", "`视觉`"),
+    ("`Image analysis`", "`图像分析`"),
+    ("`Web extract`", "`网页提取`"),
+    ("`auto · use main model`", "`自动 · 使用主模型`"),
+    ("`(provider default)`", "`（模型服务默认）`"),
+    ("`browser automation`", "`浏览器自动化`"),
+    ("`image generation`", "`图像生成`"),
+    ("`text-to-speech`", "`文本转语音`"),
+    ("`video generation`", "`视频生成`"),
+    ("`web search & extract`", "`网页搜索与提取`"),
+    ("` now run through your Nous subscription.`", "` 现在通过你的 Nous 订阅运行。`"),
+    ("` connected.`", "` 已连接。`"),
+    ("`skill payload missing message`", "`技能缺少消息内容`"),
+    ("`empty message`", "`空消息`"),
+    ("`session busy — /interrupt the current turn before sending this command`", "`会话正忙，请先用 /interrupt 中断当前轮次再发送此命令`"),
+    ("`error: ${e instanceof Error?e.message:String(e)}`", "`错误：${e instanceof Error?e.message:String(e)}`"),
+    ("`This build can't update itself from inside the app.`", "`此版本无法在应用内自行更新。`"),
+    ("`We couldn't reach the update server.`", "`无法连接更新服务。`"),
+    ("`An update is currently installing.`", "`更新正在安装。`"),
+    ("`You're on the latest version.`", "`当前已是最新版本。`"),
+    ("`Tap \"Check now\" to look for updates.`", "`点击“立即检查”查找更新。`"),
+    ("`Check now`", "`立即检查`"),
+    ("`Install update`", "`安装更新`"),
+    ("`Update available`", "`有可用更新`"),
+    ("`No updates`", "`无更新`"),
+    ("`Edit message`", "`编辑消息`"),
+    ("`HERMES AGENT`", "`小马汉化版 HERMES`"),
+    ("`HERMES 智能体`", "`小马汉化版 HERMES`"),
+    ("label: 'File'", "label: '文件'"),
+    ("label: 'Edit'", "label: '编辑'"),
+    ("label: 'View'", "label: '视图'"),
+    ("label: 'Window'", "label: '窗口'"),
+    ("label: 'Help'", "label: '帮助'"),
+    ("label: `About ${APP_NAME}`", "label: `关于 ${APP_NAME}`"),
+    ("say hi or paste a stack trace! no task too small, no repo too tangled. we'll untangle it together!", "打个招呼或粘贴错误堆栈！任务不嫌小，项目不怕乱，我们一起理清。"),
+    ("paste a bug or a file path and i'll fix it super gently. tests, diffs, PRs - all with extra care! *sparkle*", "粘贴错误或文件位置，我会细致修复。测试、差异、PR 都认真处理。"),
+    ("tell me what you're making! i love refactors, tiny helpers, and big scary repos alike (>w<)", "告诉我你在做什么。重构、小工具和复杂项目都可以交给我。"),
+    ("drop an error, a goal, or a whole folder. i'll tidy it up with lots of love and a clean commit message!", "发来错误、目标或整个文件夹。我会整理清楚，并写好提交说明。"),
+    ("one task at a time, done neatly! i can run tests, patch files, and make your repo feel cozy again <3", "一次处理一个任务，干净完成。我可以运行测试、修改文件，让项目重新清爽。"),
+    ("hiii! ready to help! (^_^)", "你好，我已准备好。"),
+    ("hermes-chan is here! <3", "Hermes 已在这里。"),
+    ("let's code together!! :3", "一起写代码吧。"),
+    ("awaiting your wish~", "等待你的任务。"),
+    ("ready and happy! (>.<)", "已准备好。"),
+    ("\"Hermes Agent is ready.\"", "\"Hermes Agent 已就绪。\""),
+    ("\"Ask a question, paste an error, or point me at a repo. I can read code, run tools, and help you ship.\"", "\"可以提问、粘贴错误，或给我一个项目位置。我能读取代码、运行工具，并帮助你交付。\""),
+    ("\"What are we building today?\"", "\"今天要做什么？\""),
+    ("\"Describe the task in your own words. I'll pick the right tools, explain my plan, and check in before risky steps.\"", "\"用你的话描述任务。我会选择合适工具，说明计划，并在高风险步骤前确认。\""),
+    ("\"Start anywhere.\"", "\"从任意位置开始。\""),
+    ("\"Drop a file path, a traceback, or a rough idea. I'll investigate, suggest next steps, and keep things reversible.\"", "\"发来文件位置、报错追踪或初步想法。我会检查、建议下一步，并保持可回退。\""),
+    ("\"Your workspace, one prompt away.\"", "\"一句话进入你的工作区。\""),
+    ("\"Search the repo, edit files, run tests, open PRs. Tell me the goal and I'll handle the mechanical parts.\"", "\"搜索项目、编辑文件、运行测试、打开 PR。告诉我目标，我来处理执行部分。\""),
+    ("\"Ready when you are.\"", "\"随时可以开始。\""),
+    ("\"Type a task, question, or snippet. I remember the session, cite my sources, and stop to ask when I'm unsure.\"", "\"输入任务、问题或片段。我会记住会话，注明来源，并在不确定时先询问。\""),
+    ("`What are we moving today?`", "`今天推进什么？`"),
+    ("`Send a bug, branch, plan, or rough idea. I'll inspect the repo and turn it into the next concrete step.`", "`发来错误、分支、计划或初步想法。我会检查项目并转成下一步具体行动。`"),
+    ("`What's on your mind?`", "`你在想什么？`"),
+    ("`Bring the code, question, or stuck part. I'll read the room before making changes.`", "`把代码、问题或卡住的部分发来。我会先看清上下文再改。`"),
+    ("`What should Hermes look at?`", "`Hermes 要看哪里？`"),
+    ("`Send the task, failing path, or half-formed plan. I'll help turn it into action.`", "`发来任务、失败位置或未成形计划。我会帮你转成行动。`"),
+    ("`Where should we start?`", "`从哪里开始？`"),
+    ("`Bring the problem, goal, or file. I'll inspect first and keep the next step concrete.`", "`发来问题、目标或文件。我会先检查，再给出明确下一步。`"),
+    ("`What needs attention?`", "`哪里需要处理？`"),
+    ("`Send the context you have. I'll help sort it into a plan or a fix.`", "`把现有上下文发来。我会整理成计划或修复方案。`"),
+    ("`Captured screenshot`", "`已截取屏幕`"),
+    ("`Capturing screenshot`", "`正在截取屏幕`"),
+    ("`Captured page snapshot`", "`已获取页面快照`"),
+    ("`Capturing page snapshot`", "`正在获取页面快照`"),
+    ("`slash command palette`", "`斜杠命令面板`"),
+    ("`Code review`", "`代码检查`"),
+    ("`Implementation plan`", "`实施计划`"),
+    ("`Explain this`", "`解释这段`"),
+    (
+        "`Audit the current change for regressions, dropped edge cases, and missing tests.`",
+        "`检查当前改动是否有回归、遗漏边界和缺失测试。`",
+    ),
+    (
+        "`Outline an approach before touching code so the diff stays focused.`",
+        "`改代码前先列方案，让改动保持聚焦。`",
+    ),
+    (
+        "`Walk through how the selected code works and link to the key files.`",
+        "`说明所选代码如何工作，并指向关键文件。`",
+    ),
+    ("`Please review this for bugs, regressions, and missing tests.`", "`请检查这里是否有错误、回归和缺失测试。`"),
+    ("`Please make a concise implementation plan before changing code.`", "`改代码前请先给出简洁实施计划。`"),
+    ("`Please explain how this works and point me to the key files.`", "`请解释这里如何工作，并指出关键文件。`"),
+]
+
+extra_user_facing_tsv = r"""
+Ready when you are	小马汉化版已就绪
+Ask me to open a repo, run tests, fix a bug, or draft a PR. I'll walk through the steps with you.	让我打开项目、运行测试、修复问题或起草 PR，我会和你一起完成步骤。
+How can I help today?	今天需要我做什么？
+Point me at a file, paste an error, or describe what you're building. I'll take it from there.	给我文件、错误或你在构建的内容，我来处理后续。
+Let's get started	开始吧
+Try: review my diff, run the test suite, or explain this function. Ask anything about your code.	可以让我检查改动、运行测试，或解释函数。代码问题都可以问。
+Tell me what you need	告诉我你的需求
+I can edit files, run commands, search the web, and walk you through tricky bugs. Just describe the task.	我可以编辑文件、运行命令、搜索网络，并协助处理复杂问题。直接描述任务。
+Hi, Hermes here	你好，Hermes 在这里
+Share a repo path or a question to start. I keep replies clear and link back to the files I touch.	发来项目位置或问题，我会清晰回复并引用相关文件。
+Describe the task. I'll do it.	描述任务，我来完成。
+Waiting for input	等待输入
+Paste code, errors, or a goal. Short answers, fast edits.	粘贴代码、错误或目标。我会简洁回复并快速修改。
+Ask. I'll read files, run tests, ship patches. No filler.	直接提问。我会读取文件、运行测试、提交修补内容。
+Standing by	待命中
+One line is enough. I'll expand only when it matters.	一句话就够。需要时我会展开说明。
+Your move	请发任务
+Command, question, or file path. I handle the rest.	命令、问题或文件位置都可以，后续我来处理。
+Shell mounted. Awaiting input.	Shell 已挂载，等待输入。
+Provide repo path, failing test, or stack trace. Tools: fs, git, exec, search, patch, http.	提供项目位置、失败测试或错误堆栈。工具：文件、Git、命令、搜索、补丁、HTTP。
+Agent loop idle	智能体循环空闲
+Send a prompt to trigger tool calls. Supports multi-file edits, test runs, git ops, and web fetches.	发送提示词即可触发工具调用。支持多文件修改、测试运行、Git 操作和网页获取。
+Ready for dispatch	准备执行
+Enter task. I will plan, call tools, verify output. Logs stream inline; diffs returned pre-apply.	输入任务。我会规划、调用工具并验证结果。日志会在界面中显示，差异会在应用前返回。
+Stdin open	标准输入已打开
+Accepts natural language or structured commands. Typical flow: read -> plan -> patch -> test -> report.	支持自然语言或结构化命令。常见流程：读取 -> 计划 -> 修改 -> 测试 -> 汇报。
+Tools initialized	工具已初始化
+filesystem, terminal, git, browser, search. Describe the change; I return diffs and test output.	文件系统、终端、Git、浏览器、搜索已就绪。描述改动，我会返回差异和测试输出。
+A blank repo, a waiting cursor	空项目，光标已就绪
+What shall we build? Paste an idea, a half-broken function, or a dream. I'll sketch it into shape.	我们要构建什么？粘贴想法、半成品函数或目标，我会把它整理成形。
+Fresh canvas, warm compiler	新画布，编译器已就绪
+Give me a spark - a feature, a refactor, a wild prototype - and I'll turn it into code you can run.	给我一个想法、功能、重构或原型，我会转成可运行代码。
+Let's make something	一起做点东西
+Describe the thing that doesn't exist yet. I'll pull tests, files, and APIs into a working draft.	描述还不存在的东西。我会整合测试、文件和 API，做出可运行草稿。
+New file, new possibilities	新文件，新可能
+Bring an intent, not a spec. We can prototype fast, refine later, and rewrite the world in the margins.	带来意图即可，不需要完整规格。我们可以快速原型，再逐步完善。
+The muse is patched in	灵感已连接
+Tell me what you're chasing. I'll remix examples, adapt snippets, and leave a tidy commit behind.	告诉我你的目标。我会改写示例、调整片段，并留下清晰提交。
+Class is in session	课堂开始
+Ask about any file, concept, or error. I'll explain the why, not just the fix, and show a worked example.	可以问任何文件、概念或错误。我会解释原因，不止给修复，并展示示例。
+What shall we learn today?	今天学什么？
+Paste code to review, a bug to debug, or a concept to unpack. I'll guide you step by step.	粘贴要检查的代码、要调试的问题或要拆解的概念。我会逐步说明。
+Ready to walk you through it	准备带你看明白
+Share the problem. I'll break it into parts, explain each, and leave you able to solve the next one alone.	发来问题。我会拆成部分逐一解释，让你下次能独立处理类似情况。
+Bring me a question	把问题发来
+We'll read the code together, find the root cause, and build a mental model you can reuse next time.	我们一起读代码，找到根因，并建立下次可复用的理解方式。
+Let's start with the basics	从基础开始
+Name the topic or paste the snippet. Expect explanations, diagrams in prose, and practice prompts.	说出主题或粘贴片段。我会给出说明、文字图解和练习提示。
+nya~ what are we hacking on?	要处理什么项目？
+paste a file, paw at a bug, or toss me a repo. i'll pounce on failing tests and leave clean diffs, nyan~	粘贴文件、错误或项目。我会处理失败测试，并留下清晰差异。
+*stretches* ready to code, nya	准备写代码了
+describe the task. i'll patch, test, and purr over your PR. careful - i nip at unused imports!	描述任务。我会修改、测试并检查 PR，顺手处理无用导入。
+mrrp! new session opened	新会话已打开
+give me a goal and i'll chase it through the codebase. reads, edits, runs - all with a twitchy tail.	给我一个目标，我会沿着代码库检查、修改并运行验证。
+tail up, claws sheathed	已准备好
+paste an error or a plan. i debug like i hunt: quietly, thoroughly, with the occasional zoomie.	粘贴错误或计划。我会安静、彻底地调试。
+nyaaa~ hermes reporting	Hermes 报到
+say the word and i'll read your files, run your tests, and curl up in your branch with a tidy commit.	发来任务，我会读取文件、运行测试，并整理出清晰提交。
+Ahoy! Ready to sail the repo	准备进入项目
+Name yer quarry - a bug, a feature, a cursed test - and I'll chase it down, matey. Diffs for plunder.	说出目标：错误、功能或失败测试。我会追踪并给出差异。
+Hermes at the helm, arrr	Hermes 已接手
+Point me at the charts (the code) and I'll patch the hull, fire the cannons (tests), hoist a clean PR.	指给我代码位置，我会修补、测试，并整理 PR。
+What be the task, cap'n?	任务是什么？
+Paste an error or a plan, ye scurvy dog. I'll navigate the stack trace and bring back treasure: green tests.	粘贴错误或计划。我会分析堆栈，并带回通过的测试。
+Anchors aweigh, keyboard ready	键盘已就绪
+Tell me where X marks the spot. I read, edit, and commit with the discipline of a proper crew, arrr.	告诉我目标位置。我会读取、修改并规范提交。
+Yo ho! Awaitin' orders	等待指令
+Throw me a bug, a repo path, or a wild idea. I'll plunder the docs and return with workin' code.	发来错误、项目位置或想法。我会查资料并返回可运行代码。
+Pray, what task dost thou bring?	请说出任务
+Speak thy bug, thy file, thy weary test, and I shall mend it with a scholar's hand and honest diff.	发来错误、文件或失败测试，我会认真修复并给出清晰差异。
+Hark! Hermes standeth ready	Hermes 已准备好
+Name the code that vexeth thee. I shall read, revise, and render a patch most fair and clean.	指出困扰你的代码。我会阅读、修改并给出干净补丁。
+What news from thy repository?	项目里发生了什么？
+Present thy stack trace or thy dream. I'll traverse files, run tests, and report in plainest verse.	发来堆栈或目标。我会遍历文件、运行测试，并用直白语言汇报。
+The stage is set, the cursor blinks	舞台已就绪，光标在闪烁
+Describe thy aim, good sir or madam. Thy branches shall be trimmed, thy bugs cast from the realm.	描述目标。我会整理分支并修复问题。
+Speak, and I shall act	请说，我来执行
+A line of intent sufficeth. I read, I edit, I commit - and leave thy history unblemished.	一句意图足够。我会读取、编辑、提交，并保持历史清晰。
+Yo dude, what's the task?	任务是什么？
+Drop a file, a bug, a gnarly stack trace - I'll ride it out. Clean diffs, green tests, no wipeouts.	发来文件、错误或复杂堆栈。我会处理并交付清晰差异和通过的测试。
+Waves lookin' clean, ready to code	状态良好，准备写代码
+Paste your repo path or the bug that's bumming you out. We'll paddle in, fix it, paddle out. Easy.	粘贴项目位置或困扰你的错误。我们进去修好，再清晰收尾。
+Hangin' ten at the prompt	提示符已就绪
+Tell me the vibe: feature, refactor, hotfix. I'll run tests, ship the patch, and keep it mellow, brah.	告诉我是功能、重构还是热修。我会运行测试并交付补丁。
+Stoked to help, bro	很乐意帮忙
+Big bug? Little typo? Whole rewrite? Just point. I handle the code; you chill with the rad commits.	大问题、小拼写或整体重写都可以。指出目标，我处理代码。
+Tide's up, cursor's blinking	时机已到，光标闪烁
+Name the task and we're off. I read, edit, test, and leave a commit smoother than a dawn patrol.	说出任务就开始。我会读取、编辑、测试，并留下清晰提交。
+Another repo, another rainy night	又一个项目，新的夜晚
+Tell me what's broken. I'll read the files, dust for prints, and leave a diff on the desk by morning.	告诉我哪里坏了。我会读取文件、查找线索，并给出差异。
+The cursor blinks. So do I.	光标闪烁，我也准备好了。
+You've got a bug. I've got patience and a terminal. Name the case and I'll work it till it talks.	你有问题，我有耐心和终端。说出目标，我会追到答案。
+Hermes. Code investigator.	Hermes，代码调查员。
+Paste the stack trace, the suspect file, the alibi. I read between the lines and return with the truth.	粘贴堆栈、可疑文件和线索。我会读出隐含信息并给出结论。
+Quiet night, open prompt	安静夜晚，提示符已打开
+Every bug leaves a trail. Give me the repo and a lead - I'll follow it, patch it, and close the file.	每个问题都有线索。给我项目和方向，我会追踪、修复并收尾。
+No case too small	没有小案子
+A typo, a segfault, a whole rotten architecture - hand me the keys. I'll bring back clean tests.	拼写、崩溃或架构问题都可以。交给我，我会带回通过的测试。
+uwu ready to hewp!	准备帮忙！
+paste a buggy fiwe or a goaw~ i'll wead, patch, and test, aww with tiny pawprints on the diff owo	粘贴有问题的文件或目标，我会读取、修改并测试。
+hermes-san is wistening	Hermes 正在听
+teww me the task, no matter how smoww~ i pwomise cwean commits and gentwe refactors, nyuu~	告诉我任务，大小都可以。我会做干净提交和温和重构。
+wet's fix things togedda!	一起修好它！
+give me a wepo path ow a buggo and i'll take cawe of it uwu. gwr at bad code, kind to yu~	给我项目位置或错误，我会处理好。
+awaiting yur command!	等待你的命令！
+i can wun tests, edit fiwes, and open pwease-wook PRs. just say da wowd, fwend uwu	我可以运行测试、编辑文件并打开 PR。发来任务即可。
+To code is to inquire. Ask.	写代码也是提问。请问。
+What problem sits before you? Describe it, and we shall examine its form, its cause, and its solution.	你面前是什么问题？描述它，我们一起看形态、原因和解法。
+A blinking cursor, an open mind	闪烁的光标，开放的思路
+Every bug is a question in disguise. Share yours; I'll read, reason, and return an answer - and a patch.	每个问题都是变形的问题。发来你的，我会阅读、推理，并返回答案和补丁。
+Begin with a single question	从一个问题开始
+What do you wish to build, or to understand? I'll reason from first principles, edit, and verify with tests.	你想构建或理解什么？我会从原理推理、编辑，并用测试验证。
+Consider the code, then speak	先看代码，再说目标
+Describe the end you seek. I pursue it through files, tests, and docs, and report what I found on the way.	描述你想要的结果。我会沿文件、测试和文档推进，并汇报发现。
+The unexamined repo is not worth running	未经检查的项目不值得运行
+Share a path, a puzzle, or a principle. I'll trace the logic, propose a change, and justify each edit.	发来路径、难题或原则。我会追踪逻辑、提出修改，并说明每处编辑。
+LET'S GOOOO! READY TO SHIP!	准备交付！
+Paste that bug, that repo, that wild feature idea - I AM LOCKED IN. Clean diffs. Green tests. RIGHT NOW.	粘贴错误、项目或功能想法。我已准备好：清晰差异、通过测试，现在开始。
+HERMES ONLINE. LFG.	HERMES 已在线。
+Drop your task and watch me cook. Files read, tests run, PRs opened - we are NOT losing today, friend.	发来任务。我会读取文件、运行测试、打开 PR，今天稳稳推进。
+New session, infinite W's	新会话，新进展
+Bring the gnarliest bug you've got. I'll read, patch, test, commit like my life depends on it. LET'S GO.	把最复杂的问题发来。我会读取、修复、测试并提交。开始。
+ABSOLUTELY DIALED IN	状态拉满
+Describe the task. I'll blitz through files, crush failing tests, and leave a commit that SLAPS. Go go go.	描述任务。我会快速处理文件、修复失败测试，并留下清晰提交。
+Ready. So ready. Too ready.	已准备好，非常准备好。
+Tiny typo or huge refactor - doesn't matter. I'm shipping clean code today. Name the task and let's WORK.	小拼写或大重构都可以。今天交付干净代码。说出任务就开始。
+Send the task, file, or rough idea. I'll use your configured voice and keep the work grounded in this repo.	发送任务、文件或粗略想法。我会按你的配置风格回复，并基于当前项目推进。
+Bring the context or the stuck part. I'll adapt to your configured personality.	发来上下文或卡住的部分。我会适配你设置的人格。
+Send the problem, file, or idea. I'll follow the personality you've configured.	发送问题、文件或想法。我会按你配置的人格处理。
+Drop the task here. I'll keep the work grounded in the repo.	把任务发到这里。我会基于当前项目推进。
+Where should we begin?	从哪里开始？
+Give me the context and I'll answer in	给我上下文，我会按该模式回答：
+more files	更多文件
+Artifacts failed to load	产物加载失败
+Open failed	打开失败
+Open preview	打开预览
+Prompt snippets…	提示词片段…
+Tip: type	提示：输入
+to reference files inline.	可在输入中引用文件。
+Prompt snippets	提示词片段
+Pick a starter prompt to drop into the composer.	选择一段起始提示词放入输入框。
+send · Shift+Enter for newline	发送 · Shift+Enter 换行
+opens the full panel · backspace dismisses	打开完整列表 · Backspace 关闭
+Editing queued turn in composer	正在编辑排队消息
+Editing in composer	正在输入框中编辑
+Attach a URL	添加 URL
+Include the full URL, e.g.	输入完整 URL，例如
+Preparing audio	正在准备音频
+Speaking response	正在朗读回复
+Reading aloud	正在朗读
+Clipboard paste failed	剪贴板粘贴失败
+New session	新建会话
+console messages	控制台消息
+Send all log entries to chat	将全部日志发送到对话
+Send to chat	发送到对话
+No console messages yet.	暂无控制台消息。
+No handler registered for 'hermes:readFileText'	未注册处理程序：hermes:readFileText
+No handler registered for 'hermes:saveImageFromUrl'	未注册处理程序：hermes:saveImageFromUrl
+Image download failed	图片下载失败
+Showing first 512 KB.	显示前 512 KB。
+This file type	此文件类型
+Server not found	未找到服务器
+Server restart failed	服务器重启失败
+Module scripts are being served with the wrong MIME type. This usually means a static file server is serving a Vite/React app instead of the project dev server.	模块脚本的 MIME 类型不正确。这通常表示静态文件服务器正在提供 Vite/React 应用，而不是项目开发服务器。
+No sessions match “	没有匹配会话“
+Rename failed	重命名失败
+Give this chat a memorable title. Leave empty to clear.	给这个对话取一个便于记忆的标题。留空可清除。
+Token, cost, and skill activity	Token、费用和技能活动
+Action started, waiting for status...	操作已开始，正在等待状态...
+Close command center	关闭命令中心
+No matching results found.	未找到匹配结果。
+No sessions yet.	暂无会话。
+Messaging gateway running	消息网关运行中
+Messaging gateway stopped	消息网关已停止
+· Active sessions	· 活跃会话
+Restart messaging	重启消息
+Update Hermes	更新 Hermes
+Loading status...	正在加载状态...
+Recent logs	最近日志
+No logs loaded yet.	尚未加载日志。
+Loading usage...	正在加载用量...
+No usage in the last	最近
+No daily activity.	暂无每日活动。
+Top models	常用模型
+No model usage yet.	暂无模型用量。
+Top skills	常用技能
+No skill activity yet.	暂无技能活动。
+Every day at 9:00 AM	每天 9:00
+Monday through Friday at 9:00 AM	周一至周五 9:00
+Every Monday at 9:00 AM	每周一 9:00
+The first day of each month at 9:00 AM	每月 1 日 9:00
+At the top of every hour	每小时整点
+Every 15 minutes	每 15 分钟
+Cron syntax or natural language	Cron 表达式或自然语言
+Cron job	定时任务
+Failed to load cron jobs	加载定时任务失败
+Failed to update cron job	更新定时任务失败
+Failed to trigger cron job	触发定时任务失败
+Failed to delete cron job	删除定时任务失败
+New cron	新建定时任务
+permanently. It will stop firing immediately.	永久移除，并立即停止触发。
+Cron expression, or phrases like "every hour" or "weekdays at 9am".	Cron 表达式，或“every hour”“weekdays at 9am”这类短语。
+Create cron	创建定时任务
+Desktop boot failed	桌面启动失败
+Failed to delete profile	删除配置档失败
+and remove its	并移除它的
+Renaming updates the profile directory and any wrapper scripts in	重命名会更新配置档目录和相关包装脚本：
+Loading files...	正在加载文件...
+File system	文件系统
+No folder selected	未选择文件夹
+No project	无项目
+Loading file tree	正在加载文件树
+Add to chat	添加到对话
+Working directory change failed	工作目录切换失败
+Delegated task	已委派任务
+The response is ready.	回复已准备好。
+Model switch failed	模型切换失败
+No active session for background restart	没有可用于后台重启的活跃会话
+Background restart did not return a task id	后台重启未返回任务 ID
+Could not read recorded audio	无法读取录音
+No desktop commands available.	没有可用的桌面命令。
+What do you see in this image?	你在这张图片里看到了什么？
+Stop failed	停止失败
+Regenerate failed	重新生成失败
+Edit failed	编辑失败
+Resume failed	继续失败
+Branch failed	分支创建失败
+Delete failed	删除失败
+Version unavailable	版本不可用
+Last checked	上次检查
+Release notes	发行说明
+These are desktop-only display preferences. Mode controls brightness; theme controls the accent palette and chat surface styling.	这些是桌面端显示偏好。模式控制亮度，主题控制强调色和对话界面样式。
+Settings failed to load	设置加载失败
+Autosave failed	自动保存失败
+Invalid config JSON	配置 JSON 无效
+env override	环境变量覆盖
+Hermes Desktop starts its own local gateway by default. Use a remote gateway when you want this app to control an already-running Hermes backend on another machine or behind a trusted proxy.	Hermes 桌面版默认启动本地网关。当你希望本应用控制另一台机器或可信代理后的 Hermes 后端时，可使用远程网关。
+Environment variables are controlling this desktop session.	环境变量正在控制当前桌面会话。
+to use the saved setting below.	以使用下方已保存设置。
+Hermes Desktop	Hermes 桌面版
+Paste session token	粘贴会话令牌
+Test remote	测试远程
+Reset failed	重置失败
+Close settings	关闭设置
+Other providers	其他服务商
+Server config must be a JSON object	服务配置必须是 JSON 对象
+New server	新建服务
+Edit server	编辑服务
+Server JSON	服务 JSON
+Save server	保存服务
+Could not load archived sessions	无法加载已归档会话
+Unarchive failed	取消归档失败
+Could not update default directory	无法更新默认目录
+Could not clear default directory	无法清除默认目录
+Tool configuration failed to load	工具配置加载失败
+This toolset has no provider options — enable it and it works with your current setup.	此工具集没有服务商选项，启用后会使用当前设置。
+No providers are available for this toolset right now.	当前没有可用于此工具集的服务商。
+Loading configuration...	正在加载配置...
+No API key required.	无需 API 密钥。
+This provider needs an extra setup step (	此服务商需要额外设置步骤（
+). Run it from the CLI with	）。请在 CLI 中运行
+for now.	。
+Recent activity	最近活动
+Messaging platforms	消息平台
+Model option update failed	模型选项更新失败
+Fast mode update failed	快速模式更新失败
+No options for this model	此模型没有选项
+No models found	未找到模型
+Edit Models…	编辑模型…
+Skills failed to load	技能加载失败
+Toolsets failed to refresh	工具集刷新失败
+toolsets enabled	个工具集已启用
+Needs keys	需要密钥
+Looking for updates…	正在查找更新…
+Update now	立即更新
+Maybe later	稍后再说
+more change	更多变更
+Update from your terminal	通过终端更新
+You installed Hermes from the command line, so updates run there too. Paste this into your terminal:	你通过命令行安装了 Hermes，因此更新也在那里运行。将下面内容粘贴到终端：
+Hermes will pick up the new version next time you launch it.	下次启动 Hermes 时会使用新版本。
+The Hermes updater will take over in its own window and reopen Hermes when it’s done.	Hermes 更新程序会在独立窗口中接管，并在完成后重新打开 Hermes。
+Hermes will close to apply the update.	Hermes 将关闭以应用更新。
+Update didn’t finish	更新未完成
+Not now	暂不
+radius scalar	半径系数
+invert color	反转颜色
+height (dvh)	高度（dvh）
+Clarify request is not ready yet	澄清请求尚未就绪
+Could not send clarify response	无法发送澄清回复
+Hermes is asking	Hermes 正在询问
+Loading question…	正在加载问题…
+Other (type your answer)	其他（输入你的回答）
+⌘/Ctrl + Enter to send	⌘/Ctrl + Enter 发送
+to pick	选择
+Branch in new chat	在新对话中分支
+Read aloud failed	朗读失败
+Preparing audio...	正在准备音频...
+Stop reading	停止朗读
+Read aloud	朗读
+Restore checkpoint	恢复检查点
+Go forward	前进
+Allow this session	允许本会话
+Always allow…	始终允许…
+Always allow this command?	始终允许此命令？
+This adds the “	这会将“
+” pattern to your permanent allowlist (	”模式加入永久允许列表（
+). Hermes won’t ask again for commands like this — in this session or any future one.	）。Hermes 以后遇到类似命令不会再次询问，包括当前会话和未来会话。
+Always allow	始终允许
+Tool returned an error.	工具返回错误。
+Navigated in browser	已在浏览器中导航
+Captured a browser accessibility snapshot	已获取浏览器可访问性快照
+Clicked on page	已点击页面
+Filled page input	已填写页面输入
+Queried web sources	已查询网页来源
+Executed command	已执行命令
+Changed file	已修改文件
+Fetched webpage	已获取网页
+Snapshot summary	快照摘要
+Command output	命令输出
+Running code	正在运行代码
+Ran code	已运行代码
+Error details	错误详情
+Search results	搜索结果
+Raw response	原始响应
+Recovered after 1 failed step	失败 1 步后已恢复
+Repair re-runs the installer and can take a few minutes on a fresh machine.	修复会重新运行安装程序，新机器上可能需要几分钟。
+Rendering image	正在渲染图片
+Installation failed	安装失败
+Finishing up	正在完成
+One of the install steps failed. On Windows, this can happen if another Hermes CLI or desktop instance is running. Stop any running Hermes instances, then retry. Check the details below or the desktop log for the full transcript.	某个安装步骤失败。在 Windows 上，如果另一个 Hermes CLI 或桌面实例正在运行，可能会发生这种情况。请停止正在运行的 Hermes 实例后重试。完整记录可查看下方详情或桌面日志。
+This is a one-time setup. The Hermes installer is downloading dependencies and configuring your machine.	这是一次性设置。Hermes 安装程序正在下载依赖并配置你的机器。
+Subsequent launches will skip this step.	后续启动会跳过此步骤。
+steps complete	步已完成
+Fetching installer manifest...	正在获取安装清单...
+Hide installer output	隐藏安装输出
+Show installer output	显示安装输出
+No output yet.	暂无输出。
+Full transcript saved to	完整记录已保存到
+Looking up providers...	正在查找服务商...
+I have an API key	我有 API 密钥
+One key, hundreds of models — a solid default	一个密钥，数百个模型，适合作为默认选择
+Get a key	获取密钥
+Starting sign-in for	正在启动登录：
+Re-open authorization page	重新打开授权页面
+Start chatting	开始对话
+Something broke in the interface	界面出现问题
+Reload window	重新加载窗口
+No models found.	未找到模型。
+No authenticated providers.	没有已认证的服务商。
+Pro models need a paid Nous subscription.	Pro 模型需要付费 Nous 订阅。
+Clear all	全部清除
+Copy failed	复制失败
+useSidebar must be used within a SidebarProvider.	useSidebar 必须在 SidebarProvider 内使用。
+Displays the mobile sidebar.	显示移动侧边栏。
+Improvements and fixes	改进和修复
+In this update	本次更新
+No model	未选择模型
+Playback failed	播放失败
+ElevenLabs rejected the API key (401).	ElevenLabs 拒绝了 API 密钥（401）。
+Connected, but Hermes still cannot resolve a usable provider.	已连接，但 Hermes 仍无法解析可用服务商。
+Could not save local endpoint	无法保存本地端点
+No desktop themes are available.	没有可用的桌面主题。
+Desktop themes:	桌面主题：
+""".strip()
+
+for line in extra_user_facing_tsv.splitlines():
+    if not line.strip() or "\t" not in line:
+        continue
+    old, new = line.split("\t", 1)
+    for wrapped_old, wrapped_new in (
+        (f"`{old}`", f"`{new}`"),
+        (f'"{old}"', f'"{new}"'),
+        (f"'{old}'", f"'{new}'"),
+    ):
+        replacements.append((wrapped_old, wrapped_new))
+
+replacements.extend([
+    ("Every day at ${k7(r,i)}", "每天 ${k7(r,i)}"),
+    ("Weekdays at ${k7(r,i)}", "工作日 ${k7(r,i)}"),
+    ("Every ${Ucn(o)} at ${k7(r,i)}", "每周 ${Ucn(o)} ${k7(r,i)}"),
+    ("Monthly on day ${a} at ${k7(r,i)}", "每月 ${a} 日 ${k7(r,i)}"),
+    ("Every hour at :${r.padStart(2,`0`)}", "每小时第 ${r.padStart(2,`0`)} 分"),
+    ("`Sunday`", "`周日`"),
+    ("`Monday`", "`周一`"),
+    ("`Tuesday`", "`周二`"),
+    ("`Wednesday`", "`周三`"),
+    ("`Thursday`", "`周四`"),
+    ("`Friday`", "`周五`"),
+    ("`Saturday`", "`周六`"),
+    ("` input`", "` 输入`"),
+    ("` output`", "` 输出`"),
+    ("` actions`", "` 次操作`"),
+    ("` active`", "` 活跃`"),
+    ("`Last: `", "`上次：`"),
+    ("`Next: `", "`下次：`"),
+])
+
+poetic_user_facing_tsv = r"""
+*stretches* ready to code, nya	准备写代码咯
+准备写代码了	准备写代码咯
+*tiny keyboard sounds*	键盘轻触
+键盘轻响	键盘轻触
+A blank repo, a waiting cursor	空仓库已打开，光标在等你
+空项目，光标已就绪	空仓库已打开，光标在等你
+A blinking cursor, an open mind	光标一闪，思路也亮了
+闪烁的光标，开放的思路	光标一闪，思路也亮了
+A line of intent sufficeth. I read, I edit, I commit - and leave thy history unblemished.	一句意图就够。小马帮你读、改、提交，让历史记录保持干净。
+一句意图足够。小马会读取、编辑、提交，并保持历史清晰。	一句意图就够。小马帮你读、改、提交，让历史记录保持干净。
+A typo, a segfault, a whole rotten architecture - hand me the keys. I'll bring back clean tests.	拼写、崩溃、架构混乱都交给小马。小马会把通过测试带回来。
+拼写、崩溃或架构问题都可以。交给小马，小马会带回通过的测试。	拼写、崩溃、架构混乱都交给小马。小马会把通过测试带回来。
+ABSOLUTELY DIALED IN	状态在线，火力全开
+状态拉满	状态在线，火力全开
+Accepts natural language or structured commands. Typical flow: read -> plan -> patch -> test -> report.	支持自然语言和结构化命令。常见路径：读取 -> 规划 -> 修改 -> 测试 -> 汇报。
+支持自然语言或结构化命令。常见流程：读取 -> 计划 -> 修改 -> 测试 -> 汇报。	支持自然语言和结构化命令。常见路径：读取 -> 规划 -> 修改 -> 测试 -> 汇报。
+Agent loop idle	智能体循环静静待命
+智能体循环空闲	智能体循环静静待命
+Ahoy! Ready to sail the repo	上马扬鞭，项目就在前方
+准备进入项目	上马扬鞭，项目就在前方
+Anchors aweigh, keyboard ready	起锚，键盘已经备好
+键盘已就绪	起锚，键盘已经备好
+Another repo, another rainy night	又一个项目，又一个有雨的夜晚
+又一个项目，新的夜晚	又一个项目，又一个有雨的夜晚
+Ask a question, paste an error, or point me at a repo. I can read code, run tools, and help you ship.	提问、粘贴错误，或给小马项目位置。小马会读代码、用工具，帮你把东西交出去。
+可以提问、粘贴错误，或给小马一个项目位置。小马能读取代码、运行工具，并帮助你交付。	提问、粘贴错误，或给小马项目位置。小马会读代码、用工具，帮你把东西交出去。
+Ask about any file, concept, or error. I'll explain the why, not just the fix, and show a worked example.	文件、概念、错误都可以问。小马会讲原因，给做法，也给示例。
+可以问任何文件、概念或错误。小马会解释原因，不止给修复，并展示示例。	文件、概念、错误都可以问。小马会讲原因，给做法，也给示例。
+Ask me to open a repo, run tests, fix a bug, or draft a PR. I'll walk through the steps with you.	让小马打开项目、跑测试、修问题或起草 PR，小马会陪你一步步完成。
+让小马打开项目、运行测试、修复问题或起草 PR，小马会和你一起完成步骤。	让小马打开项目、跑测试、修问题或起草 PR，小马会陪你一步步完成。
+Ask. I'll read files, run tests, ship patches. No filler.	直接提问。小马读文件、跑测试、交补丁，不说空话。
+直接提问。小马会读取文件、运行测试、提交修补内容。	直接提问。小马读文件、跑测试、交补丁，不说空话。
+awaiting your wish~	静候你的愿望～
+等待你的任务。	静候你的愿望～
+awaiting yur command!	等你的命令！
+等待你的命令！	等你的命令！
+Begin with a single question	从一个问题开始
+Big bug? Little typo? Whole rewrite? Just point. I handle the code; you chill with the rad commits.	大问题、小拼写、整段重写都行。指给小马目标，代码交给小马处理。
+大问题、小拼写或整体重写都可以。指出目标，小马处理代码。	大问题、小拼写、整段重写都行。指给小马目标，代码交给小马处理。
+Bring an intent, not a spec. We can prototype fast, refine later, and rewrite the world in the margins.	带来一个意图就够。和小马一起做出原型，慢慢打磨，在边角处改写世界。
+带来意图即可，不需要完整规格。小马们可以快速原型，再逐步完善。	带来一个意图就够。和小马一起做出原型，慢慢打磨，在边角处改写世界。
+Bring me a question	把问题教给小马
+把问题发来	把问题教给小马
+Bring the code, question, or stuck part. I'll read the room before making changes.	代码、问题、卡住的地方都发来。小马会读懂现场后再动手。
+把代码、问题或卡住的部分发来。小马会先看清上下文再改。	代码、问题、卡住的地方都发来。小马会读懂现场后再动手。
+Bring the context or the stuck part. I'll adapt to your configured personality.	发来上下文或卡住的地方。小马会按你设定的风格回应。
+发来上下文或卡住的部分。小马会适配你设置的人格。	发来上下文或卡住的地方。小马会按你设定的风格回应。
+Bring the gnarliest bug you've got. I'll read, patch, test, commit like my life depends on it. LET'S GO.	把最难缠的问题发来。小马读、改、测、提交，把它处理到位。出发。
+把最复杂的问题发来。小马会读取、修复、测试并提交。开始。	把最难缠的问题发来。小马读、改、测、提交，把它处理到位。出发。
+Bring the problem, goal, or file. I'll inspect first and keep the next step concrete.	发来问题、目标或文件。小马查看后给出具体下一步。
+发来问题、目标或文件。小马会先检查，再给出明确下一步。	发来问题、目标或文件。小马查看后给出具体下一步。
+Class is in session	课堂开场
+课堂开始	课堂开场
+Command, question, or file path. I handle the rest.	命令、问题、文件路径都可以，余下的小马来处理。
+命令、问题或文件位置都可以，后续小马来处理。	命令、问题、文件路径都可以，余下的小马来处理。
+Consider the code, then speak	看过代码，再说方向
+先看代码，再说目标	看过代码，再说方向
+Describe the end you seek. I pursue it through files, tests, and docs, and report what I found on the way.	描述你要抵达的结果。小马会沿着文件、测试、文档推进，并汇报沿途发现。
+描述你想要的结果。小马会沿文件、测试和文档推进，并汇报发现。	描述你要抵达的结果。小马会沿着文件、测试、文档推进，并汇报沿途发现。
+Describe the task in your own words. I'll pick the right tools, explain my plan, and check in before risky steps.	用自己的话描述任务。小马会选工具、说明计划，在风险步骤前停下来确认。
+用你的话描述任务。小马会选择合适工具，说明计划，并在高风险步骤前确认。	用自己的话描述任务。小马会选工具、说明计划，在风险步骤前停下来确认。
+Describe the task. I'll blitz through files, crush failing tests, and leave a commit that SLAPS. Go go go.	描述任务。小马会翻过文件、修好失败测试，留下干净提交。开工。
+描述任务。小马会快速处理文件、修复失败测试，并留下清晰提交。	描述任务。小马会翻过文件、修好失败测试，留下干净提交。开工。
+Describe the task. I'll do it.	描述任务，小马来完成。
+describe the task. i'll patch, test, and purr over your PR. careful - i nip at unused imports!	描述任务。小马会修改、测试、检查 PR，顺手收拾无用导入。
+描述任务。小马会修改、测试并检查 PR，顺手处理无用导入。	描述任务。小马会修改、测试、检查 PR，顺手收拾无用导入。
+Describe the thing that doesn't exist yet. I'll pull tests, files, and APIs into a working draft.	描述那个尚未成形的东西。小马会把测试、文件和 API 合成可运行草稿。
+描述还不存在的东西。小马会整合测试、文件和 API，做出可运行草稿。	描述那个尚未成形的东西。小马会把测试、文件和 API 合成可运行草稿。
+Describe thy aim, good sir or madam. Thy branches shall be trimmed, thy bugs cast from the realm.	说出目标。小马会修枝整叶，把问题赶出代码王国。
+描述目标。小马会整理分支并修复问题。	说出目标。小马会修枝整叶，把问题赶出代码王国。
+Drop a file path, a traceback, or a rough idea. I'll investigate, suggest next steps, and keep things reversible.	发来文件路径、报错堆栈或粗略想法。小马会查明情况，给出下一步，并保留回退余地。
+发来文件位置、报错追踪或初步想法。小马会检查、建议下一步，并保持可回退。	发来文件路径、报错堆栈或粗略想法。小马会查明情况，给出下一步，并保留回退余地。
+Drop a file, a bug, a gnarly stack trace - I'll ride it out. Clean diffs, green tests, no wipeouts.	发来文件、问题或复杂堆栈。小马会陪它走完，留下干净差异和通过测试。
+发来文件、错误或复杂堆栈。小马会处理并交付清晰差异和通过的测试。	发来文件、问题或复杂堆栈。小马会陪它走完，留下干净差异和通过测试。
+drop an error, a goal, or a whole folder. i'll tidy it up with lots of love and a clean commit message!	发来错误、目标或整个文件夹。小马会整理妥当，也写好提交说明。
+发来错误、目标或整个文件夹。小马会整理清楚，并写好提交说明。	发来错误、目标或整个文件夹。小马会整理妥当，也写好提交说明。
+Drop the task here. I'll keep the work grounded in the repo.	把任务放在这里。小马会依托当前项目推进。
+把任务发到这里。小马会基于当前项目推进。	把任务放在这里。小马会依托当前项目推进。
+Drop your task and watch me cook. Files read, tests run, PRs opened - we are NOT losing today, friend.	发来任务，看小马下厨：读文件、跑测试、开 PR，今天把事推进。
+发来任务。小马会读取文件、运行测试、打开 PR，今天稳稳推进。	发来任务，看小马下厨：读文件、跑测试、开 PR，今天把事推进。
+dwop yur ewwor message hewe! i'll find the cuwpwit, fix it, and weave a happy test suite behind me owo	把错误信息放这里。小马会找出元凶，修好它，再留下开心的测试。
+把错误信息发来，小马会定位问题、修复它，并补好测试。	把错误信息放这里。小马会找出元凶，修好它，再留下开心的测试。
+Enter task. I will plan, call tools, verify output. Logs stream inline; diffs returned pre-apply.	输入任务。小马会规划、调用工具、核验结果。日志会内联流动，差异会在应用前返回。
+输入任务。小马会规划、调用工具并验证结果。日志会在界面中显示，差异会在应用前返回。	输入任务。小马会规划、调用工具、核验结果。日志会内联流动，差异会在应用前返回。
+Every bug is a question in disguise. Share yours; I'll read, reason, and return an answer - and a patch.	每个 bug 都像一道藏起来的问题。发来你的线索，小马会读、想、给答案，也给补丁。
+每个问题都是变形的问题。发来你的，小马会阅读、推理，并返回答案和补丁。	每个 bug 都像一道藏起来的问题。发来你的线索，小马会读、想、给答案，也给补丁。
+Every bug leaves a trail. Give me the repo and a lead - I'll follow it, patch it, and close the file.	每个问题都有痕迹。给小马项目和线索，小马会追过去、修好它、合上卷宗。
+每个问题都有线索。给小马项目和方向，小马会追踪、修复并收尾。	每个问题都有痕迹。给小马项目和线索，小马会追过去、修好它、合上卷宗。
+filesystem, terminal, git, browser, search. Describe the change; I return diffs and test output.	文件系统、终端、Git、浏览器和搜索已就位。描述改动，小马返回差异和测试输出。
+文件系统、终端、Git、浏览器、搜索已就绪。描述改动，小马会返回差异和测试输出。	文件系统、终端、Git、浏览器和搜索已就位。描述改动，小马返回差异和测试输出。
+Fresh canvas, warm compiler	新画布，编译器带着余温
+新画布，编译器已就绪	新画布，编译器带着余温
+give me a goal and i'll chase it through the codebase. reads, edits, runs - all with a twitchy tail.	给小马目标，小马会穿过代码库：读取、编辑、运行，一路留下轻快脚印。
+给小马一个目标，小马会沿着代码库检查、修改并运行验证。	给小马目标，小马会穿过代码库：读取、编辑、运行，一路留下轻快脚印。
+Give me a spark - a feature, a refactor, a wild prototype - and I'll turn it into code you can run.	给小马一点火花：功能、重构、野生原型。小马会把它变成能运行的代码。
+给小马一个想法、功能、重构或原型，小马会转成可运行代码。	给小马一点火花：功能、重构、野生原型。小马会把它变成能运行的代码。
+give me a wepo path ow a buggo and i'll take cawe of it uwu. gwr at bad code, kind to yu~	给小马项目路径或小 bug，小马来处理好。对坏代码露爪，对你保持温柔～
+给小马项目位置或错误，小马会处理好。	给小马项目路径或小 bug，小马来处理好。对坏代码露爪，对你保持温柔～
+Give me the context and I'll answer in	给小马上下文，小马会按这个模式回答：
+给小马上下文，小马会按该模式回答：	给小马上下文，小马会按这个模式回答：
+Hangin' ten at the prompt	提示符上，浪已经起来
+提示符已就绪	提示符上，浪已经起来
+Hark! Hermes standeth ready	听令，Hermes 已经待命
+Hermes 已准备好	听令，Hermes 已经待命
+HERMES AGENT	HERMES小马汉化版(
+小马汉化版 HERMES	HERMES小马汉化版(
+Hermes Agent is ready.	Hermes Agent 已经就绪。
+Hermes Agent 已就绪。	Hermes Agent 已经就绪。
+Hermes at the helm, arrr	Hermes 掌舵，准备起航
+Hermes 已接手	Hermes 掌舵，准备起航
+HERMES ONLINE. LFG.	HERMES 在线，准备开工。
+HERMES 已在线。	HERMES 在线，准备开工。
+hermes-chan is here! <3	hermes-chan 来啦！<3
+Hermes 已在这里。	hermes-chan 来啦！<3
+hermes-san is wistening	小马桑正在听
+Hermes 正在听	小马桑正在听
+Hermes. Code investigator.	Hermes，代码侦探。
+Hermes，代码调查员。	Hermes，代码侦探。
+Hi, Hermes here	你好，Hermes 在这里
+hiii! ready to help! (^_^)	你好呀，小马已经准备好了。(^_^)
+你好，小马已准备好。	你好呀，小马已经准备好了。(^_^)
+How can I help today?	今天想让小马帮你做什么？
+今天需要小马做什么？	今天想让小马帮你做什么？
+I can edit files, run commands, search the web, and walk you through tricky bugs. Just describe the task.	小马可以编辑文件、运行命令、搜索网页，也能陪你拆开难解的 bug。直接说任务。
+小马可以编辑文件、运行命令、搜索网络，并协助处理复杂问题。直接描述任务。	小马可以编辑文件、运行命令、搜索网页，也能陪你拆开难解的 bug。直接说任务。
+i can wun tests, edit fiwes, and open pwease-wook PRs. just say da wowd, fwend uwu	小马可以跑测试、改文件、开 PR。说一声就行，朋友。
+小马可以运行测试、编辑文件并打开 PR。发来任务即可。	小马可以跑测试、改文件、开 PR。说一声就行，朋友。
+let's code together!! :3	一起写代码吧！！
+一起写代码吧。	一起写代码吧！！
+Let's get started	开始吧
+LET'S GOOOO! READY TO SHIP!	准备交付！
+Let's make something	一起做点东西
+Let's start with the basics	从基础出发
+从基础开始	从基础出发
+mrrp! new session opened	新会话已经打开
+新会话已打开	新会话已经打开
+Name the code that vexeth thee. I shall read, revise, and render a patch most fair and clean.	指出困扰你的代码。小马会阅读、修改，交回一份干净补丁。
+指出困扰你的代码。小马会阅读、修改并给出干净补丁。	指出困扰你的代码。小马会阅读、修改，交回一份干净补丁。
+Name the task and we're off. I read, edit, test, and leave a commit smoother than a dawn patrol.	说出任务，小马们就出发。小马会读取、编辑、测试，留下像清晨海面一样干净的提交。
+说出任务就开始。小马会读取、编辑、测试，并留下清晰提交。	说出任务，小马们就出发。小马会读取、编辑、测试，留下像清晨海面一样干净的提交。
+Name the topic or paste the snippet. Expect explanations, diagrams in prose, and practice prompts.	说出主题或粘贴片段。小马会给解释、文字图解和练习提示。
+说出主题或粘贴片段。小马会给出说明、文字图解和练习提示。	说出主题或粘贴片段。小马会给解释、文字图解和练习提示。
+Name yer quarry - a bug, a feature, a cursed test - and I'll chase it down, matey. Diffs for plunder.	说出猎物：bug、功能、坏掉的测试。小马会追上它，带回差异。
+说出目标：错误、功能或失败测试。小马会追踪并给出差异。	说出猎物：bug、功能、坏掉的测试。小马会追上它，带回差异。
+New file, new possibilities	新文件，新去处
+新文件，新可能	新文件，新去处
+New session, infinite W's	新会话，新收获
+新会话，新进展	新会话，新收获
+No case too small	小案子也值得认真处理
+没有小案子	小案子也值得认真处理
+nyaaa~ hermes reporting	Hermes 报到
+nya~ what are we hacking on?	今天要动哪段代码？
+要处理什么项目？	今天要动哪段代码？
+One line is enough. I'll expand only when it matters.	一句话就够。需要展开时，小马会展开。
+一句话就够。需要时小马会展开说明。	一句话就够。需要展开时，小马会展开。
+one task at a time, done neatly! i can run tests, patch files, and make your repo feel cozy again <3	一次一个任务，利落完成。小马能跑测试、改文件，让项目重新清爽起来。
+一次处理一个任务，干净完成。小马可以运行测试、修改文件，让项目重新清爽。	一次一个任务，利落完成。小马能跑测试、改文件，让项目重新清爽起来。
+paste a bug or a file path and i'll fix it super gently. tests, diffs, PRs - all with extra care! *sparkle*	粘贴错误或文件路径，小马会轻轻修好。测试、差异、PR 都细心处理。
+粘贴错误或文件位置，小马会细致修复。测试、差异、PR 都认真处理。	粘贴错误或文件路径，小马会轻轻修好。测试、差异、PR 都细心处理。
+paste a buggy fiwe or a goaw~ i'll wead, patch, and test, aww with tiny pawprints on the diff owo	粘贴问题文件或目标，小马会读、改、测，在差异里留下小爪印。
+粘贴有问题的文件或目标，小马会读取、修改并测试。	粘贴问题文件或目标，小马会读、改、测，在差异里留下小爪印。
+paste a file, paw at a bug, or toss me a repo. i'll pounce on failing tests and leave clean diffs, nyan~	粘贴文件、bug 或项目。小马会扑向失败测试，留下干净差异，喵～
+粘贴文件、错误或项目。小马会处理失败测试，并留下清晰差异。	粘贴文件、bug 或项目。小马会扑向失败测试，留下干净差异，喵～
+Paste an error or a plan, ye scurvy dog. I'll navigate the stack trace and bring back treasure: green tests.	粘贴错误或计划。小马会航过堆栈，带回宝藏：通过测试。
+粘贴错误或计划。小马会分析堆栈，并带回通过的测试。	粘贴错误或计划。小马会航过堆栈，带回宝藏：通过测试。
+paste an error or a plan. i debug like i hunt: quietly, thoroughly, with the occasional zoomie.	粘贴错误或计划。小马会像猎手一样调试：安静、细致，偶尔快跑一下。
+粘贴错误或计划。小马会安静、彻底地调试。	粘贴错误或计划。小马会像猎手一样调试：安静、细致，偶尔快跑一下。
+Paste code to review, a bug to debug, or a concept to unpack. I'll guide you step by step.	粘贴要审查的代码、要调试的 bug 或要拆开的概念。小马会一步步带你过。
+粘贴要检查的代码、要调试的问题或要拆解的概念。小马会逐步说明。	粘贴要审查的代码、要调试的 bug 或要拆开的概念。小马会一步步带你过。
+Paste code, errors, or a goal. Short answers, fast edits.	粘贴代码、错误或目标。短回答，快修改。
+粘贴代码、错误或目标。小马会简洁回复并快速修改。	粘贴代码、错误或目标。短回答，快修改。
+Paste that bug, that repo, that wild feature idea - I AM LOCKED IN. Clean diffs. Green tests. RIGHT NOW.	粘贴 bug、项目或大胆功能想法。小马已经进入状态：干净差异，通过测试，现在开始。
+粘贴错误、项目或功能想法。小马已准备好：清晰差异、通过测试，现在开始。	粘贴 bug、项目或大胆功能想法。小马已经进入状态：干净差异，通过测试，现在开始。
+Paste the stack trace, the suspect file, the alibi. I read between the lines and return with the truth.	粘贴堆栈、可疑文件和线索。小马会读出字里行间的真相。
+粘贴堆栈、可疑文件和线索。小马会读出隐含信息并给出结论。	粘贴堆栈、可疑文件和线索。小马会读出字里行间的真相。
+Paste your repo path or the bug that's bumming you out. We'll paddle in, fix it, paddle out. Easy.	粘贴项目路径或烦人的 bug。小马们划进去，修好它，再划出来。简单。
+粘贴项目位置或困扰你的错误。小马们进去修好，再清晰收尾。	粘贴项目路径或烦人的 bug。小马们划进去，修好它，再划出来。简单。
+Point me at a file, paste an error, or describe what you're building. I'll take it from there.	指给小马文件，粘贴错误，或描述你在做什么。后面交给小马。
+给小马文件、错误或你在构建的内容，小马来处理后续。	指给小马文件，粘贴错误，或描述你在做什么。后面交给小马。
+Point me at the charts (the code) and I'll patch the hull, fire the cannons (tests), hoist a clean PR.	指给小马代码航图。小马会补船身、开测试炮，再升起干净 PR。
+指给小马代码位置，小马会修补、测试，并整理 PR。	指给小马代码航图。小马会补船身、开测试炮，再升起干净 PR。
+Pray, what task dost thou bring?	请说出任务
+Present thy stack trace or thy dream. I'll traverse files, run tests, and report in plainest verse.	发来堆栈或梦想。小马会穿过文件、运行测试，用直白文字汇报。
+发来堆栈或目标。小马会遍历文件、运行测试，并用直白语言汇报。	发来堆栈或梦想。小马会穿过文件、运行测试，用直白文字汇报。
+Provide repo path, failing test, or stack trace. Tools: fs, git, exec, search, patch, http.	提供项目路径、失败测试或堆栈。工具：文件、Git、命令、搜索、补丁、HTTP。
+提供项目位置、失败测试或错误堆栈。工具：文件、Git、命令、搜索、补丁、HTTP。	提供项目路径、失败测试或堆栈。工具：文件、Git、命令、搜索、补丁、HTTP。
+Quiet night, open prompt	夜静，提示符已开
+安静夜晚，提示符已打开	夜静，提示符已开
+ready and happy! (>.<)	开心待命！(>.<)
+已准备好。	开心待命！(>.<)
+Ready for dispatch	准备派发
+准备执行	准备派发
+Ready to walk you through it	准备陪你走一遍
+准备带你看明白	准备陪你走一遍
+Ready when you are	小马汉化版已就绪
+Ready when you are.	随时可以开始。
+Ready. So ready. Too ready.	已就绪，很就绪，过分就绪。
+已准备好，非常准备好。	已就绪，很就绪，过分就绪。
+say hi or paste a stack trace! no task too small, no repo too tangled. we'll untangle it together!	打个招呼或粘贴堆栈。任务再小也值得做，项目再乱也能一起理清。
+打个招呼或粘贴错误堆栈！任务不嫌小，项目不怕乱，小马们一起理清。	打个招呼或粘贴堆栈。任务再小也值得做，项目再乱也能一起理清。
+say the word and i'll read your files, run your tests, and curl up in your branch with a tidy commit.	发来任务，小马会读文件、跑测试，在分支里窝出一条干净提交。
+发来任务，小马会读取文件、运行测试，并整理出清晰提交。	发来任务，小马会读文件、跑测试，在分支里窝出一条干净提交。
+Search the repo, edit files, run tests, open PRs. Tell me the goal and I'll handle the mechanical parts.	搜索项目、编辑文件、运行测试、打开 PR。告诉小马目标，执行部分交给小马。
+搜索项目、编辑文件、运行测试、打开 PR。告诉小马目标，小马来处理执行部分。	搜索项目、编辑文件、运行测试、打开 PR。告诉小马目标，执行部分交给小马。
+Send a bug, branch, plan, or rough idea. I'll inspect the repo and turn it into the next concrete step.	发来 bug、分支、计划或粗略想法。小马会检查项目，转成下一步行动。
+发来错误、分支、计划或初步想法。小马会检查项目并转成下一步具体行动。	发来 bug、分支、计划或粗略想法。小马会检查项目，转成下一步行动。
+Send a prompt to trigger tool calls. Supports multi-file edits, test runs, git ops, and web fetches.	发送提示词即可触发工具调用。支持多文件修改、测试运行、Git 操作和网页获取。
+Send the context you have. I'll help sort it into a plan or a fix.	把现有上下文发来。小马会整理成计划或修复办法。
+把现有上下文发来。小马会整理成计划或修复方案。	把现有上下文发来。小马会整理成计划或修复办法。
+Send the problem, file, or idea. I'll follow the personality you've configured.	发送问题、文件或想法。小马会按你配置的风格处理。
+发送问题、文件或想法。小马会按你配置的人格处理。	发送问题、文件或想法。小马会按你配置的风格处理。
+Send the task, failing path, or half-formed plan. I'll help turn it into action.	发来任务、失败路径或半成形计划。小马会帮它变成行动。
+发来任务、失败位置或未成形计划。小马会帮你转成行动。	发来任务、失败路径或半成形计划。小马会帮它变成行动。
+Send the task, file, or rough idea. I'll use your configured voice and keep the work grounded in this repo.	发送任务、文件或粗略想法。小马会用你配置的语气回应，并依托当前项目推进。
+发送任务、文件或粗略想法。小马会按你的配置风格回复，并基于当前项目推进。	发送任务、文件或粗略想法。小马会用你配置的语气回应，并依托当前项目推进。
+Share a path, a puzzle, or a principle. I'll trace the logic, propose a change, and justify each edit.	发来路径、谜题或原则。小马会追踪逻辑、提出修改，并说明每处编辑。
+发来路径、难题或原则。小马会追踪逻辑、提出修改，并说明每处编辑。	发来路径、谜题或原则。小马会追踪逻辑、提出修改，并说明每处编辑。
+Share a repo path or a question to start. I keep replies clear and link back to the files I touch.	发来项目路径或问题即可开始。小马会回复清楚，并回引小马碰过的文件。
+发来项目位置或问题，小马会清晰回复并引用相关文件。	发来项目路径或问题即可开始。小马会回复清楚，并回引小马碰过的文件。
+Share the problem. I'll break it into parts, explain each, and leave you able to solve the next one alone.	发来问题。小马会拆成几部分逐一解释，让你下次能独自处理类似情况。
+发来问题。小马会拆成部分逐一解释，让你下次能独立处理类似情况。	发来问题。小马会拆成几部分逐一解释，让你下次能独自处理类似情况。
+Shell mounted. Awaiting input.	Shell 已挂载，等待输入。
+Speak thy bug, thy file, thy weary test, and I shall mend it with a scholar's hand and honest diff.	说出 bug、文件或疲惫的测试。小马会以学者般的手法修补，并交出诚实差异。
+发来错误、文件或失败测试，小马会认真修复并给出清晰差异。	说出 bug、文件或疲惫的测试。小马会以学者般的手法修补，并交出诚实差异。
+Speak, and I shall act	你说，小马来做
+请说，小马来执行	你说，小马来做
+Standing by	静候中
+待命中	静候中
+Start anywhere.	从任意位置开始。
+Stdin open	标准输入已打开
+Stoked to help, bro	很愿意帮忙，兄弟
+很乐意帮忙	很愿意帮忙，兄弟
+tail up, claws sheathed	尾巴竖起，爪子收好，已经准备好
+已准备好	尾巴竖起，爪子收好，已经准备好
+Tell me the vibe: feature, refactor, hotfix. I'll run tests, ship the patch, and keep it mellow, brah.	告诉小马风格：功能、重构、热修。小马会跑测试、交补丁，让过程保持轻松。
+告诉小马是功能、重构还是热修。小马会运行测试并交付补丁。	告诉小马风格：功能、重构、热修。小马会跑测试、交补丁，让过程保持轻松。
+Tell me what you need	告诉小马你需要什么
+告诉小马你的需求	告诉小马你需要什么
+Tell me what you're chasing. I'll remix examples, adapt snippets, and leave a tidy commit behind.	告诉小马你在追什么。小马会改写示例、调整片段，留下整洁提交。
+告诉小马你的目标。小马会改写示例、调整片段，并留下清晰提交。	告诉小马你在追什么。小马会改写示例、调整片段，留下整洁提交。
+tell me what you're making! i love refactors, tiny helpers, and big scary repos alike (>w<)	告诉小马你在做什么。重构、小工具、庞大项目都可以交给小马。
+告诉小马你在做什么。重构、小工具和复杂项目都可以交给小马。	告诉小马你在做什么。重构、小工具、庞大项目都可以交给小马。
+Tell me what's broken. I'll read the files, dust for prints, and leave a diff on the desk by morning.	告诉小马哪里坏了。小马会读文件、寻找指纹，在清晨前把差异放到桌上。
+告诉小马哪里坏了。小马会读取文件、查找线索，并给出差异。	告诉小马哪里坏了。小马会读文件、寻找指纹，在清晨前把差异放到桌上。
+Tell me where X marks the spot. I read, edit, and commit with the discipline of a proper crew, arrr.	告诉小马 X 标在哪儿。小马会读、改、提交，像合格船员一样守规矩。
+告诉小马目标位置。小马会读取、修改并规范提交。	告诉小马 X 标在哪儿。小马会读、改、提交，像合格船员一样守规矩。
+teww me the task, no matter how smoww~ i pwomise cwean commits and gentwe refactors, nyuu~	告诉小马任务，大小都行。小马会交出干净提交和温和重构，喵～
+告诉小马任务，大小都可以。小马会做干净提交和温和重构。	告诉小马任务，大小都行。小马会交出干净提交和温和重构，喵～
+The cursor blinks. So do I.	光标闪了一下，小马也眨了眨眼。
+光标闪烁，小马也准备好了。	光标闪了一下，小马也眨了眨眼。
+The muse is patched in	灵感已经接入
+灵感已连接	灵感已经接入
+The stage is set, the cursor blinks	舞台已铺好，光标正闪
+舞台已就绪，光标在闪烁	舞台已铺好，光标正闪
+The unexamined repo is not worth running	没有检查过的项目，不值得运行
+未经检查的项目不值得运行	没有检查过的项目，不值得运行
+Throw me a bug, a repo path, or a wild idea. I'll plunder the docs and return with workin' code.	发来 bug、项目路径或大胆想法。小马会翻资料，带回能跑的代码。
+发来错误、项目位置或想法。小马会查资料并返回可运行代码。	发来 bug、项目路径或大胆想法。小马会翻资料，带回能跑的代码。
+Tide's up, cursor's blinking	潮水涨起，光标在闪
+时机已到，光标闪烁	潮水涨起，光标在闪
+Tiny typo or huge refactor - doesn't matter. I'm shipping clean code today. Name the task and let's WORK.	小拼写、大重构都行。今天交付干净代码。说出任务，小马们开工。
+小拼写或大重构都可以。今天交付干净代码。说出任务就开始。	小拼写、大重构都行。今天交付干净代码。说出任务，小马们开工。
+To code is to inquire. Ask.	写代码，也是在追问。请问。
+写代码也是提问。请问。	写代码，也是在追问。请问。
+to reference files inline.	可在输入中引用文件。
+Tools initialized	工具已经初始化
+工具已初始化	工具已经初始化
+Try: review my diff, run the test suite, or explain this function. Ask anything about your code.	试试：检查小马的差异、运行测试套件，或解释这个函数。代码问题都可以问。
+可以让小马检查改动、运行测试，或解释函数。代码问题都可以问。	试试：检查小马的差异、运行测试套件，或解释这个函数。代码问题都可以问。
+Type a task, question, or snippet. I remember the session, cite my sources, and stop to ask when I'm unsure.	输入任务、问题或片段。小马会记住会话、注明来源，遇到拿不准的地方会停下来问你。
+输入任务、问题或片段。小马会记住会话，注明来源，并在不确定时先询问。	输入任务、问题或片段。小马会记住会话、注明来源，遇到拿不准的地方会停下来问你。
+uwu ready to hewp!	准备帮忙！
+Waiting for input	等待输入
+Waves lookin' clean, ready to code	浪面干净，准备写代码
+状态良好，准备写代码	浪面干净，准备写代码
+We'll read the code together, find the root cause, and build a mental model you can reuse next time.	小马们一起读代码，找到根因，建立下次还能用的理解框架。
+小马们一起读代码，找到根因，并建立下次可复用的理解方式。	小马们一起读代码，找到根因，建立下次还能用的理解框架。
+wet's fix things togedda!	一起把问题修好！
+一起修好它！	一起把问题修好！
+What are we building today?	今天要搭建什么？
+今天要做什么？	今天要搭建什么？
+What are we moving today?	今天要推进什么？
+今天推进什么？	今天要推进什么？
+What be the task, cap'n?	船长，任务是什么？
+任务是什么？	船长，任务是什么？
+What do you wish to build, or to understand? I'll reason from first principles, edit, and verify with tests.	你想构建什么，或理解什么？小马会从底层原理出发，编辑，并用测试验证。
+你想构建或理解什么？小马会从原理推理、编辑，并用测试验证。	你想构建什么，或理解什么？小马会从底层原理出发，编辑，并用测试验证。
+What needs attention?	哪里需要照看？
+哪里需要处理？	哪里需要照看？
+What news from thy repository?	项目里传来什么消息？
+项目里发生了什么？	项目里传来什么消息？
+What problem sits before you? Describe it, and we shall examine its form, its cause, and its solution.	你面前是什么问题？描述它，小马们一起看形态、原因和解法。
+What shall we build? Paste an idea, a half-broken function, or a dream. I'll sketch it into shape.	小马们要构建什么？粘贴想法、半成品函数或一个梦想，小马会把它勾勒成形。
+小马们要构建什么？粘贴想法、半成品函数或目标，小马会把它整理成形。	小马们要构建什么？粘贴想法、半成品函数或一个梦想，小马会把它勾勒成形。
+What shall we learn today?	今天学什么？
+What should Hermes look at?	Hermes 要看哪里？
+What's on your mind?	你在想什么？
+Where should we begin?	从哪里开始？
+Where should we start?	从哪里开始？
+Yo dude, what's the task?	嘿，任务是什么？
+任务是什么？	嘿，任务是什么？
+Yo ho! Awaitin' orders	哟嗬，等待命令
+等待指令	哟嗬，等待命令
+You've got a bug. I've got patience and a terminal. Name the case and I'll work it till it talks.	你有 bug，小马有耐心和终端。说出案子，小马会追到它开口。
+你有问题，小马有耐心和终端。说出目标，小马会追到答案。	你有 bug，小马有耐心和终端。说出案子，小马会追到它开口。
+Your move	轮到你了
+请发任务	轮到你了
+Your workspace, one prompt away.	你的工作区，只差一句提示。
+一句话进入你的工作区。	你的工作区，只差一句提示。
+Add context	添加上下文
+Add files as context	添加文件作为上下文
+Add folders as context	添加文件夹作为上下文
+Attach images	添加图片
+Clipboard paste failed	剪贴板粘贴失败
+Copy code	复制代码
+Download image	下载图片
+Download started	已开始下载
+Drop files	拖放文件
+Drop files to attach	拖放文件即可添加
+Failed to write image to disk.	暂时不能保存图片文件。
+无法保存图片文件。	暂时不能保存图片文件。
+Hermes gateway unavailable	Hermes 网关不可用
+Image attach	添加图片
+Image attach failed	添加图片失败
+Image download failed	图片下载失败
+Image preview failed	图片预览失败
+Image saved	图片已保存
+No handler registered for 'hermes:saveImageFromUrl'	未注册处理程序：hermes:saveImageFromUrl
+No image found in clipboard	剪贴板中未找到图片
+Open image	打开图片
+Rendering image	正在渲染图片
+Restart Hermes Desktop to save images	重启 Hermes Desktop 后保存图片
+Restart Hermes Desktop to use Save Image.	重启 Hermes Desktop 后使用保存图片。
+Saving image	正在保存图片
+Attach a URL	添加链接
+Attach a URL	添加 URL
+Attachment-only turn	仅附件轮次
+Audit the current change for regressions, dropped edge cases, and missing tests.	检查当前改动是否有回归、遗漏边界和缺失测试。
+Code review	代码检查
+Common commands	常用命令
+Configure speech-to-text to use voice mode.	配置语音转文字后可使用语音模式。
+copy selection or last assistant message	复制所选内容或上一条助手消息
+Could not start microphone recording.	暂时不能开始麦克风录音。
+无法开始麦克风录音。	暂时不能开始麦克风录音。
+Could not start voice session	暂时不能开始语音会话
+无法开始语音会话	暂时不能开始语音会话
+Delete queued turn	删除排队消息
+Desktop theme suggestions	桌面主题建议
+Dictating	正在听写
+Edit queued turn	编辑排队消息
+Editing in composer	正在输入框中编辑
+Editing queued turn in composer	正在编辑排队消息
+Empty turn	空轮次
+End voice conversation	结束语音对话
+Explain this	解释这段
+Files…	文件…
+Folder…	文件夹…
+Hermes will fetch the page and include it as context for this turn.	Hermes 会获取该页面，并作为本轮上下文。
+Hotkeys	快捷键
+Images…	图片…
+Implementation plan	实施计划
+Include the full URL, e.g.	输入完整 URL，例如
+Listening	正在聆听
+Looking up…	正在查找…
+Microphone access denied.	麦克风访问被拒绝。
+Microphone constraints are not supported by this device.	当前设备不支持此麦克风参数。
+Microphone failed	麦克风异常
+Microphone is already in use by another app.	麦克风正被其他应用使用。
+Mute microphone	关闭麦克风
+No matches.	无匹配项。
+No matching themes.	没有匹配主题。
+No microphone was found.	未找到麦克风。
+No speech detected	未检测到语音
+opens the full panel · backspace dismisses	打开完整列表 · Backspace 关闭
+Outline an approach before touching code so the diff stays focused.	改代码前列出方案，让改动保持聚焦。
+改代码前先列方案，让改动保持聚焦。	改代码前列出方案，让改动保持聚焦。
+Paste image	粘贴图片
+Pick a starter prompt to drop into the composer.	选择一段起始提示词放入输入框。
+Please explain how this works and point me to the key files.	请解释这里如何工作，并指出关键文件。
+Please make a concise implementation plan before changing code.	改代码前请给出简洁实施计划。
+改代码前请先给出简洁实施计划。	改代码前请给出简洁实施计划。
+Please review this for bugs, regressions, and missing tests.	请检查这里是否有错误、回归和缺失测试。
+Preparing audio	正在准备音频
+Prompt snippets	提示词片段
+Prompt snippets…	提示词片段…
+Queue message	消息排队
+Reading aloud	正在朗读
+Reconnecting to Hermes…	正在重新连接 Hermes…
+resume a prior session	继续之前的会话
+Send follow-up	发送后续消息
+Send queued turn now	立即发送排队轮次
+send · Shift+Enter for newline	发送 · Shift+Enter 换行
+slash command palette	斜杠命令面板
+Speaking	正在说话
+Speaking response	正在朗读回复
+start a new session	新建会话
+Start voice conversation	开始语音对话
+Starting Hermes...	正在启动 Hermes...
+Stop dictation	停止听写
+Stop listening and send	停止聆听并发送
+This runtime does not support microphone recording.	当前运行环境不支持麦克风录制。
+Tip: type	提示：输入
+Transcribing	正在转写
+Transcribing dictation	正在转写听写
+Try recording again.	请重新录制。
+Unmute microphone	打开麦克风
+URL…	链接…
+Voice dictation	语音输入
+Voice playback failed	语音播放失败
+Voice recording failed	语音录制失败
+Voice transcription failed	语音转写失败
+Voice transcription is not available yet.	语音转写暂不可用。
+Voice unavailable	语音不可用
+Walk through how the selected code works and link to the key files.	说明所选代码如何工作，并指向关键文件。
+Copy ID	复制 ID
+Could not copy session ID	暂时不能复制会话 ID
+无法复制会话 ID	暂时不能复制会话 ID
+Everything here is pinned. Unpin a chat to show it in recents.	这里都是已固定会话。取消固定后会显示在最近会话中。
+Give this chat a memorable title. Leave empty to clear.	给这个对话取一个便于记忆的标题。留空可清除。
+Group by workspace	按工作区分组
+Group sessions by workspace	按工作区分组会话
+Load more	加载更多
+New session in	在此新建会话：
+No sessions match “	没有匹配会话
+没有匹配会话“	没有匹配会话
+No workspace	无工作区
+Rename failed	重命名失败
+Rename session	重命名会话
+Renamed	已重命名
+Search sessions…	搜索会话…
+Session actions	会话操作
+Session running	会话运行中
+Shift-click a chat to pin · drag to reorder	Shift 点击会话可固定，拖动可排序
+Show sessions as a single list	以单列表显示会话
+Ungroup sessions	取消会话分组
+Allow this session	允许本会话
+Always allow	始终允许
+Always allow this command?	始终允许此命令？
+Always allow…	始终允许…
+Branch in new chat	在新对话中分支
+Captured a browser accessibility snapshot	已获取浏览器无障碍快照
+已获取浏览器可访问性快照	已获取浏览器无障碍快照
+Captured page snapshot	已获取页面快照
+Captured screenshot	已截取屏幕
+Capturing page snapshot	正在获取页面快照
+Capturing screenshot	正在截取屏幕
+Changed file	已修改文件
+Clarify request is not ready yet	澄清请求尚未就绪
+Clicked on page	已点击页面
+Command output	命令输出
+Copy activity	复制活动
+Copy content	复制内容
+Copy file	复制文件
+Copy query	复制查询
+Copy results	复制结果
+Could not send approval response	暂时不能发送审批结果
+无法发送审批结果	暂时不能发送审批结果
+Could not send clarify response	暂时不能发送澄清回复
+无法发送澄清回复	暂时不能发送澄清回复
+Edit message	编辑消息
+Editable checkpoint	可编辑检查点
+Edited file	已编辑文件
+Editing file	正在编辑文件
+Error details	错误详情
+Executed command	已执行命令
+Fetched webpage	已获取网页
+Filled page input	已填写页面输入
+Go forward	前进
+Hermes is asking	Hermes 正在询问
+Hermes is loading a response	Hermes 正在载入回复
+Hermes 正在加载回复	Hermes 正在载入回复
+Loading question…	正在载入问题…
+正在加载问题…	正在载入问题…
+Loading session	正在载入会话
+正在加载会话	正在载入会话
+More approval options	更多审批选项
+Navigated in browser	已在浏览器中导航
+Other (type your answer)	其他（输入你的回答）
+Preparing audio...	正在准备音频...
+Queried web sources	已查询网页来源
+Ran code	已运行代码
+Ran command	已运行命令
+Raw response	原始响应
+Read aloud	朗读
+Read aloud failed	朗读失败
+Read file	读取文件
+Reading file	正在读取文件
+Recovered after 1 failed step	失败 1 步后已恢复
+Restore checkpoint	恢复检查点
+Restore next checkpoint	恢复下一个检查点
+Restore previous checkpoint	恢复上一个检查点
+Running code	正在运行代码
+Running command	正在运行命令
+Search results	搜索结果
+Searched session history	已搜索会话历史
+Searching session history	正在搜索会话历史
+Send edited message	发送已编辑消息
+Snapshot summary	快照摘要
+Stop reading	停止朗读
+This adds the “	这会将
+这会将“	这会将
+to pick	选择
+Tool returned an error.	工具返回错误。
+Tool returned success=false.	工具返回 success=false。
+Type your answer…	输入你的回答…
+” pattern to your permanent allowlist (	模式加入永久允许列表（
+”模式加入永久允许列表（	模式加入永久允许列表（
+⌘/Ctrl + Enter to send	⌘/Ctrl + Enter 发送
+Ask Hermes to restart the server	请求 Hermes 重启服务
+Clear console	清空控制台
+Click to select · shift-click to extend · drag to composer	点击选择 · Shift 点击延展选择 · 拖到输入区
+点击选择 · Shift 点击扩展选择 · 拖到输入区	点击选择 · Shift 点击延展选择 · 拖到输入区
+Close preview pane	关闭预览面板
+console messages	控制台消息
+Copy all to clipboard	复制全部到剪贴板
+Copy selected to clipboard	复制所选内容到剪贴板
+Copy this entry	复制此条目
+Could not copy console output	暂时不能复制控制台输出
+无法复制控制台输出	暂时不能复制控制台输出
+Deselect entry	取消选择条目
+Hermes could not restart the server.	Hermes 暂时不能重启服务。
+Hermes 无法重启服务。	Hermes 暂时不能重启服务。
+Hermes finished	Hermes 已完成
+Hermes finished restarting the preview server	Hermes 已完成预览服务重启
+Hermes is restarting...	Hermes 正在重启...
+Hermes is still working, but no restart result has arrived yet. The server command may be running in the foreground.	Hermes 仍在处理，但还没有收到重启结果。服务命令也许仍在前台运行。
+Hermes 仍在处理，但还没有收到重启结果。服务命令可能仍在前台运行。	Hermes 仍在处理，但还没有收到重启结果。服务命令也许仍在前台运行。
+Hermes is working in the background. Watch the preview console for progress.	Hermes 正在后台处理，可在预览控制台查看进度。
+Hide preview console	隐藏预览控制台
+Hide preview DevTools	隐藏预览开发者工具
+Loading preview…	正在载入预览…
+正在加载预览…	正在载入预览…
+Module scripts are being served with the wrong MIME type. This usually means a static file server is serving a Vite/React app instead of the project dev server.	模块脚本的 MIME 类型不正确。这通常表示静态文件服务器正在提供 Vite/React 应用，而不是项目开发服务器。
+No console messages yet.	暂无控制台消息。
+No handler registered for 'hermes:readFileText'	未注册处理程序：hermes:readFileText
+No inline preview	无内嵌预览
+Open preview	打开预览
+Open preview DevTools	打开预览开发者工具
+Preview anyway	仍然预览
+Preview app failed to boot	预览应用启动失败
+Preview Console	预览控制台
+Preview console:	预览控制台：
+Preview failed to load	预览加载失败
+Preview restart failed	预览重启失败
+Preview server restarted	预览服务已重启
+Reloading the preview now.	正在重新加载预览。
+Resize preview console	调整预览控制台大小
+Restarting preview server	正在重启预览服务
+Select entry	选择条目
+Send all log entries to chat	将全部日志发送到对话
+Send this entry to chat	发送此条目到会话
+Send to chat	发送到对话
+Sent to chat	已发送到会话
+Server not found	未找到服务器
+Server restart failed	服务器重启失败
+Server restart failed:	服务重启失败：
+Show preview console	显示预览控制台
+Showing first 512 KB.	显示前 512 KB。
+The preview page could not be reached.	暂时不能访问预览页面。
+无法访问预览页面。	暂时不能访问预览页面。
+This file is large	文件较大
+This file type	此文件类型
+This looks like a binary file	这看起来是二进制文件
+Workspace changed, reloading preview	工作区已变更，正在重新加载预览
+Artifacts failed to load	产物加载失败
+Copy path	复制路径
+Copy URL	复制 URL
+Generated images and file outputs will appear here as sessions produce them.	会话生成的图片和文件输出会显示在这里。
+Go to	前往
+Indexing recent session artifacts	正在索引最近会话产物
+Link title	链接标题
+Links	链接
+No artifacts found	未找到产物
+Open failed	打开失败
+Refresh artifacts	刷新产物
+Refreshing artifacts	正在刷新产物
+Search artifacts...	搜索产物...
+Title / name	标题 / 名称
+Access token	访问令牌
+Add a group robot in WeCom and copy its webhook key as WECOM_BOT_ID. Send-only — use the WeCom (app) option for two-way.	在企业微信中添加群机器人，并将 webhook key 作为 WECOM_BOT_ID。此方式仅发送。双向通信请使用 WeCom（app）。
+在企业微信中添加群机器人，并将 webhook key 作为 WECOM_BOT_ID。此方式仅发送；双向通信请使用 WeCom（app）。	在企业微信中添加群机器人，并将 webhook key 作为 WECOM_BOT_ID。此方式仅发送。双向通信请使用 WeCom（app）。
+Advanced (	高级（
+Allowed Discord user IDs	允许的 Discord 用户 ID
+Allowed Matrix user IDs	允许的 Matrix 用户 ID
+Allowed Signal users	允许的 Signal 用户
+Allowed Slack user IDs	允许的 Slack 用户 ID
+Allowed Telegram user IDs	允许的 Telegram 用户 ID
+Allowed user IDs	允许的用户 ID
+Allowed WhatsApp users	允许的 WhatsApp 用户
+Bot token	Bot 令牌
+Bot user ID	Bot 用户 ID
+Bridge mode	桥接模式
+Create a bot with @BotFather, then paste the token it gives you.	使用 @BotFather 创建 bot，然后粘贴它提供的令牌。
+Create a DingTalk app in the developer console, then copy the Client ID (App key) and Client Secret here.	在开发者控制台创建钉钉应用，然后复制 Client ID（App key）和 Client Secret 到这里。
+Create a Feishu / Lark app, configure the bot capability, and copy the App ID, App secret, and event encryption keys.	创建飞书 / Lark 应用，配置 bot 能力，然后复制 App ID、App secret 和事件加密密钥。
+Create a Slack app, enable Socket Mode, install it to your workspace, then copy the Bot token (xoxb-) and App-level token (xapp-).	创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot token（xoxb-）和 App-level token（xapp-）。
+Create an application in the Discord Developer Portal, add a bot, then paste its token.	在 Discord 开发者门户创建应用、添加 bot，然后粘贴其令牌。
+Credentials set	凭据已设置
+Enable WhatsApp bridge	启用 WhatsApp 桥接
+Expose Hermes as an OpenAI-compatible API. Set an auth key, then point Open WebUI / LobeChat / etc. at the host:port.	将 Hermes 暴露为 OpenAI 兼容 API。设置认证密钥后，将 Open WebUI / LobeChat 等指向该 host:port。
+Failed to clear	清除失败：
+first, all, or off.	first、all 或 off。
+Get your credentials	获取凭据
+Get your Twilio Account SID and Auth Token from the Twilio console, plus a phone number that can send SMS.	从 Twilio 控制台获取 Account SID 和 Auth Token，并准备一个可发送短信的号码。
+Homeserver URL	主服务器 URL
+In Home Assistant, open your profile and create a long-lived access token. Paste it here along with your HA URL.	在 Home Assistant 中打开个人资料，创建长期访问令牌，并连同 HA URL 一起粘贴到这里。
+In Telegram, talk to @BotFather, run /newbot, and copy the token it gives you. Then grab your numeric user ID from @userinfobot.	在 Telegram 中与 @BotFather 对话，运行 /newbot 并复制它提供的令牌。然后从 @userinfobot 获取你的数字用户 ID。
+Loading messaging platforms...	正在载入消息平台...
+正在加载消息平台...	正在载入消息平台...
+Messaging platforms failed to load	消息平台加载失败
+Needs setup	需要设置
+On your Mattermost server, create a bot account or personal access token, then paste the server URL and token here.	在 Mattermost 服务器上创建 bot 账户或个人访问令牌，然后在此粘贴服务器 URL 和令牌。
+Only needed on networks where Telegram is blocked.	在 Telegram 受限的网络环境中才需要。
+Open docs	打开文档
+Open setup guide	打开设置指南
+Open the Discord Developer Portal, create an application, add a Bot, then copy its token. Invite the bot to your server with the right scopes.	打开 Discord 开发者门户，创建应用并添加 Bot，然后复制令牌。用合适权限邀请 bot 加入服务器。
+Phone number	手机号
+Proxy URL	代理 URL
+Recommended. Comma-separated Discord user IDs.	推荐填写。Discord 用户 ID，用逗号分隔。
+Recommended. Comma-separated Mattermost user IDs.	推荐填写。Mattermost 用户 ID，用逗号分隔。
+Recommended. Comma-separated numeric IDs from @userinfobot. Without this, anyone can DM your bot.	推荐填写。来自 @userinfobot 的数字 ID，用逗号分隔。未填写时任何人都可私信你的 bot。
+Recommended. Comma-separated phone numbers or WhatsApp IDs.	推荐填写。手机号或 WhatsApp ID，用逗号分隔。
+Recommended. Comma-separated Signal identifiers.	推荐填写。Signal 标识符，用逗号分隔。
+Recommended. Comma-separated Slack user IDs.	推荐填写。Slack 用户 ID，用逗号分隔。
+Recommended. Comma-separated user IDs in @user:server format.	推荐填写。@user:server 格式的用户 ID，用逗号分隔。
+Register an app on the QQ Open Platform (q.qq.com) and copy the App ID and Client Secret.	在 QQ 开放平台（q.qq.com）注册应用，并复制 App ID 和 Client Secret。
+Reply style	回复方式
+Restart needed	需要重启
+Restart the gateway for this change to take effect.	请重启网关以使此更改生效。
+Restart the gateway from the status bar to apply this change.	请从状态栏重启网关以应用此更改。
+Restart the gateway to reconnect with the new credentials.	请重启网关以使用新凭据重新连接。
+Retrying	正在重试
+Run a signal-cli REST bridge somewhere reachable, then point Hermes at the URL and the registered phone number.	运行一个 Hermes 可访问的 signal-cli REST 桥接，然后填写 URL 和注册手机号。
+Run an HTTP server that other tools (GitHub, GitLab, custom apps) can POST to. Use the secret to verify signatures.	运行一个可接收其他工具（GitHub、GitLab、自定义应用）POST 的 HTTP 服务，并使用 secret 验证签名。
+Run BlueBubbles Server on a Mac with iMessage, expose its API, then point Hermes at the URL with the server password.	在启用 iMessage 的 Mac 上运行 BlueBubbles Server，开放 API，然后在 Hermes 中填写 URL 和服务器密码。
+Save changes	保存更改
+Search messaging...	搜索消息...
+Server URL	服务器 URL
+Set automatically by the toggle below. Leave alone unless you know you need it.	由下方开关自动设置。不确定时保持默认。
+Set up a WeCom self-built app, expose its callback URL, and provide the corp ID, secret, agent ID, and AES key.	设置企业微信自建应用，开放回调 URL，并提供 corp ID、secret、agent ID 和 AES key。
+setup saved	设置已保存
+setup was updated.	设置已更新。
+Sign in to the WeChat Official Account platform, copy the AppID and Token, and point the message callback URL at Hermes.	登录微信公众号平台，复制 AppID 和 Token，并将消息回调 URL 指向 Hermes。
+Sign in to your homeserver with the bot account, then copy the access token, user ID, and homeserver URL.	使用 bot 账户登录 homeserver，然后复制访问令牌、用户 ID 和 homeserver URL。
+Signal bridge URL	Signal 桥接 URL
+Slack app token	Slack app 令牌
+Slack bot token	Slack bot 令牌
+Start the gateway from the status bar to connect.	请从状态栏启动网关以连接。
+Start the WhatsApp bridge that ships with Hermes, scan the QR code on first run, then enable the platform.	启动 Hermes 附带的 WhatsApp 桥接，首次运行时扫码，然后启用该平台。
+Starts with xapp-. Required for Socket Mode.	以 xapp- 开头。Socket Mode 必填。
+Starts with xoxb-. Found under OAuth & Permissions after installing your Slack app.	以 xoxb- 开头。安装 Slack 应用后可在 OAuth & Permissions 下找到。
+Startup failed	启动失败
+The number registered with your signal-cli bridge.	在 signal-cli 桥接中注册的号码。
+This platform does not need a token here. Use the setup guide above, then enable it below.	此平台无需在这里填写令牌。请使用上方设置指南，然后在下方启用。
+URL of a running signal-cli REST bridge.	正在运行的 signal-cli REST 桥接 URL。
+Use a dedicated mailbox. For Gmail/Workspace, create an app password and use imap.gmail.com / smtp.gmail.com.	建议使用专用邮箱。Gmail/Workspace 请创建应用密码，并使用 imap.gmail.com / smtp.gmail.com。
+0 9 * * * or weekdays at 9am	0 9 * * * 或 工作日 9 点
+At the top of every hour	每小时整点
+Create cron	创建定时任务
+Create first cron	创建第一个定时任务
+Cron created	定时任务已创建
+Cron deleted	定时任务已删除
+Cron expression, or phrases like "every hour" or "weekdays at 9am".	Cron 表达式，或every hourweekdays at 9am这类短语。
+Cron 表达式，或“every hour”“weekdays at 9am”这类短语。	Cron 表达式，或every hourweekdays at 9am这类短语。
+Cron job	定时任务
+Cron paused	定时任务已暂停
+Cron resumed	定时任务已恢复
+Cron syntax or natural language	Cron 表达式或自然语言
+Cron triggered	定时任务已触发
+Cron updated	定时任务已更新
+Custom schedule	自定义计划
+Delete cron	删除定时任务
+Delete cron job?	删除定时任务？
+Deliver to	发送到
+Edit cron	编辑定时任务
+Edit cron job	编辑定时任务
+Every 15 minutes	每 15 分钟
+Every day at 9:00 AM	每天 9:00
+Every Monday at 9:00 AM	每周一 9:00
+Failed to delete cron job	删除定时任务失败
+Failed to load cron jobs	加载定时任务失败
+Failed to save cron job	保存定时任务失败
+Failed to trigger cron job	触发定时任务失败
+Failed to update cron job	更新定时任务失败
+Frequency	频率
+Hourly	每小时
+Loading cron jobs...	正在载入定时任务...
+正在加载定时任务...	正在载入定时任务...
+Monday through Friday at 9:00 AM	周一至周五 9:00
+Monthly	每月
+Morning briefing	晨间简报
+New cron	新建定时任务
+New cron job	新建定时任务
+No matches	无匹配项
+No scheduled jobs yet	暂无定时任务
+Pause cron	暂停定时任务
+permanently. It will stop firing immediately.	永久移除，并立即停止触发。
+Prompt and schedule are required.	提示词和计划必填。
+Refresh cron jobs	刷新定时任务
+Refreshing cron jobs	正在刷新定时任务
+Resume cron	恢复定时任务
+Schedule a prompt to run automatically. Use cron syntax or a natural phrase like "every 15 minutes".	设置自动运行提示词。可使用 cron 语法，或类似每 15 分钟的自然语言。
+设置自动运行提示词。可使用 cron 语法，或类似“每 15 分钟”的自然语言。	设置自动运行提示词。可使用 cron 语法，或类似每 15 分钟的自然语言。
+Schedule a prompt to run on a cron expression. Hermes will run it and deliver results to the destination you pick.	设置按 cron 表达式运行的提示词，Hermes 会执行并将结果发送到所选目标。
+Search cron jobs...	搜索定时任务...
+Summarize my unread Slack threads and email me the top 5...	总结小马未读的 Slack 讨论，并通过邮件发送前 5 条...
+The first day of each month at 9:00 AM	每月 1 日 9:00
+This desktop	此桌面端
+This will remove	将删除
+Trigger now	立即触发
+Update the schedule, prompt, or delivery target. Changes apply on next run.	更新计划、提示词或发送目标。更改将在下次运行时生效。
+Weekdays	工作日
+Weekly	每周
+Clone from default	从默认配置复制
+Copy config, skills, and SOUL.md from your default profile.	从默认配置档复制配置、技能和 SOUL.md。
+Copy setup	复制设置
+Copying...	正在复制...
+Create profile	创建配置档
+Creating...	正在创建...
+Delete profile?	删除配置档？
+Deleting...	正在删除...
+directory. This cannot be undone.	目录。此操作暂时不能撤销。
+目录。此操作无法撤销。	目录。此操作暂时不能撤销。
+Empty SOUL.md — start writing the persona...	SOUL.md 为空，请开始编写人格...
+Failed to copy setup command	复制设置命令失败
+Failed to create profile	创建配置档失败
+Failed to delete profile	删除配置档失败
+Failed to load profiles	加载配置档失败
+Failed to load SOUL.md	加载 SOUL.md 失败
+Failed to rename profile	重命名配置档失败
+Failed to save SOUL.md	保存 SOUL.md 失败
+Invalid name.	名称无效。
+Loading profiles...	正在载入配置档...
+正在加载配置档...	正在载入配置档...
+Loading SOUL.md...	正在载入 SOUL.md...
+正在加载 SOUL.md...	正在载入 SOUL.md...
+Lowercase letters, digits, hyphens, and underscores. Must start with a letter or digit.	可用小写字母、数字、连字符和下划线。必须以字母或数字开头。
+Name is required.	名称必填。
+New name	新名称
+New profile	新建配置档
+No profiles yet.	暂无配置档。
+Profile created	配置档已创建
+Profile deleted	配置档已删除
+Profile renamed	配置档已重命名
+Profiles are independent Hermes environments: separate config, skills, and SOUL.md.	配置档是独立 Hermes 环境：配置、技能和 SOUL.md 相互分开。
+Refresh profiles	刷新配置档
+Refreshing profiles	正在刷新配置档
+Rename profile	重命名配置档
+Renaming updates the profile directory and any wrapper scripts in	重命名会更新配置档目录和其中的包装脚本：
+Renaming updates the profile directory and any wrapper scripts in	重命名会更新配置档目录和相关包装脚本：
+Renaming...	正在重命名...
+Save SOUL.md	保存 SOUL.md
+Select a profile to view its details.	选择配置档以查看详情。
+Setup command copied	设置命令已复制
+SOUL.md saved	SOUL.md 已保存
+The system prompt and persona instructions baked into this profile.	此配置档内置的系统提示词和人格说明。
+This will delete	将删除
+Unsaved changes	未保存更改
+Close agents	关闭智能体
+Live subagent activity for the current turn.	当前轮次的子智能体实时活动。
+more files	更多文件
+No live subagents	暂无活动子智能体
+Spawn tree	子智能体树
+When a turn delegates work, child agents stream their progress here.	当前轮次委派工作时，子智能体进度会显示在这里。
+Action started, waiting for status...	操作已开始，正在等待状态...
+API calls	API 调用
+Browse generated outputs	浏览生成内容
+Close command center	关闭命令中心
+Configure Hermes desktop	配置 Hermes 桌面端
+Daily tokens	每日 Token
+Delete session	删除会话
+Enable skills, toolsets, and providers	启用技能、工具集和模型服务
+Est. cost	预估费用
+Export session	导出会话
+Gateway status, logs, restart/update	网关状态、日志、重启和更新
+Loading status...	正在载入状态...
+正在加载状态...	正在载入状态...
+Loading usage...	正在载入用量...
+正在加载用量...	正在载入用量...
+Messaging gateway running	消息网关运行中
+Messaging gateway stopped	消息网关已停止
+New session	新建会话
+No daily activity.	暂无每日活动。
+No logs loaded yet.	尚未加载日志。
+No matching results found.	未找到匹配结果。
+No model usage yet.	暂无模型用量。
+No sessions yet.	暂无会话。
+No skill activity yet.	暂无技能活动。
+No usage in the last	最近
+Pin session	固定会话
+Recent logs	最近日志
+Restart messaging	重启消息
+Search and manage sessions	搜索并管理会话
+Search sessions	搜索会话
+Search sessions, views, and actions	搜索会话、视图和操作
+Search, pin, and manage sessions	搜索、固定和管理会话
+Sessions panel	会话面板
+Set up Telegram, Slack, Discord, and more	设置 Telegram、Slack、Discord 等
+Skills & Tools	技能与工具
+Start a fresh session	开始新会话
+System panel	系统面板
+Token, cost, and skill activity	Token、费用和技能活动
+Token, cost, and skill activity over time	Token、费用和技能活动趋势
+Tokens in/out	输入/输出 Token
+Top models	常用模型
+Top skills	常用技能
+Unpin	取消固定
+Unpin session	取消固定会话
+Usage panel	用量面板
+· Active sessions	· 活跃会话
+(none)	无
+（无）	无
+(provider default)	（模型服务默认）
+). Run it from the CLI with	）。请在 CLI 中运行
+About Hermes Desktop	关于 Hermes 桌面版
+Advanced	高级
+Allow Private URLs	允许私有 URL
+API Keys	API 密钥
+API Retries	API 重试次数
+Appearance	外观
+Applies to new sessions. Use the model picker in the composer to hot-swap the active chat.	应用于新会话。可在输入区模型选择器中临时切换当前会话模型。
+Applying...	正在应用...
+Approval Mode	审批模式
+Approval Timeout	审批超时
+Archived Chats	已归档会话
+auto · use main model	自动 · 使用主模型
+Auto-Compression	自动压缩
+Automatically speak assistant responses.	自动朗读助手回复。
+Autosave failed	自动保存失败
+Auxiliary models	辅助模型
+Backup provider:model entries to try if the default model fails.	默认模型失败时尝试的备用 服务:模型 条目。
+Bright desktop surfaces	明亮桌面界面
+Browser Private URLs	浏览器私有 URL
+Checkpoint Limit	检查点限制
+Close settings	关闭设置
+Code Execution Mode	代码执行模式
+comma-separated value	逗号分隔值
+comma-separated values	逗号分隔值
+Command Allowlist	命令允许列表
+Command Timeout	命令超时
+Compression	压缩
+Compression Target	压缩目标
+Compression Threshold	压缩阈值
+Config imported	配置已导入
+Confirm MCP Reloads	确认 MCP 重新加载
+Context compaction	上下文压缩
+Context Engine	上下文引擎
+Context Window	上下文窗口
+Controls how image attachments are sent to the model.	控制图片附件如何发送给模型。
+Create rollback snapshots before file edits.	修改文件前创建可回退快照。
+Curator	整理器
+Default assistant style for new sessions.	新会话默认助手风格。
+Default Model	默认模型
+Default project folder for tool and terminal work.	工具和终端工作的默认项目文件夹。
+Edge Voice	Edge 声音
+ElevenLabs Language	ElevenLabs 语言
+ElevenLabs Model	ElevenLabs 模型
+ElevenLabs STT Model	ElevenLabs STT 模型
+ElevenLabs Voice	ElevenLabs 声音
+Enable local or provider-backed speech transcription.	启用本地或服务支持的语音转写。
+Enabled Toolsets	已启用工具集
+Environment Passthrough	环境变量传递
+Environment variables to pass into tool execution.	传递给工具执行的环境变量。
+Execution Backend	执行后端
+Export config	导出配置
+Export failed	导出失败
+Fallback Models	备用模型
+File Checkpoints	文件检查点
+File Page Limit	文件页数限制
+File Read Limit	文件读取限制
+Follow OS appearance	跟随系统外观
+Gateway connection...	网关连接...
+Helper tasks run on the main model by default. Assign a dedicated model to any task to override.	辅助任务默认使用主模型。可为任意任务指定专用模型。
+Hide detected secrets from model-visible content when possible.	尽量从模型可见内容中隐藏检测到的密钥。
+尽可能从模型可见内容中隐藏检测到的密钥。	尽量从模型可见内容中隐藏检测到的密钥。
+How Hermes handles commands that need explicit approval.	Hermes 如何处理需要明确审批的命令。
+How long approval prompts wait before timing out.	审批提示超时前等待的时长。
+How strictly code execution is scoped to the current project.	控制代码执行在当前项目内的约束程度。
+控制代码执行限制在当前项目内的严格程度。	控制代码执行在当前项目内的约束程度。
+Image analysis	图像分析
+Image Attachments	图片附件
+Import config	导入配置
+Included with a Nous subscription — sign in to Nous Portal to activate.	包含在 Nous 订阅中，请登录 Nous 门户启用。
+Invalid config JSON	配置 JSON 无效
+Keep shell state between commands when the backend supports it.	后端支持时在命令之间保留 Shell 状态。
+Leave at 0 to use the selected model's detected context window.	填 0 时使用所选模型检测到的上下文窗口。
+Line Length Limit	行长度限制
+Loading configuration...	正在载入配置...
+正在加载配置...	正在载入配置...
+Loading Hermes configuration...	正在载入 Hermes 配置...
+正在加载 Hermes 配置...	正在载入 Hermes 配置...
+Loading model configuration...	正在载入模型配置...
+正在加载模型配置...	正在载入模型配置...
+Local Browser For Private URLs	私有 URL 使用本地浏览器
+Local Transcription Model	本地转写模型
+Low-glare workspace	低眩光工作区
+Main model	主模型
+Maintain a compact profile of user preferences.	维护简洁的用户偏好画像。
+Max Agent Steps	最大智能体步骤
+Max Recording Length	最长录音时长
+Maximum characters Hermes can read from one file request.	Hermes 单次文件读取请求可读取的最大字符数。
+MCP tool routing	MCP 工具路由
+Memory & Context	记忆与上下文
+Memory Budget	记忆预算
+Memory Provider	记忆服务
+Needs keys	需要密钥
+No API key required.	无需 API 密钥。
+No matching settings	没有匹配设置
+No providers are available for this toolset right now.	当前没有可用于此工具集的服务商。
+Not set	未设置
+OpenAI TTS Model	OpenAI TTS 模型
+OpenAI Voice	OpenAI 声音
+Optional ISO-639-3 language code. Blank lets ElevenLabs auto-detect.	可选 ISO-639-3 语言代码。留空则由 ElevenLabs 自动检测。
+Page summarization	页面摘要
+Parallel Subagents	并行子智能体
+Persistent Memory	持久记忆
+Persistent Shell	持久 Shell
+Profile Budget	画像预算
+Protected Recent Messages	受保护的最近消息
+Provider selected	服务已选择
+Read Responses Aloud	朗读回复
+Reasoning Blocks	推理块
+Recall queries	回忆查询
+Redact Secrets	隐藏密钥
+Reset all settings to Hermes defaults?	要将全部设置重置为 Hermes 默认值吗？
+Reset all to main	全部重置为主模型
+Reset failed	重置失败
+Reset to defaults	重置为默认值
+Safety	安全
+Save durable memories that can help future sessions.	保存可帮助后续会话的持久记忆。
+Saving…	正在保存…
+Search API keys	搜索 API 密钥
+Search API keys...	搜索 API 密钥...
+Search archived sessions...	搜索已归档会话...
+Search MCP servers	搜索 MCP 服务
+Search MCP servers...	搜索 MCP 服务...
+Search settings...	搜索设置...
+Service Tier	服务层级
+Session search	会话搜索
+Session titles	会话标题
+Set to main	设为主模型
+Settings failed to load	设置加载失败
+Show reasoning sections when the backend provides them.	后端提供时显示推理部分。
+Skill search	技能搜索
+Skill-usage review	技能使用复核
+Skills hub	技能中心
+Smart auto-approve	智能自动批准
+Speaker Diarization	说话人分离
+Speech To Text	语音转文字
+Speech-To-Text Provider	语音转文字服务
+Strategy for managing long conversations near the context limit.	接近上下文限制时管理长对话的策略。
+Subagent Model	子智能体模型
+Subagent Provider	子智能体服务
+Subagent Reasoning Effort	子智能体推理强度
+Subagent Timeout	子智能体超时
+Subagent Turn Limit	子智能体轮次限制
+Summarize older context when conversations get large.	对话变长时总结较早上下文。
+Tag Audio Events	标记音频事件
+Terminal Output Limit	终端输出限制
+Text-To-Speech Provider	文本转语音服务
+This provider needs an extra setup step (	此服务商需要额外设置步骤（
+This toolset has no provider options — enable it and it works with your current setup.	此工具集没有服务商选项，启用后会使用当前设置。
+Timezone	时区
+Title gen	标题生成
+Tool configuration failed to load	工具配置加载失败
+Tool-Use Enforcement	工具使用约束
+Transcription Language	转写语言
+Try a different search term or choose another section.	换个搜索词或选择其他分区。
+Upper bound for tool-calling turns before Hermes stops a run.	Hermes 停止运行前工具调用轮次的上限。
+Used for new chats unless you pick a different model in the composer.	用于新会话，除非你在输入区选择其他模型。
+Used when Hermes needs local time context. Blank uses the system timezone.	Hermes 需要本地时间上下文时使用。留空则使用系统时区。
+User Profile	用户画像
+Vision	视觉
+Voice Shortcut	语音快捷键
+Web extract	网页提取
+Working Directory	工作目录
+Color Mode	颜色模式
+Desktop palettes only. The selected mode is applied on top.	桌面配色。所选模式会叠加应用。
+Human-friendly tool activity with concise summaries.	以简洁摘要展示工具活动。
+Include raw tool args/results and low-level details.	显示原始工具参数、结果和底层细节。
+Product	产品
+Product hides raw tool payloads; Technical shows full input/output.	产品模式隐藏原始工具负载。技术模式显示完整输入/输出。
+产品模式隐藏原始工具负载；技术模式显示完整输入/输出。	产品模式隐藏原始工具负载。技术模式显示完整输入/输出。
+Technical	技术
+Tool Call Display	工具调用显示
+Base URL for the remote dashboard backend. Path prefixes are supported, for example /hermes.	远程控制台后端的基础 URL。支持路径前缀，例如 /hermes。
+Connect this desktop shell to a remote Hermes backend using its session token.	使用会话令牌将此桌面外壳连接到远程 Hermes 后端。
+Could not apply gateway settings	暂时不能应用网关设置
+无法应用网关设置	暂时不能应用网关设置
+Could not save gateway settings	暂时不能保存网关设置
+无法保存网关设置	暂时不能保存网关设置
+Diagnostics	诊断
+Enter a remote URL and session token before switching to remote.	切换到远程前，请填写远程 URL 和会话令牌。
+切换到远程前请先填写远程 URL 和会话令牌。	切换到远程前，请填写远程 URL 和会话令牌。
+Enter a remote URL and session token before testing.	测试前，请填写远程 URL 和会话令牌。
+测试前请先填写远程 URL 和会话令牌。	测试前，请填写远程 URL 和会话令牌。
+env override	环境变量覆盖
+Environment variables are controlling this desktop session.	环境变量正在控制当前桌面会话。
+Gateway Connection	网关连接
+Gateway connection restarting	网关连接正在重启
+Gateway settings failed to load	网关设置加载失败
+Gateway settings saved	网关设置已保存
+Gateway settings unavailable	网关设置不可用
+Hermes Desktop will reconnect using the saved settings.	Hermes 桌面版将使用已保存设置重新连接。
+Loading gateway settings...	正在载入网关设置...
+正在加载网关设置...	正在载入网关设置...
+Local gateway	本地网关
+Paste session token	粘贴会话令牌
+Remote	远程
+Remote gateway	远程网关
+Remote gateway incomplete	远程网关信息不完整
+Remote gateway reachable	远程网关可访问
+Remote gateway test failed	远程网关测试失败
+Remote URL	远程 URL
+Reveal desktop.log in your file manager — useful when the gateway fails to start.	在文件管理器中显示 desktop.log，适合排查网关启动失败。
+Save and reconnect	保存并重新连接
+Save for next restart	保存到下次重启
+Saved for the next restart.	已保存，将在下次重启时生效。
+Session token	会话令牌
+Start a private Hermes backend on localhost. This is the default and works offline.	在 localhost 启动私有 Hermes 后端。这是默认方式，可离线工作。
+Test remote	测试远程
+The dashboard session token used for REST and WebSocket access. Leave blank to keep the saved token.	用于 REST 和 WebSocket 访问的控制台会话令牌。留空则保留已保存令牌。
+The desktop IPC bridge does not expose gateway settings.	桌面 IPC 桥接未暴露网关设置。
+Add a stdio or HTTP server to expose MCP tools.	添加 stdio 或 HTTP 服务以开放 MCP 工具。
+Add MCP server	添加 MCP 服务
+Edit MCP server	编辑 MCP 服务
+Edit server	编辑服务
+Gateway unavailable	网关不可用
+Give this MCP server a config key.	请为此 MCP 服务填写配置键。
+Loading MCP servers...	正在载入 MCP 服务...
+正在加载 MCP 服务...	正在载入 MCP 服务...
+MCP reload failed	MCP 重新加载失败
+MCP server saved	MCP 服务已保存
+MCP servers	MCP 服务
+MCP tools reloaded	MCP 工具已重新加载
+Name required	需要名称
+New server	新建服务
+New tool schemas apply to fresh turns.	新的工具结构将在新轮次中生效。
+No MCP servers	暂无 MCP 服务
+Reconnect the gateway before reloading MCP.	重新加载 MCP 前，请连接网关。
+重新加载 MCP 前请先连接网关。	重新加载 MCP 前，请连接网关。
+Remove failed	移除失败
+Save failed	保存失败
+Save server	保存服务
+Saving...	正在保存...
+Server config must be a JSON object	服务配置必须是 JSON 对象
+Server JSON	服务 JSON
+Clear value	清除值
+Credential removed	凭据已移除
+Credential saved	凭据已保存
+Enter value	输入值
+Failed to save	保存失败：
+Hide value	隐藏值
+LLM providers	LLM 服务
+Loading API keys and credentials...	正在载入 API 密钥和凭据...
+正在加载 API 密钥和凭据...	正在载入 API 密钥和凭据...
+Open provider docs	打开服务文档
+Replace current value	替换当前值
+Reveal value	显示值
+Archive a chat to hide it here.	归档会话后会在这里隐藏。
+Archived chats	已归档会话
+Archived sessions	已归档会话
+Could not clear default directory	暂时不能清除默认目录
+无法清除默认目录	暂时不能清除默认目录
+Could not load archived sessions	暂时不能加载已归档会话
+无法加载已归档会话	暂时不能加载已归档会话
+Could not update default directory	暂时不能更新默认目录
+无法更新默认目录	暂时不能更新默认目录
+Default project directory	默认项目目录
+Default project directory updated	默认项目目录已更新
+Delete failed	删除失败
+Delete permanently	永久删除
+Loading archived sessions…	正在载入已归档会话…
+正在加载已归档会话…	正在载入已归档会话…
+New sessions start in this folder unless you pick another. Leave it unset to use your home directory.	新会话会从此文件夹开始，除非另选位置。留空则使用用户目录。
+No archived chats	没有已归档会话
+No archived chats match your search.	没有匹配搜索的已归档会话。
+Nothing archived	暂无归档
+Restore	恢复
+Restored	已恢复
+Unarchive failed	取消归档失败
+An update is currently installing.	更新正在安装。
+Automatic updates	自动更新
+Check now	立即检查
+Hermes checks for updates automatically in the background and lets you know when one is ready.	Hermes 会在后台自动检查更新，并在可用时通知你。
+Last checked	上次检查
+Release notes	发行说明
+Tap "Check now" to look for updates.	点击立即检查查找更新。
+点击“立即检查”查找更新。	点击立即检查查找更新。
+This build can't update itself from inside the app.	此版本暂时不能在应用内自行更新。
+此版本无法在应用内自行更新。	此版本暂时不能在应用内自行更新。
+Version unavailable	版本不可用
+We couldn't reach the update server.	暂时不能连接更新服务。
+无法连接更新服务。	暂时不能连接更新服务。
+You're on the latest version.	当前已是最新版本。
+Add to chat	添加到对话
+Change working directory	更改工作目录
+Collapse all folders	折叠全部文件夹
+File system	文件系统
+Focus terminal view	聚焦终端视图
+Loading file tree	正在载入文件树
+正在加载文件树	正在载入文件树
+Loading files...	正在载入文件...
+正在加载文件...	正在载入文件...
+No folder selected	未选择文件夹
+No project	无项目
+Open a different folder	打开其他文件夹
+Open a folder	打开文件夹
+Open folder	打开文件夹
+Preview unavailable	暂时不能预览
+无法预览	暂时不能预览
+Refresh tree	刷新文件树
+Return to split view	返回分栏视图
+Right sidebar	右侧栏
+Right sidebar panels	右侧栏面板
+The file tree hit an error rendering this folder.	文件树渲染此文件夹时出错。
+This folder is empty.	此文件夹为空。
+Tree error	文件树错误
+Unreadable	暂时不能读取
+无法读取	暂时不能读取
+Advanced Hermes environments for separate personas, config, skills, and SOUL.md.	为不同角色、配置、技能和 SOUL.md 准备的 Hermes 高级环境。
+App controls	应用控制
+Checking inference	正在检查推理服务
+Close Command Center	关闭命令中心
+Command Center	命令中心
+Context usage	上下文用量
+Current turn elapsed	当前轮次耗时
+Disconnected	已断开
+Edit Models…	编辑模型…
+Fast mode update failed	快速模式更新失败
+Hermes inference gateway status	Hermes 推理网关状态
+Hide right sidebar	隐藏右侧栏
+Hide sidebar	隐藏侧边栏
+Inference not ready	推理未就绪
+Inference ready	推理已就绪
+Manage profiles	管理配置档
+Medium	中
+Messaging platforms	消息平台
+Model option update failed	模型选项更新失败
+Mute haptics	关闭触感反馈
+No options for this model	此模型没有选项
+Open agents	打开智能体
+Open Command Center	打开命令中心
+Open cron jobs	打开定时任务
+Open model picker	打开模型选择器
+Open settings	打开设置
+Open system panel	打开系统面板
+Pane controls	面板控制
+Recent activity	最近活动
+Runtime session elapsed	运行会话耗时
+Show right sidebar	显示右侧栏
+Show sidebar	显示侧边栏
+Unmute haptics	打开触感反馈
+Update in progress	更新进行中
+View all logs →	查看全部日志 →
+Window controls	窗口控制
+YOLO off	YOLO 已关闭
+YOLO off — click to auto-approve dangerous commands.	YOLO 关闭：点击后自动批准危险命令。
+YOLO on — auto-approving dangerous commands. Click to turn off.	YOLO 开启：自动批准危险命令。点击关闭。
+All	全部
+Anthropic API Key	Anthropic API 密钥
+Anthropic OAuth: Required Extra Usage Credits to Use Subscription	Anthropic OAuth：使用订阅需要额外额度
+Authorize Hermes there.	在那里授权 Hermes。
+Back to sign in	返回登录
+Connect a model provider to start chatting. Most options take one click.	连接模型服务后即可开始对话，大多数选项一步完成。
+connected.	已连接。
+connected. Picking a default model...	已连接，正在选择默认模型...
+Continue	继续
+Copy the authorization code and paste it below.	复制授权码并粘贴到下方。
+Could not save credential.	暂时不能保存凭据。
+无法保存凭据。	暂时不能保存凭据。
+Default model	默认模型
+Direct access to Google Gemini models.	直接访问 Google Gemini 模型。
+Direct access to OpenAI models.	直接访问 OpenAI 模型。
+Direct access to xAI Grok models.	直接访问 xAI Grok 模型。
+Get a key	获取密钥
+GPT-class models	GPT 类模型
+Hermes is finishing install. This usually takes under a minute on first run.	Hermes 正在完成安装，首次运行通常不到一分钟。
+Hosts hundreds of models behind a single key. Good default for new installs.	一个密钥接入数百个模型，新安装推荐。
+I have an API key	小马有 API 密钥
+I've signed in	小马已登录
+in your browser.	在浏览器中。
+in your browser. Enter this code there:	在浏览器中。在那里输入此代码：
+in your browser. Enter this code there:	在浏览器中。请在那里输入此代码：
+Let's get you setup with Hermes Agent	开始设置 Hermes Agent
+Local / custom endpoint	本地 / 自定义端点
+Looking up providers...	正在查找服务商...
+Nous Portal	Nous 门户
+One key, hundreds of models — a solid default	一个密钥，数百个模型，适合作为默认选择
+one key, many models	一个密钥，多种模型
+One subscription, 300+ frontier models — the recommended way to run Hermes	一个订阅可用 300 多个前沿模型，这是推荐的 Hermes 运行方式
+Opens a verification page in your browser — Hermes connects automatically	会在浏览器打开验证页面，Hermes 将自动连接
+Opens your browser to sign in — Hermes connects automatically	会打开浏览器登录，Hermes 将自动连接
+Opens your browser to sign in, then continues here	打开浏览器登录，然后回到这里继续
+Other providers	其他服务商
+Paste API key	粘贴 API 密钥
+Paste authorization code	粘贴授权码
+Pick a different provider	选择其他模型服务
+Point Hermes at a local or self-hosted OpenAI-compatible endpoint (vLLM, llama.cpp, Ollama, etc).	将 Hermes 指向本地或自托管的 OpenAI 兼容端点（vLLM、llama.cpp、Ollama 等）。
+Qwen Code	通义灵码
+Re-open authorization page	重新打开授权页面
+Re-open sign-in page	重新打开登录页面
+Re-open verification page	重新打开验证页面
+Required	必填
+Sign in once in your terminal, then come back to chat	在终端登录一次，然后返回对话
+Sign-in failed. Try again.	登录失败，请重试。
+Start chatting	开始对话
+Starting Hermes…	正在启动 Hermes…
+Starting sign-in for	正在启动登录：
+Waiting for you to authorize...	正在等待授权...
+We opened	已打开
+Auto	自动
+Cancel install	取消安装
+Cancelling...	正在取消...
+Copied!	已复制！
+Copy command	复制命令
+Copy output	复制输出
+Failed	失败
+Fetching installer manifest...	正在获取安装清单...
+Fixed	已修复
+Full transcript saved to	完整记录已保存到
+Hermes needs a one-time install	Hermes 需要完成一次安装
+Hermes 需要完成一次性安装	Hermes 需要完成一次安装
+Hide	隐藏
+Hide installer output	隐藏安装输出
+Install command	安装命令
+Install update	安装更新
+Installation failed	安装失败
+Installing	安装中
+No output yet.	暂无输出。
+One of the install steps failed. On Windows, this can happen if another Hermes CLI or desktop instance is running. Stop any running Hermes instances, then retry. Check the details below or the desktop log for the full transcript.	某个安装步骤未完成。在 Windows 上，如果另一个 Hermes CLI 或桌面实例正在运行，就会出现这种情况。请停止正在运行的 Hermes 实例后重试。完整记录可查看下方详情或桌面日志。
+某个安装步骤失败。在 Windows 上，如果另一个 Hermes CLI 或桌面实例正在运行，可能会发生这种情况。请停止正在运行的 Hermes 实例后重试。完整记录可查看下方详情或桌面日志。	某个安装步骤未完成。在 Windows 上，如果另一个 Hermes CLI 或桌面实例正在运行，就会出现这种情况。请停止正在运行的 Hermes 实例后重试。完整记录可查看下方详情或桌面日志。
+Reload and retry	重新加载并重试
+Setting up Hermes Agent	正在设置 Hermes Agent
+Show	显示
+Show installer output	显示安装输出
+Skipped	已跳过
+steps complete	步已完成
+Stop	停止
+Subsequent launches will skip this step.	后续启动会跳过此步骤。
+System	跟随系统
+This is a one-time setup. The Hermes installer is downloading dependencies and configuring your machine.	这是一次设置。Hermes 安装程序正下载依赖，并配置你的机器。
+这是一次性设置。Hermes 安装程序正在下载依赖并配置你的机器。	这是一次设置。Hermes 安装程序正下载依赖，并配置你的机器。
+View install docs	查看安装文档
+Will install to	将安装到
+A new version of Hermes is ready to install.	Hermes 新版本已可安装。
+About	关于
+Backend out of date	后端版本过旧
+Copied	已复制
+Copy	复制
+Couldn’t check for updates	暂时不能检查更新
+无法检查更新	暂时不能检查更新
+Desktop bridge unavailable.	桌面桥接不可用。
+Done	完成
+Finishing up	正在完成
+Hermes is ready	Hermes 已就绪
+Hermes will close to apply the update.	Hermes 将关闭以应用更新。
+Hermes will pick up the new version next time you launch it.	下次启动 Hermes 时会使用新版本。
+Looking for updates…	正在查找更新…
+Manual	手动
+Maybe later	稍后再说
+more change	更多变更
+New update available	有新版本可用
+No updates	无更新
+No worries — nothing was lost. You can try again now.	不用担心，内容没有丢失。现在可以重试。
+Not now	暂不
+REQUIRED	必填
+Retry	重试
+See what's new	查看新增内容
+Starting update…	正在开始更新…
+The Hermes updater will take over in its own window and reopen Hermes when it’s done.	Hermes 更新程序会在独立窗口中接管，并在完成后重新打开 Hermes。
+This version of Hermes can’t update itself from inside the app.	此版本的 Hermes 暂时不能在应用内自行更新。
+此版本的 Hermes 无法在应用内自行更新。	此版本的 Hermes 暂时不能在应用内自行更新。
+Try again	重试
+Update available	有可用更新
+Update didn’t finish	更新未完成
+Update from your terminal	通过终端更新
+Update Hermes	更新 Hermes
+Update not available	暂无可用更新
+Update now	立即更新
+Update ready	更新已就绪
+Updating Hermes…	正在更新 Hermes…
+You installed Hermes from the command line, so updates run there too. Paste this into your terminal:	你通过命令行安装了 Hermes，因此更新也在那里运行。将下面内容粘贴到终端：
+Your Hermes backend is older than this desktop build and may not work correctly. Update to align them.	Hermes 后端版本低于当前桌面端，运行会出问题。请更新，让两端保持一致。
+Hermes 后端版本低于当前桌面端，可能无法正常工作。请更新以保持一致。	Hermes 后端版本低于当前桌面端，运行会出问题。请更新，让两端保持一致。
+You’re all set	已全部就绪
+Clean grayscale — minimal and focused	干净灰阶，极简专注
+Cool slate blue — focused developer theme	冷调石板蓝，专注开发主题
+Cyberpunk	赛博朋克
+Dark	深色
+Desktop themes:	桌面主题：
+Ember	余烬
+Glass neutrals with Nous blue accents	玻璃质感柔和灰调，点缀 Nous 蓝
+玻璃中性色搭配 Nous 蓝色点缀	玻璃质感柔和灰调，点缀 Nous 蓝
+Light	浅色
+Midnight	午夜
+Mono	单色
+Neon green on black — matrix terminal	黑底霓虹绿，矩阵终端风格
+No desktop themes are available.	没有可用的桌面主题。
+Slate	石板
+These are desktop-only display preferences. Mode controls brightness; theme controls the accent palette and chat surface styling.	这些是桌面端显示偏好。模式控制亮度，主题控制强调色和对话界面样式。
+Warm crimson and bronze — forge vibes	暖红与青铜色，锻造氛围
+`Model · ${y}: ${v||`none`}`	`模型 · ${y}: ${v||`未选择`}`
+ElevenLabs Scribe model	ElevenLabs Scribe 模型
+Hermes Desktop starts its own local gateway by default. Use a remote gateway when you want this app to control an already-running Hermes backend on another machine or behind a trusted proxy.	Hermes 桌面版默认启动本地网关。当你希望本应用控制另一台机器或可信代理后的 Hermes 后端时，可使用远程网关。
+The background gateway didn't come up. Try one of the recovery steps below — nothing here deletes your chats or settings.	后台网关未启动。请尝试下面的恢复步骤。这里不会删除你的对话或设置。
+后台网关未启动。请尝试下面的恢复步骤；这里不会删除你的对话或设置。	后台网关未启动。请尝试下面的恢复步骤。这里不会删除你的对话或设置。
+). Hermes won’t ask again for commands like this — in this session or any future one.	）。Hermes 以后遇到类似命令不会再次询问，包括当前会话和未来会话。
+Activity	活动
+Add a provider credential before sending your first message.	发送第一条消息前，请添加模型服务凭据。
+发送第一条消息前请先添加模型服务凭据。	发送第一条消息前，请添加模型服务凭据。
+Add a remote URL and token before switching to remote.	切换到远程前，请添加远程 URL 和令牌。
+切换到远程前，请先添加远程 URL 和令牌。	切换到远程前，请添加远程 URL 和令牌。
+Add or switch inference provider.	添加或切换推理模型服务。
+Add provider	添加模型服务
+Add provider…	添加模型服务…
+Administrator password	管理员密码
+ADVANCED	高级
+Agents	智能体
+Allowed Telegram user IDs (comma-separated)	允许的 Telegram 用户 ID（用逗号分隔）
+and remove its	并移除它的
+API service tier (OpenAI/Anthropic)	API 服务层级（OpenAI/Anthropic）
+Apply	应用
+Approval	审批
+Archive	归档
+Archive failed	归档失败
+Archived chats are hidden from the sidebar but keep all their messages. Ctrl/⌘-click a chat in the sidebar to archive it without opening.	已归档会话会从侧边栏隐藏，但保留全部消息。在侧边栏按 Ctrl/⌘ 点击会话可直接归档而无需打开。
+Archived chats are hidden from the sidebar but keep all their messages. Ctrl/⌘-click a chat in the sidebar to archive it.	已归档会话会从侧边栏隐藏，但保留全部消息。在侧边栏按 Ctrl/⌘ 点击会话可直接归档。
+Artifacts	产物
+Attach	添加
+Backend stopped	后端已停止
+Background restart did not return a task id	后台重启未返回任务 ID
+Base	基础
+Branch	分支
+Branch failed	分支创建失败
+Branch the latest message into a new chat	将最新消息分支到新会话
+Browser	浏览器
+browser automation	浏览器自动化
+Cancel	取消
+Change	更改
+Chat	对话
+Clear	清除
+Clear all	全部清除
+Clear search	清空搜索
+Clipboard	剪贴板
+Close	关闭
+Close ${e.label}	关闭 ${e.label}
+Compress this conversation context	压缩当前对话上下文
+Compressor	压缩器
+Connected	已连接
+Connected, but Hermes still cannot resolve a usable provider.	已连接，但 Hermes 还未找到可用模型服务。
+Connected, but Hermes still cannot resolve a usable provider.	已连接，但 Hermes 仍暂时不能解析可用服务商。
+已连接，但 Hermes 仍无法解析可用服务商。	已连接，但 Hermes 仍暂时不能解析可用服务商。
+Connecting	正在连接
+Connecting live desktop gateway	正在连接桌面网关
+Connection test failed	连接测试失败
+Connection test succeeded	连接测试成功
+Connection:	连接：
+Context	上下文
+Copy detail	复制详情
+Copy failed	复制失败
+Copy link	复制链接
+Could not attach ${e.name||	暂时不能添加 ${e.name||
+无法添加 ${e.name||	暂时不能添加 ${e.name||
+Could not change model	暂时不能切换模型
+无法切换模型	暂时不能切换模型
+Could not create a new session	暂时不能创建新会话
+无法创建新会话	暂时不能创建新会话
+Could not delete session	暂时不能删除会话
+无法删除会话	暂时不能删除会话
+Could not load models	暂时不能加载模型
+无法加载模型	暂时不能加载模型
+Could not preview ${e.label}	暂时不能预览 ${e.label}
+无法预览 ${e.label}	暂时不能预览 ${e.label}
+Could not reach ${n}.	暂时不能访问 ${n}。
+无法访问 ${n}。	暂时不能访问 ${n}。
+Could not reach that endpoint.	暂时不能访问该端点。
+无法访问该端点。	暂时不能访问该端点。
+Could not read recorded audio	暂时不能读取录音
+无法读取录音	暂时不能读取录音
+Could not render math with KaTeX	暂时不能用 KaTeX 渲染数学公式
+无法用 KaTeX 渲染数学公式	暂时不能用 KaTeX 渲染数学公式
+Could not restore session	暂时不能恢复会话
+无法恢复会话	暂时不能恢复会话
+Could not save local endpoint	暂时不能保存本地端点
+无法保存本地端点	暂时不能保存本地端点
+Could not send secret	暂时不能发送密钥
+无法发送密钥	暂时不能发送密钥
+Could not send sudo password	暂时不能发送管理员密码
+无法发送管理员密码	暂时不能发送管理员密码
+Could not toggle YOLO	暂时不能切换 YOLO
+无法切换 YOLO	暂时不能切换 YOLO
+Create a debug report	创建调试报告
+Cron	定时任务
+Custom	自定义
+Daily	每天
+dangerous command	危险命令
+Default	默认
+Delegated task	已委派任务
+Delete	删除
+Desktop boot failed	桌面启动失败
+Details	详情
+Disable	禁用
+Disabled	已禁用
+Dismiss notification	关闭通知
+Displays the mobile sidebar.	显示移动侧边栏。
+docs	文档
+Edit	编辑
+Edit failed	编辑失败
+ElevenLabs rejected the API key (401).	ElevenLabs 拒绝了 API 密钥（401）。
+Empty	空
+empty message	空消息
+Enable	启用
+Enabled	已启用
+Enter a value first.	请输入值。
+请先输入值。	请输入值。
+Enter the endpoint URL first.	请输入端点 URL。
+请先输入端点 URL。	请输入端点 URL。
+Error	错误
+error: ${e instanceof Error?e.message:String(e)}	错误：${e instanceof Error?e.message:String(e)}
+Export	导出
+Failed to update	更新失败：
+Fast	快速
+Faster	更快
+Files	文件
+Filter providers and models...	筛选服务和模型...
+Folders	文件夹
+Free tier	免费层级
+Gateway	网关
+GET YOUR CREDENTIALS	获取凭据
+Go to next page	下一页
+Go to previous page	上一页
+height (dvh)	视口高（dvh）
+高度（dvh）	视口高（dvh）
+Hermes background process exited during startup.	Hermes 后台进程在启动时退出。
+Hermes background process exited.	Hermes 后台进程已退出。
+Hermes couldn't start	Hermes 暂时不能启动
+Hermes 无法启动	Hermes 暂时不能启动
+Hermes Desktop	Hermes 桌面版
+Hermes Desktop is ready	Hermes Desktop 已就绪
+Hermes error	Hermes 错误
+Hermes gateway is not connected	Hermes 网关未连接
+Hermes needs a credential to continue.	Hermes 需要凭据才能继续。
+Hermes needs your sudo password to run a privileged command. It is sent only to your local agent.	Hermes 需要管理员密码来运行特权命令。密码会发送给本机 agent。
+Hermes reported an error	Hermes 报告错误
+HERMES 智能体	小马汉化版 HERMES
+High	高
+image generation	图像生成
+Images	图片
+Improved	已改进
+Improvements and fixes	改进和修复
+In this update	本次更新
+in your browser. Authorize Hermes there and you'll be connected automatically — nothing to copy or paste.	在浏览器中。完成 Hermes 授权后会自动连接，无需复制或粘贴。
+Input / Output price per million tokens	每百万 Token 输入 / 输出价格
+invert color	反转颜色
+Kawaii	可爱
+label: 'Edit'	label: '编辑'
+label: 'File'	label: '文件'
+label: 'Help'	label: '帮助'
+label: 'View'	label: '视图'
+label: 'Window'	label: '窗口'
+label: `About ${APP_NAME}`	label: `关于 ${APP_NAME}`
+Latest	最新版
+List or restore filesystem checkpoints	列出或恢复文件系统检查点
+Load ${n} more	再加载 ${n} 条
+Loading	正在载入
+正在加载	正在载入
+Loading capabilities...	正在载入能力...
+正在加载能力...	正在载入能力...
+Loading Hermes settings	正在载入 Hermes 设置
+正在加载 Hermes 设置	正在载入 Hermes 设置
+Loading recent sessions	正在载入最近会话
+正在加载最近会话	正在载入最近会话
+Loading…	正在载入…
+正在加载…	正在载入…
+Local	本地
+LOCATION	位置
+Location	位置
+Log file	日志文件
+Low	低
+Manage the standing goal for this session	管理此会话的常驻目标
+Max	最高
+Memory provider plugin	记忆服务插件
+Message	消息
+Messaging	消息
+Microphone permission was denied.	麦克风权限被拒绝。
+Model	模型
+Model switch failed	模型切换失败
+Models	模型
+Muted	已静音
+Name	名称
+Navigate	导航
+Next	下一页
+No active session for background restart	没有可用于后台重启的活跃会话
+No authenticated providers.	没有已认证的服务商。
+No description.	无说明。
+No desktop commands available.	没有可用的桌面命令。
+No inference provider is configured.	尚未配置推理模型服务。
+No matching archived chats	没有匹配的已归档会话
+No model	未选择模型
+no model	未选择模型
+No models found	未找到模型
+No models found.	未找到模型。
+No skills found	未找到技能
+No toolsets found	未找到工具集
+Nothing to branch	没有可分支内容
+Notifications	通知
+now run through your Nous subscription.	现在通过你的 Nous 订阅运行。
+Off	关
+On	开
+Open link	打开链接
+Open logs	打开日志
+Other improvements	其他改进
+page	第
+Path	路径
+Pause	暂停
+Pending	等待中
+Persist globally	全局保存
+Persist globally (otherwise this session only)	全局保存（否则仅本次会话）
+Personality	助手风格
+Pin	固定
+Pinned	已固定
+Playback failed	播放失败
+Prev	上一页
+Preview	预览
+Pro models need a paid Nous subscription.	Pro 模型需要付费 Nous 订阅。
+Profiles	配置档
+Project	项目
+Prompt	提示词
+Prompt failed	提示词提交失败
+Provider	模型服务
+Queue a prompt for the next turn	将提示词加入下一轮队列
+radius scalar	半径系数
+Ready	就绪
+RECENT ACTIVITY	最近活动
+recent logs	最近日志
+RECOMMENDED	推荐
+Recommended	推荐
+Refresh skills	刷新技能
+Refreshing skills	正在刷新技能
+Regenerate failed	重新生成失败
+Reload window	重新加载窗口
+Remote token	远程令牌
+Remove the last user/assistant exchange	移除上一组用户/助手对话
+Rename	重命名
+Rename the current session	重命名当前会话
+Repair install	修复安装
+Repair re-runs the installer and can take a few minutes on a fresh machine.	修复会重新运行安装程序，新机器上也许需要几分钟。
+修复会重新运行安装程序，新机器上可能需要几分钟。	修复会重新运行安装程序，新机器上也许需要几分钟。
+Reset config	重置配置
+Restart the desktop backend to apply cwd changes to this active session.	重启桌面后端以将工作目录更改应用到当前会话。
+Results	结果
+Resume	继续
+Resume a saved session	恢复已保存会话
+Resume failed	继续失败
+Retry the last user message	重试上一条用户消息
+Run	运行
+Run a prompt in the background	在后台运行提示词
+Run Hermes from Telegram DMs, groups, and topics.	通过 Telegram 私信、群组和话题运行 Hermes。
+Running	运行中
+Save	保存
+Saved	已保存
+Search	搜索
+Search archived chats	搜索已归档会话
+Search models	搜索模型
+Search skills...	搜索技能...
+Search toolsets...	搜索工具集...
+Secret required	需要密钥
+secret value	密钥内容
+Send	发送
+Session	会话
+Session busy	会话正忙
+session busy — /interrupt the current turn before sending this command	会话正忙，请用 /interrupt 中断当前轮次，再发送此命令
+会话正忙，请先用 /interrupt 中断当前轮次再发送此命令	会话正忙，请用 /interrupt 中断当前轮次，再发送此命令
+Session exported	会话已导出
+Session unavailable	会话不可用
+Sessions	会话
+Settings	设置
+Shell Session	Shell 会话
+Show active desktop sessions and running tasks	显示活动桌面会话和运行中任务
+Show current session status	显示当前会话状态
+Show desktop slash commands	显示桌面端斜杠命令
+Show token usage for this session	显示此会话 Token 用量
+Sign in with ${n}	登录 ${n}
+signs in through its own CLI. Run this command in a terminal, then come back and pick "I've signed in":	会通过自己的 CLI 登录。请在终端运行此命令，然后返回这里选择小马已登录：
+会通过自己的 CLI 登录。请在终端运行此命令，然后返回这里选择“小马已登录”：	会通过自己的 CLI 登录。请在终端运行此命令，然后返回这里选择小马已登录：
+Skill disabled	技能已禁用
+Skill enabled	技能已启用
+skill payload missing message	技能缺少消息内容
+Skills	技能
+Skills failed to load	技能加载失败
+Something broke in the interface	界面出现问题
+Start a new desktop chat	开始新的桌面会话
+Start or resume a chat before branching.	请开始或恢复会话后再创建分支。
+请先开始或恢复会话再创建分支。	请开始或恢复会话后再创建分支。
+Starting desktop connection	正在启动桌面连接
+Starting Hermes Desktop…	正在启动 Hermes Desktop…
+Steer the current run after the next tool call	在下一次工具调用后引导当前运行
+Stop failed	停止失败
+Stop running background processes	停止运行中的后台进程
+Stop the current turn before branching this chat.	请停止当前轮次后再为此会话创建分支。
+请先停止当前轮次再为此会话创建分支。	请停止当前轮次后再为此会话创建分支。
+sudo password	sudo 密码
+Switch desktop theme or cycle to the next one	切换桌面主题或轮换到下一个
+Switch model	切换模型
+Terminal	终端
+Terminal execution backend	终端执行后端
+Terminal must be opened first	需要打开终端
+需先打开终端	需要打开终端
+Test connection	测试连接
+text-to-speech	文本转语音
+The desktop backend rejected that request (405 Method Not Allowed). Try restarting Hermes Desktop.	桌面后端拒绝了该请求（405 Method Not Allowed）。请尝试重启 Hermes Desktop。
+The response is ready.	回复已准备好。
+The view hit an unexpected error. Your chats and settings are safe - try again, or reload the window.	视图遇到异常。你的对话和设置仍安全，请重试或重新加载窗口。
+Theme	主题
+Thinking	正在思考
+This message has no text to branch from.	此消息没有可用于分支的文本。
+TITLE / NAME	标题 / 名称
+to use the saved setting below.	以使用下方已保存设置。
+Toggle YOLO — auto-approve dangerous commands	切换 YOLO：自动批准危险命令
+Token exchange failed.	令牌交换失败。
+Tool Gateway enabled	工具网关已启用
+Tools	工具
+Toolset disabled	工具集已禁用
+Toolset enabled	工具集已启用
+Toolsets	工具集
+toolsets enabled	个工具集已启用
+Toolsets failed to refresh	工具集刷新失败
+Try a broader search or different category.	换个关键词或分类试试。
+Try a broader search query.	换个更宽泛的搜索词试试。
+Unknown	未知
+Untitled session	未命名会话
+Updates	更新
+URL	链接
+Usage	用量
+Use local gateway	使用本地网关
+useSidebar must be used within a SidebarProvider.	useSidebar 必须在 SidebarProvider 内使用。
+video generation	视频生成
+Voice	语音
+web search & extract	网页搜索与提取
+What do you see in this image?	你在这张图片里看到了什么？
+What's new	新增内容
+Working directory change failed	工作目录切换失败
+Working directory staged	工作目录更改已暂存
+Workspace	工作区
+YOLO armed for this chat	此会话已启用 YOLO
+You're about to visit an external website.	即将访问外部网站。
+使用 bot 账户登录 homeserver，然后复制访问令牌、用户 ID 和 homeserver URL。	使用 bot 账户登录主服务器，然后复制访问令牌、用户 ID 和主服务器地址。
+创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot token（xoxb-）和 App-level token（xapp-）。	创建 Slack 应用，启用 Socket Mode，安装到工作区，然后复制 Bot 令牌（xoxb-）和应用级令牌（xapp-）。
+""".strip()
+
+for line in poetic_user_facing_tsv.splitlines():
+    if not line.strip() or "\t" not in line:
+        continue
+    old, new = line.split("\t", 1)
+    for wrapped_old, wrapped_new in (
+        (f"`{old}`", f"`{new}`"),
+        (f'"{old}"', f'"{new}"'),
+        (f"'{old}'", f"'{new}'"),
+    ):
+        replacements.append((wrapped_old, wrapped_new))
+
+# Repair overly broad poetic replacements from earlier local builds.
+replacements.extend([
+    ("class名称", "className"),
+    ("display名称", "displayName"),
+    ("tool名称", "toolName"),
+    ("get上下文", "getContext"),
+    ("use上下文", "useContext"),
+    ("create上下文", "createContext"),
+    ("text基础line", "textBaseline"),
+    ("addColor停止", "addColorStop"),
+    ("match全部", "matchAll"),
+    ("is运行ning", "isRunning"),
+    ("is等待中", "isWaiting"),
+    ("set等待中", "setWaiting"),
+    ("class名称", "className"),
+])
+
+changed_files = []
+for path in root.rglob("*"):
+    if not path.is_file() or path.suffix not in {".js", ".cjs", ".html", ".json"}:
+        continue
+    try:
+        original = path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        continue
+    updated = original
+    for old, new in replacements:
+        updated = updated.replace(old, new)
+    while "Copyright © 2026 Nous Research / 中文增强 / 中文增强" in updated:
+        updated = updated.replace(
+            "Copyright © 2026 Nous Research / 中文增强 / 中文增强",
+            "Copyright © 2026 Nous Research / 中文增强",
+        )
+    if "Copyright © 2026 Nous Research / 中文增强" not in updated:
+        updated = updated.replace("Copyright © 2026 Nous Research", "Copyright © 2026 Nous Research / 中文增强")
+    if updated != original:
+        path.write_text(updated, encoding="utf-8")
+        changed_files.append(str(path.relative_to(root)))
+
+if changed_files:
+    marker.write_text(json.dumps({"changed": sorted(changed_files)}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+PY_DESKTOP_PATCH
+
+    if [ ! -f "$marker_file" ]; then
+      say "桌面端补丁：已是最新：$app"
+      continue
+    fi
+
+    rm -f "$marker_file"
+    if ! "$node_cmd" "$asar_cli" pack "$work_dir" "$new_asar" >/dev/null 2>&1; then
+      say "桌面端补丁：重打包失败，已跳过：$app"
+      continue
+    fi
+
+    local new_hash
+    new_hash="$(shasum -a 256 "$new_asar" | awk '{print $1}')"
+    cp "$new_asar" "$asar_file"
+    if [ -f "$plist_file" ]; then
+      python3 - "$plist_file" "$new_hash" <<'PY_PLIST'
+import plistlib
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+new_hash = sys.argv[2]
+data = plistlib.loads(path.read_bytes())
+integrity = data.setdefault("ElectronAsarIntegrity", {})
+entry = integrity.setdefault("Resources/app.asar", {})
+entry["algorithm"] = "SHA256"
+entry["hash"] = new_hash
+path.write_bytes(plistlib.dumps(data, fmt=plistlib.FMT_XML, sort_keys=False))
+PY_PLIST
+    fi
+
+    if command -v codesign >/dev/null 2>&1; then
+      if codesign --force --deep --sign - "$app" >/dev/null 2>&1; then
+        say "桌面端补丁：已刷新本机签名：$app"
+      else
+        say "桌面端补丁：签名刷新失败，但资源已处理：$app"
+      fi
+    fi
+    say "桌面端补丁：已应用：$app"
+    patched_any="1"
+  done <<EOF_DESKTOP_APPS
+$(find_hermes_desktops)
+EOF_DESKTOP_APPS
+
+  if [ "$found_any" != "1" ]; then
+    say "桌面端补丁：未找到 Hermes.app。"
+  elif [ "$patched_any" != "1" ]; then
+    say "桌面端补丁：没有新的改动。"
+  fi
+}
+
 ensure_path_hint() {
   if [ "${XIAOMA_HERMES_SKIP_PATH:-0}" = "1" ]; then
     return
@@ -4082,6 +7557,7 @@ main() {
   install_helper "$payload_root"
   install_wrapper
   apply_tui_source_patch "$(find_real_hermes)"
+  apply_desktop_app_patch
   ensure_path_hint
 
   say "小马AI Hermes 中文增强已安装"

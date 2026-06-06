@@ -11,9 +11,17 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
+$pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
+if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
+  $pinnedVersion = "v2026.06.06.1"
+}
+$downloadTimeoutSec = 60
+if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
+  $downloadTimeoutSec = [Math]::Max(10, [int]$env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)
+}
 $officialInstallUrl = $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URL
 if ([string]::IsNullOrWhiteSpace($officialInstallUrl)) {
   $officialInstallUrl = "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1"
@@ -21,6 +29,59 @@ if ([string]::IsNullOrWhiteSpace($officialInstallUrl)) {
 
 function Write-Step([string]$Message) {
   Write-Host "[Hermes 中文增强] $Message"
+}
+
+function Select-UniqueText([string[]]$Items) {
+  $seen = @{}
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($item in $Items) {
+    if ([string]::IsNullOrWhiteSpace($item)) { continue }
+    $clean = $item.Trim().TrimEnd("/")
+    if (-not $seen.ContainsKey($clean)) {
+      $seen[$clean] = $true
+      [void]$result.Add($clean)
+    }
+  }
+  return $result.ToArray()
+}
+
+function Get-InstallerBaseUrls {
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_BASE_URLS)) {
+    return Select-UniqueText ($env:XIAOMA_HERMES_BASE_URLS -split ",")
+  }
+  return Select-UniqueText @(
+    $BaseUrl,
+    $FallbackBaseUrl,
+    "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
+    "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
+    "https://raw.githubusercontent.com/fresh-claw/hermes-cn/$pinnedVersion"
+  )
+}
+
+function Get-OfficialInstallUrls {
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_OFFICIAL_INSTALL_URLS)) {
+    return Select-UniqueText ($env:XIAOMA_HERMES_OFFICIAL_INSTALL_URLS -split ",")
+  }
+  return Select-UniqueText @(
+    $officialInstallUrl,
+    "https://cdn.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.ps1",
+    "https://fastly.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.ps1",
+    "https://gcore.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.ps1"
+  )
+}
+
+function Invoke-DownloadWithSources([string[]]$Urls, [string]$OutFile, [string]$Label) {
+  foreach ($url in $Urls) {
+    if ([string]::IsNullOrWhiteSpace($url)) { continue }
+    Write-Step "正在下载$Label：$url"
+    try {
+      Invoke-WebRequest -Uri $url -OutFile $OutFile -UseBasicParsing -TimeoutSec $downloadTimeoutSec
+      return $url
+    } catch {
+      Write-Step "当前入口不可用或过慢，正在切换下一个入口。"
+    }
+  }
+  throw "$Label 下载失败，请稍后重试。"
 }
 
 function Get-HermesHomePath {
@@ -158,7 +219,7 @@ function Invoke-OfficialInstall {
   $officialInstaller = Join-Path ([System.IO.Path]::GetTempPath()) ("hermes-official-" + [guid]::NewGuid().ToString("N") + ".ps1")
   try {
     Backup-UserConfig -HermesHomePath $hermesHome -BackupDir $configBackup
-    Invoke-WebRequest -Uri $officialInstallUrl -OutFile $officialInstaller -UseBasicParsing
+    Invoke-DownloadWithSources -Urls (Get-OfficialInstallUrls) -OutFile $officialInstaller -Label "官方 Hermes 安装器" | Out-Null
     & powershell -NoProfile -ExecutionPolicy Bypass -File $officialInstaller -IncludeDesktop -NonInteractive
     if ($LASTEXITCODE -ne 0) {
       throw "官方 Hermes 桌面端安装失败，退出码 $LASTEXITCODE。"
@@ -191,24 +252,24 @@ function Test-BashInstaller([string]$Path) {
   return ($firstLine -like "#!*bash*" -or $firstLine -like "#!/usr/bin/env bash*")
 }
 
-function Download-Installer([string]$PrimaryBaseUrl, [string]$BackupBaseUrl, [string]$OutFile) {
-  try {
-    Invoke-WebRequest -Uri "$PrimaryBaseUrl/install.sh" -OutFile $OutFile -UseBasicParsing
-    if (-not (Test-BashInstaller -Path $OutFile)) {
-      throw "主入口返回的不是 Bash 安装脚本。"
-    }
-    return $PrimaryBaseUrl
-  } catch {
-    if (-not [string]::IsNullOrWhiteSpace($BackupBaseUrl) -and $BackupBaseUrl -ne $PrimaryBaseUrl) {
-      Write-Step "网站下载受限，改用备用入口。"
-      Invoke-WebRequest -Uri "$BackupBaseUrl/install.sh" -OutFile $OutFile -UseBasicParsing
+function Download-Installer([string]$OutFile) {
+  foreach ($base in (Get-InstallerBaseUrls)) {
+    if ([string]::IsNullOrWhiteSpace($base)) { continue }
+    $url = if ($base.EndsWith("/install.sh")) { $base } else { "$($base.TrimEnd('/'))/install.sh" }
+    try {
+      Invoke-DownloadWithSources -Urls @($url) -OutFile $OutFile -Label "中文增强安装器" | Out-Null
       if (-not (Test-BashInstaller -Path $OutFile)) {
-        throw "备用入口返回的不是 Bash 安装脚本。"
+        throw "当前入口返回的不是 Bash 安装脚本。"
       }
-      return $BackupBaseUrl
+      if ($base.EndsWith("/install.sh")) {
+        return ($base.Substring(0, $base.Length - "/install.sh".Length)).TrimEnd("/")
+      }
+      return $base.TrimEnd("/")
+    } catch {
+      Write-Step "当前入口不可用或过慢，正在切换下一个入口。"
     }
-    throw
   }
+  throw "中文增强安装器下载失败，请稍后重试。"
 }
 
 Invoke-OfficialInstall
@@ -224,7 +285,7 @@ $installer = Join-Path $tempDir "install.sh"
 
 try {
   Write-Step "下载中文增强安装器。"
-  $activeBaseUrl = Download-Installer -PrimaryBaseUrl $BaseUrl -BackupBaseUrl $FallbackBaseUrl -OutFile $installer
+  $activeBaseUrl = Download-Installer -OutFile $installer
 
   $env:XIAOMA_HERMES_PLATFORM = "windows"
   $env:XIAOMA_HERMES_ENTRYPOINT = "windows-powershell"
