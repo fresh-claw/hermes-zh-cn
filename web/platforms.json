@@ -13,6 +13,7 @@
     "macos_linux_installer": "install.sh",
     "macos_click_installer": "install.command",
     "macos_zip_installer": "hermes-macos-installer.zip",
+    "windows_exe_installer": "Hermes-zh-CN-Setup.exe",
     "windows_installer": "install.ps1",
     "windows_click_installer": "install-windows.cmd"
   },
@@ -20,10 +21,10 @@
     {
       "id": "windows",
       "label": "Windows",
-      "recommended": "download_cmd",
-      "download": "https://useai.live/hermes/install-windows.cmd",
+      "recommended": "download_exe",
+      "download": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
       "command": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex",
-      "method": "下载 install-windows.cmd 运行；高级用户可用 PowerShell 命令。",
+      "method": "下载 Hermes-zh-CN-Setup.exe 运行；高级用户可用 PowerShell 命令。",
       "desktop": "生成官方 Hermes.exe，并补 Hermes 核心、TUI、网关和配置。"
     },
     {

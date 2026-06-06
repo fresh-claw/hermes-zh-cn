@@ -29,7 +29,7 @@
     "linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop"
   },
   "install_downloads": {
-    "windows": "https://useai.live/hermes/install-windows.cmd",
+    "windows": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
     "macos": "https://useai.live/hermes/hermes-macos-installer.zip",
     "linux": "https://useai.live/hermes/install.sh"
   },
@@ -46,7 +46,7 @@
     {
       "type": "choose_platform_entry",
       "visibility": "agent_and_human",
-      "windows_download": "https://useai.live/hermes/install-windows.cmd",
+      "windows_download": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
       "windows": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex",
       "macos_download": "https://useai.live/hermes/hermes-macos-installer.zip",
       "macos_linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop",
@@ -146,7 +146,7 @@
     "preferred_command": "~/.xiaoma-hermes/bin/xiaoma-hermes status",
     "avoid": "不要把本地 JSON 通过管道交给解释器。",
       "expected": [
-      "Windows 新手入口：install-windows.cmd",
+      "Windows 新手入口：Hermes-zh-CN-Setup.exe",
       "Windows PowerShell 入口：install.ps1",
       "Windows 官方桌面端：Hermes.exe",
       "macOS 新手入口：hermes-macos-installer.zip",

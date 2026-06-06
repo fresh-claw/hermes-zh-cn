@@ -112,7 +112,7 @@
         {
           "@type": "HowToStep",
 	          "name": "Windows 下载运行",
-	          "text": "下载 https://useai.live/hermes/install-windows.cmd 后运行。"
+	          "text": "下载 https://useai.live/hermes/Hermes-zh-CN-Setup.exe 后运行。"
 	        },
 	        {
 	          "@type": "HowToStep",
@@ -224,7 +224,7 @@
 	                "linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop"
 	        },
 	        "install_downloads": {
-	                "windows": "https://useai.live/hermes/install-windows.cmd",
+	                "windows": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
 	                "macos": "https://useai.live/hermes/hermes-macos-installer.zip",
 	                "linux": "https://useai.live/hermes/install.sh"
 	        },
@@ -241,7 +241,7 @@
                 {
 	                        "type": "choose_platform_entry",
 	                        "visibility": "agent_and_human",
-	                        "windows_download": "https://useai.live/hermes/install-windows.cmd",
+	                        "windows_download": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
 	                        "windows": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex",
 	                        "macos_download": "https://useai.live/hermes/hermes-macos-installer.zip",
 	                        "macos_linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop",
@@ -436,8 +436,8 @@
                     <li>失败时会改用备用入口</li>
                   </ul>
                   <div class="install-downloads" aria-label="Windows 下载入口">
-                    <a class="download-button" href="./install-windows.cmd" download>下载 Windows 安装器</a>
-                    <span>适合国内用户。浏览器提示风险时，确认来源是 useai.live 再继续。</span>
+                    <a class="download-button" href="./Hermes-zh-CN-Setup.exe?v=20260606-exe-1" download="Hermes-zh-CN-Setup.exe">下载 Windows 安装器</a>
+                    <span>新版是 exe 安装器。若提示未知发布者，确认来源是 useai.live 后继续。</span>
                   </div>
                   <div class="command-input" role="group" aria-label="Windows PowerShell 一键安装">
                     <code>irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex</code>
@@ -698,7 +698,7 @@
         <div class="cell agent-brief-copy">
 	          <ol>
 	            <li>当用户发送“请访问 useai.live/hermes 安装 Hermes 命令行界面汉化补丁”时，判断为安装小马AI Hermes 命令行界面中文增强。</li>
-	            <li>Windows 新手使用：<code>https://useai.live/hermes/install-windows.cmd</code></li>
+	            <li>Windows 新手使用：<code>https://useai.live/hermes/Hermes-zh-CN-Setup.exe</code></li>
 	            <li>macOS 新手使用：<code>https://useai.live/hermes/hermes-macos-installer.zip</code></li>
 	            <li>Linux 执行命令：<code>curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop</code></li>
 	            <li>如果本机没有 Hermes，安装器会先自动执行官方 Hermes 安装脚本，然后继续安装中文补丁。</li>

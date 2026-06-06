@@ -175,7 +175,8 @@
             <li><b>latest.json</b><span>当前中文包版本、兼容范围和下载入口。</span></li>
             <li><b>platforms.json</b><span>Windows、macOS、Linux 一键入口与桌面版汉化策略。</span></li>
             <li><b>install.sh</b><span>自包含安装器：未安装 Hermes 时先装官方 Hermes，再检测版本、校验文件、启用中文、应用启动界面、快捷指令、网关状态和分类补丁、安装更新辅助脚本。</span></li>
-	            <li><b>install-windows.cmd</b><span>Windows 新手入口：下载后运行，调用 PowerShell 安装器，失败时改用备用入口。</span></li>
+	            <li><b>Hermes-zh-CN-Setup.exe</b><span>Windows 新手入口：下载后运行，失败时会停在安装窗口并显示原因。</span></li>
+            <li><b>install-windows.cmd</b><span>Windows 备用入口：调用 PowerShell 安装器，失败时改用备用入口。</span></li>
 	            <li><b>install.ps1</b><span>Windows PowerShell 入口：先安装官方 Hermes，再调用中文增强安装器。</span></li>
 	            <li><b>hermes-macos-installer.zip</b><span>macOS 新手入口：解压后打开 install.command。</span></li>
 	            <li><b>install.command</b><span>macOS 双击入口：调用同一套中文增强安装器。</span></li>

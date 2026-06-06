@@ -4,6 +4,7 @@
   "latest": "2026.05.29.1",
   "install": "https://useai.live/hermes/install.sh",
   "install_windows": "https://useai.live/hermes/install.ps1",
+  "install_windows_exe": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
   "install_windows_click": "https://useai.live/hermes/install-windows.cmd",
   "install_macos_click": "https://useai.live/hermes/install.command",
   "install_macos_zip": "https://useai.live/hermes/hermes-macos-installer.zip",
