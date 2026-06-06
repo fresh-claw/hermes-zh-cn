@@ -28,9 +28,14 @@
     "macos": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop",
     "linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop"
   },
+  "install_downloads": {
+    "windows": "https://useai.live/hermes/install-windows.cmd",
+    "macos": "https://useai.live/hermes/hermes-macos-installer.zip",
+    "linux": "https://useai.live/hermes/install.sh"
+  },
   "platforms_manifest": "https://useai.live/hermes/platforms.json",
   "requires_user_confirmation": true,
-  "authorization_model": "single install command",
+  "authorization_model": "download installer or single install command",
   "version_detection": {
     "owner": "installer",
     "timeout_seconds": 4,
@@ -41,9 +46,11 @@
     {
       "type": "choose_platform_entry",
       "visibility": "agent_and_human",
+      "windows_download": "https://useai.live/hermes/install-windows.cmd",
       "windows": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex",
+      "macos_download": "https://useai.live/hermes/hermes-macos-installer.zip",
       "macos_linux": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop",
-      "note": "Windows 使用 PowerShell 安装官方桌面端并应用中文增强；macOS、Linux、WSL2 使用 Bash 安装官方桌面端并应用中文增强。"
+      "note": "新手优先使用下载入口；高级用户可使用命令。"
     },
     {
       "type": "execute_install_command",
@@ -139,8 +146,10 @@
     "preferred_command": "~/.xiaoma-hermes/bin/xiaoma-hermes status",
     "avoid": "不要把本地 JSON 通过管道交给解释器。",
       "expected": [
-      "Windows 一键入口：install.ps1",
+      "Windows 新手入口：install-windows.cmd",
+      "Windows PowerShell 入口：install.ps1",
       "Windows 官方桌面端：Hermes.exe",
+      "macOS 新手入口：hermes-macos-installer.zip",
       "macOS 双击入口：install.command",
       "TUI补丁：已应用",
       "爱马仕机器人",

@@ -12,23 +12,27 @@
     "core_tui": "packages/0.15.x/zh-CN/zh-cn.min.json",
     "macos_linux_installer": "install.sh",
     "macos_click_installer": "install.command",
-    "windows_installer": "install.ps1"
+    "macos_zip_installer": "hermes-macos-installer.zip",
+    "windows_installer": "install.ps1",
+    "windows_click_installer": "install-windows.cmd"
   },
   "platforms": [
     {
       "id": "windows",
       "label": "Windows",
-      "recommended": "powershell",
+      "recommended": "download_cmd",
+      "download": "https://useai.live/hermes/install-windows.cmd",
       "command": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex",
-      "method": "PowerShell 调用官方桌面安装参数，再调用 Git Bash 应用中文增强。",
+      "method": "下载 install-windows.cmd 运行；高级用户可用 PowerShell 命令。",
       "desktop": "生成官方 Hermes.exe，并补 Hermes 核心、TUI、网关和配置。"
     },
     {
       "id": "macos",
       "label": "macOS",
-      "recommended": "command_file_or_terminal",
+      "recommended": "download_zip",
+      "download": "https://useai.live/hermes/hermes-macos-installer.zip",
       "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop",
-      "method": "调用官方 --include-desktop 流程生成 Hermes.app，再应用中文增强。",
+      "method": "下载 zip，解压后打开 install.command；高级用户可用终端命令。",
       "desktop": "生成官方桌面端，并补 Hermes 核心、TUI、网关和配置。"
     },
     {

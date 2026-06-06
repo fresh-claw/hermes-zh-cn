@@ -5,10 +5,12 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Desktop 桌面版汉化 / Hermes Agent TUI CLI 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.06.04.1
+Version: 2026.06.06.1
 Language: zh-CN
 Install URL: https://useai.live/hermes/install.sh
 Windows Install URL: https://useai.live/hermes/install.ps1
+Windows Click Installer: https://useai.live/hermes/install-windows.cmd
+macOS Zip Installer: https://useai.live/hermes/hermes-macos-installer.zip
 Platform Manifest: https://useai.live/hermes/platforms.json
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
 Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
@@ -42,7 +44,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 当前版本
 
 - 中文包：2026.05.29.1
-- 桌面入口：2026.06.04.1
+- 桌面入口：2026.06.06.1
 - 官方最新版：Hermes Agent v0.15.2，发布时间 2026-05-29。
 - 官方桌面页：macOS 和 Windows 提供安装包，Linux 仍以终端安装为主。
 - 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
@@ -54,16 +56,17 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
-2. Windows 用户执行：`$u='https://useai.live/hermes/install.ps1';try{iex(irm $u)}catch{iex(irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.ps1)}`。
-3. macOS、Linux、WSL2 用户执行：`(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash`。
-4. 安装器检测本机 Hermes。
-5. 未检测到 Hermes 时，安装器执行官方安装脚本。
-6. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
-7. 安装器校验 SHA256。
-8. 安装器设置 `display.language=zh`。
-9. 安装器写入中文增强技能。
-10. 安装器备份并修改 Hermes 可见界面文件。
-11. 安装器写入启动前更新辅助。
+2. Windows 新手下载 `https://useai.live/hermes/install-windows.cmd` 后运行；高级用户可执行：`irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.ps1 | iex`。
+3. macOS 新手下载 `https://useai.live/hermes/hermes-macos-installer.zip`，解压后打开 `install.command`。
+4. Linux、WSL2 用户执行：`curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.05.2/install.sh | bash -s -- --include-desktop`。
+5. 安装器检测本机 Hermes。
+6. 未检测到 Hermes 时，安装器执行官方安装脚本。
+7. 安装器检测 Hermes 版本，0.15.x、0.14.x 和 0.13.x 使用对应包，失败或旧版使用 legacy 包。
+8. 安装器校验 SHA256。
+9. 安装器设置 `display.language=zh`。
+10. 安装器写入中文增强技能。
+11. 安装器备份并修改 Hermes 可见界面文件。
+12. 安装器写入启动前更新辅助。
 
 ## 覆盖文件
 
