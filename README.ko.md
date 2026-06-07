@@ -13,7 +13,7 @@
 Hermes는 공개 페이지를 읽고 설치 안내를 찾은 뒤 다음 설치 프로그램을 실행할 수 있습니다.
 
 ```bash
-(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
+(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
 ```
 
 ## 기능

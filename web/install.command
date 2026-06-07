@@ -5,7 +5,7 @@ export XIAOMA_HERMES_ENTRYPOINT="macos-command"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOCAL_INSTALLER="$SCRIPT_DIR/install.sh"
-PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.07.1}"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.07.2}"
 CURL_CONNECT_TIMEOUT="${XIAOMA_HERMES_CONNECT_TIMEOUT:-8}"
 CURL_MAX_TIME="${XIAOMA_HERMES_MAX_TIME:-180}"
 CURL_SPEED_LIMIT="${XIAOMA_HERMES_SPEED_LIMIT:-1024}"
@@ -38,7 +38,8 @@ installer_sources() {
     done
     return
   fi
-  append_source "${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
+  append_source "${XIAOMA_HERMES_BASE_URL:-http://47.121.138.43/hermes}"
+  append_source "https://useai.live/hermes"
   append_source "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}"
   append_source "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"
   append_source "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"

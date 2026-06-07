@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
+BASE_URL="${XIAOMA_HERMES_BASE_URL:-http://47.121.138.43/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.06.07.1"
-PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.07.1}"
+PACKAGE_VERSION="2026.06.07.2"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.07.2}"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -80,6 +80,7 @@ installer_base_urls() {
     return
   fi
   append_url_once "$BASE_URL" "$seen_file"
+  append_url_once "https://useai.live/hermes" "$seen_file"
   append_url_once "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}" "$seen_file"
   append_url_once "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}" "$seen_file"
   append_url_once "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}" "$seen_file"
@@ -96,6 +97,7 @@ official_install_urls() {
     return
   fi
   append_url_once "$BASE_URL/official-hermes-install.sh" "$seen_file"
+  append_url_once "https://useai.live/hermes/official-hermes-install.sh" "$seen_file"
   append_url_once "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}/official-hermes-install.sh" "$seen_file"
   append_url_once "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}/official-hermes-install.sh" "$seen_file"
   append_url_once "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}/official-hermes-install.sh" "$seen_file"
@@ -631,7 +633,7 @@ fi
 if [ -f "\$HOME/.hermes/hermes-agent/hermes" ]; then
   exec python3 "\$HOME/.hermes/hermes-agent/hermes" "\$@"
 fi
-printf '未找到原版 Hermes，请重新执行：(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash\\n' >&2
+printf '未找到原版 Hermes，请重新执行：(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash\\n' >&2
 exit 127
 EOF_WRAPPER
   chmod +x "$BIN_DIR/hermes"
