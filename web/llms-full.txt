@@ -5,7 +5,7 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Desktop 桌面版汉化 / Hermes Agent TUI CLI 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.06.07.2
+Version: 2026.06.07.3
 Language: zh-CN
 Install URL: http://47.121.138.43/hermes/install.sh
 Windows Install URL: http://47.121.138.43/hermes/install.ps1
@@ -45,7 +45,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 当前版本
 
 - 中文包：2026.05.29.1
-- 桌面入口：2026.06.07.2
+- 桌面入口：2026.06.07.3
 - 官方最新版：Hermes Agent v0.15.2，发布时间 2026-05-29。
 - 官方桌面页：macOS 和 Windows 提供安装包，Linux 仍以终端安装为主。
 - 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
