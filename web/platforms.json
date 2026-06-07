@@ -1,15 +1,15 @@
 {
-  "version": "2026.06.07.4",
+  "version": "2026.06.07.5",
   "updated_at": "2026-06-07",
   "locale": "zh-CN",
   "upstream": {
     "desktop_page": "https://hermes-ai.net/desktop/",
     "agent_repo": "https://github.com/NousResearch/hermes-agent",
-    "agent_release": "v2026.5.29.2",
-    "agent_version": "0.15.2"
+    "agent_release": "v2026.6.5",
+    "agent_version": "0.16.0"
   },
   "packages": {
-    "core_tui": "packages/0.15.x/zh-CN/zh-cn.min.json",
+    "core_tui": "packages/0.16.x/zh-CN/zh-cn.min.json",
     "macos_linux_installer": "install.sh",
     "macos_click_installer": "install.command",
     "macos_zip_installer": "hermes-macos-installer.zip",

@@ -5,7 +5,7 @@
 Canonical URL: https://useai.live/hermes/
 Details URL: https://useai.live/hermes/details.html
 Windows download: http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe
-macOS download: http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260607-mac-2
+macOS download: http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260607-mac-5
 Linux command: `curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop`
 Platform manifest: https://useai.live/hermes/platforms.json
 Repository: https://github.com/fresh-claw/hermes-zh-cn
@@ -18,11 +18,11 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 
 ## 当前版本
 
-- 中文包：2026.05.29.1
-- 桌面入口：2026.06.07.4
-- 官方最新版：Hermes Agent v0.15.2，发布时间 2026-05-29。
+- 中文包：2026.06.07.5
+- 桌面入口：2026.06.07.5
+- 官方最新版：Hermes Agent v0.16.0，发布时间 2026-06-05。
 - 官方桌面页：提供 macOS、Windows 下载，Linux 仍以终端安装为主。
-- 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
+- 安装器支持 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
 
 ## 覆盖范围
 
@@ -44,7 +44,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 
 Windows：下载 http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe 后运行。
 
-macOS：下载 http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260607-mac-2，解压后打开 `install.command`。
+macOS：下载 http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260607-mac-5，解压后打开 `install.command`。
 
 Linux：
 
