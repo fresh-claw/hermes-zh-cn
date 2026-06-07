@@ -5104,8 +5104,8 @@ html[data-theme="orange"] .install-side {
 
 html[data-theme="orange"] .install-card {
   display: grid;
-  grid-template-rows: auto auto auto;
-  align-content: center;
+  grid-template-rows: 64px 112px 42px minmax(92px, auto);
+  align-content: start;
   gap: 18px;
   min-height: 318px;
   padding: 18px;
@@ -5120,7 +5120,9 @@ html[data-theme="orange"] .install-card-primary {
 
 html[data-theme="orange"] .install-card-copy {
   display: grid;
+  align-content: start;
   gap: 8px;
+  min-height: 64px;
   min-width: 0;
   margin: 0;
 }
@@ -5159,7 +5161,9 @@ html[data-theme="orange"] .install-card p {
 html[data-theme="orange"] .install-card-points {
   display: grid;
   grid-template-columns: 1fr;
+  align-content: start;
   gap: 8px;
+  min-height: 112px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -5191,7 +5195,9 @@ html[data-theme="orange"] .install-card-points li::before {
 html[data-theme="orange"] .install-downloads {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: 8px;
+  min-height: 42px;
   min-width: 0;
 }
 
@@ -5244,6 +5250,7 @@ html[data-theme="orange"] .install-hub .install-message .command-input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(60px, 5.8vw, 68px);
   align-items: stretch;
+  align-self: start;
   width: 100%;
   height: auto;
   min-height: 92px;
@@ -5453,6 +5460,7 @@ html[data-theme="orange"] .install-message-copy span {
   }
 
   html[data-theme="orange"] .install-card {
+    grid-template-rows: auto;
     min-height: 0;
   }
 
