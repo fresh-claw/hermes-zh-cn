@@ -19,7 +19,7 @@ Full LLM context: https://useai.live/hermes/llms-full.txt
 ## 当前版本
 
 - 中文包：2026.05.29.1
-- 桌面入口：2026.06.07.3
+- 桌面入口：2026.06.07.4
 - 官方最新版：Hermes Agent v0.15.2，发布时间 2026-05-29。
 - 官方桌面页：提供 macOS、Windows 下载，Linux 仍以终端安装为主。
 - 安装器支持 0.15.x、0.14.x、0.13.x 和 legacy 兼容包。

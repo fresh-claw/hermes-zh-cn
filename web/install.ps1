@@ -11,12 +11,12 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.3"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.4"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
 if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
-  $pinnedVersion = "v2026.06.07.3"
+  $pinnedVersion = "v2026.06.07.4"
 }
 $downloadTimeoutSec = 60
 if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
@@ -191,6 +191,39 @@ function Find-HermesDesktop {
   return $null
 }
 
+function New-HermesDesktopShortcut {
+  $desktopExe = Find-HermesDesktop
+  if (-not $desktopExe) {
+    Write-Step "未找到 Hermes 桌面程序，暂时无法创建桌面快捷方式。"
+    return
+  }
+
+  try {
+    $desktopDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)
+    if ([string]::IsNullOrWhiteSpace($desktopDir)) {
+      $desktopDir = Join-Path $env:USERPROFILE "Desktop"
+    }
+    if ([string]::IsNullOrWhiteSpace($desktopDir)) {
+      Write-Step "未找到桌面目录，暂时无法创建快捷方式。"
+      return
+    }
+
+    New-Item -ItemType Directory -Force -Path $desktopDir | Out-Null
+    $shortcutPath = Join-Path $desktopDir "Hermes 中文增强版.lnk"
+    $shell = New-Object -ComObject WScript.Shell
+    $shortcut = $shell.CreateShortcut($shortcutPath)
+    $shortcut.TargetPath = $desktopExe
+    $shortcut.WorkingDirectory = Split-Path -Parent $desktopExe
+    $shortcut.IconLocation = "$desktopExe,0"
+    $shortcut.Description = "Hermes 中文增强版"
+    $shortcut.Save()
+
+    Write-Step "已在桌面创建快捷方式：Hermes 中文增强版。"
+  } catch {
+    Write-Step "创建桌面快捷方式未完成：$($_.Exception.Message)"
+  }
+}
+
 function Find-Bash {
   $cmd = Get-Command bash -ErrorAction SilentlyContinue
   if ($cmd) { return $cmd.Source }
@@ -305,6 +338,7 @@ try {
     throw "中文增强安装失败，退出码 $LASTEXITCODE。"
   }
 
+  New-HermesDesktopShortcut
   Write-Step "完成。重新打开 Hermes 后检查中文界面。"
 } finally {
   Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue

@@ -201,7 +201,7 @@
     "macos_linux_url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
     "macos_linux_command": "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --include-desktop"
   },
-  "version": "2026.06.07.3",
+  "version": "2026.06.07.4",
   "upstream": {
     "latest_release": "Hermes Agent v0.15.2 (2026-05-29)",
     "main_commit": "77a1650c78a4cb1813d8a81fa1da40a15b6a3ec5",

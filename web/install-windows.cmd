@@ -6,7 +6,7 @@ title Hermes 中文增强安装器
 set "BASE_URL=%XIAOMA_HERMES_BASE_URL%"
 if "%BASE_URL%"=="" set "BASE_URL=http://47.121.138.43/hermes"
 set "FALLBACK_BASE_URL=%XIAOMA_HERMES_FALLBACK_BASE_URL%"
-if "%FALLBACK_BASE_URL%"=="" set "FALLBACK_BASE_URL=https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.3"
+if "%FALLBACK_BASE_URL%"=="" set "FALLBACK_BASE_URL=https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.4"
 set "XIAOMA_HERMES_BASE_URL=%BASE_URL%"
 set "XIAOMA_HERMES_FALLBACK_BASE_URL=%FALLBACK_BASE_URL%"
 
