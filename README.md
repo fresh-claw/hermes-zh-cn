@@ -17,13 +17,13 @@ Hermes 读取页面说明后，直接执行安装命令。Windows 入口会检�
 Windows 桌面版用户可直接运行：
 
 ```powershell
-irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.ps1 | iex
+irm https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.ps1 | iex
 ```
 
 macOS、Linux 和 WSL2 用户运行：
 
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.sh | bash -s -- --include-desktop
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.sh | bash -s -- --include-desktop
 ```
 
 ## 机制
@@ -61,7 +61,7 @@ scripts/check_release.sh     # 本地自检
 ## 安装
 
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.06.1/install.sh | bash -s -- --include-desktop
+curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.1/install.sh | bash -s -- --include-desktop
 ```
 
 本地测试时可以改成：

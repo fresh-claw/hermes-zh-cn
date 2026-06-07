@@ -3,8 +3,8 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.06.06.1"
-PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.06.1}"
+PACKAGE_VERSION="2026.06.07.1"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.07.1}"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
 HERMES_HOME_DIR="${HERMES_HOME:-$HOME/.hermes}"
@@ -95,6 +95,11 @@ official_install_urls() {
     done
     return
   fi
+  append_url_once "$BASE_URL/official-hermes-install.sh" "$seen_file"
+  append_url_once "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}/official-hermes-install.sh" "$seen_file"
+  append_url_once "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}/official-hermes-install.sh" "$seen_file"
+  append_url_once "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}/official-hermes-install.sh" "$seen_file"
+  append_url_once "https://raw.githubusercontent.com/fresh-claw/hermes-cn/${PINNED_VERSION}/official-hermes-install.sh" "$seen_file"
   append_url_once "$OFFICIAL_HERMES_INSTALL_URL" "$seen_file"
   append_url_once "https://cdn.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.sh" "$seen_file"
   append_url_once "https://fastly.jsdelivr.net/gh/NousResearch/hermes-agent@main/scripts/install.sh" "$seen_file"
