@@ -5,7 +5,7 @@ export XIAOMA_HERMES_ENTRYPOINT="macos-command"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOCAL_INSTALLER="$SCRIPT_DIR/install.sh"
-PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.08.1}"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.08.2}"
 CURL_CONNECT_TIMEOUT="${XIAOMA_HERMES_CONNECT_TIMEOUT:-8}"
 CURL_MAX_TIME="${XIAOMA_HERMES_MAX_TIME:-180}"
 CURL_SPEED_LIMIT="${XIAOMA_HERMES_SPEED_LIMIT:-1024}"
@@ -16,12 +16,21 @@ if ! command -v curl >/dev/null 2>&1; then
   exit 1
 fi
 
-if [ -f "$LOCAL_INSTALLER" ]; then
+installer_script_ok() {
+  local path="$1"
+  [ -f "$path" ] || return 1
+  head -n 1 "$path" | grep -Eq '^#!.*bash' || return 1
+  grep -F 'PACKAGE_VERSION="2026.06.08.2"' "$path" >/dev/null 2>&1
+}
+
+if installer_script_ok "$LOCAL_INSTALLER"; then
   printf '%s\n' "正在使用本地安装脚本。"
   bash "$LOCAL_INSTALLER" --include-desktop
   printf '%s\n' ""
   printf '%s\n' "Hermes 中文增强已完成。可以关闭此窗口。"
   exit 0
+elif [ -f "$LOCAL_INSTALLER" ]; then
+  printf '%s\n' "本地安装脚本版本不匹配，改用在线入口。"
 fi
 
 append_source() {
@@ -39,7 +48,6 @@ installer_sources() {
     return
   fi
   append_source "${XIAOMA_HERMES_BASE_URL:-http://47.121.138.43/hermes}"
-  append_source "https://useai.live/hermes"
   append_source "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}"
   append_source "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"
   append_source "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"
@@ -62,7 +70,7 @@ download_installer() {
     --speed-limit "$CURL_SPEED_LIMIT" \
     --speed-time "$CURL_SPEED_TIME" \
     "$url" -o "$out_file"
-  if ! head -n 1 "$out_file" | grep -Eq '^#!.*bash'; then
+  if ! installer_script_ok "$out_file"; then
     printf '这个入口返回的不是安装脚本：%s\n' "$url" >&2
     return 1
   fi

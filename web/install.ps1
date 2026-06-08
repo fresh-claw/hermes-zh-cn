@@ -11,12 +11,12 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.08.1"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.08.2"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
 if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
-  $pinnedVersion = "v2026.06.08.1"
+  $pinnedVersion = "v2026.06.08.2"
 }
 $downloadTimeoutSec = 60
 if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
@@ -51,7 +51,6 @@ function Get-InstallerBaseUrls {
   }
   return Select-UniqueText @(
     $BaseUrl,
-    "https://useai.live/hermes",
     $FallbackBaseUrl,
     "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
     "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion",
@@ -65,7 +64,6 @@ function Get-OfficialInstallUrls {
   }
   return Select-UniqueText @(
     "$BaseUrl/official-hermes-install.ps1",
-    "https://useai.live/hermes/official-hermes-install.ps1",
     "$FallbackBaseUrl/official-hermes-install.ps1",
     "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion/official-hermes-install.ps1",
     "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@$pinnedVersion/official-hermes-install.ps1",
@@ -89,6 +87,29 @@ function Invoke-DownloadWithSources([string[]]$Urls, [string]$OutFile, [string]$
     }
   }
   throw "$Label 下载失败，请稍后重试。"
+}
+
+function Test-OfficialInstallerPs1([string]$Path) {
+  if (-not (Test-Path $Path)) { return $false }
+  $text = Get-Content -Raw -Path $Path -ErrorAction SilentlyContinue
+  return ($text -and $text.Contains("param(") -and $text.Contains("IncludeDesktop") -and $text.Contains("hermes-agent"))
+}
+
+function Download-OfficialInstaller([string]$OutFile) {
+  foreach ($url in (Get-OfficialInstallUrls)) {
+    if ([string]::IsNullOrWhiteSpace($url)) { continue }
+    Write-Step "正在下载官方 Hermes 安装器：$url"
+    try {
+      Invoke-WebRequest -Uri $url -OutFile $OutFile -UseBasicParsing -TimeoutSec $downloadTimeoutSec
+      if (-not (Test-OfficialInstallerPs1 -Path $OutFile)) {
+        throw "当前入口返回的不是官方安装器脚本。"
+      }
+      return $url
+    } catch {
+      Write-Step "当前入口不可用或过慢，正在切换下一个入口。"
+    }
+  }
+  throw "官方 Hermes 安装器下载失败，请稍后重试。"
 }
 
 function Get-HermesHomePath {
@@ -314,7 +335,7 @@ function Invoke-OfficialInstall {
   $officialInstaller = Join-Path ([System.IO.Path]::GetTempPath()) ("hermes-official-" + [guid]::NewGuid().ToString("N") + ".ps1")
   try {
     Backup-UserConfig -HermesHomePath $hermesHome -BackupDir $configBackup
-    Invoke-DownloadWithSources -Urls (Get-OfficialInstallUrls) -OutFile $officialInstaller -Label "官方 Hermes 安装器" | Out-Null
+    Download-OfficialInstaller -OutFile $officialInstaller | Out-Null
 
     try {
       Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
@@ -359,7 +380,9 @@ function Convert-ToBashPath([string]$Path, [string]$BashPath) {
 function Test-BashInstaller([string]$Path) {
   if (-not (Test-Path $Path)) { return $false }
   $firstLine = Get-Content -Path $Path -TotalCount 1 -ErrorAction SilentlyContinue
-  return ($firstLine -like "#!*bash*" -or $firstLine -like "#!/usr/bin/env bash*")
+  if (-not ($firstLine -like "#!*bash*" -or $firstLine -like "#!/usr/bin/env bash*")) { return $false }
+  $text = Get-Content -Raw -Path $Path -ErrorAction SilentlyContinue
+  return ($text -and $text.Contains('PACKAGE_VERSION="2026.06.08.2"'))
 }
 
 function Download-Installer([string]$OutFile) {

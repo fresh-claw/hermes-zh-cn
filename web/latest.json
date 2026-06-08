@@ -1,13 +1,13 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.06.08.1",
+  "latest": "2026.06.08.2",
   "install": "http://47.121.138.43/hermes/install.sh",
   "install_windows": "http://47.121.138.43/hermes/install.ps1",
-  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe",
+  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260608-exe-2",
   "install_windows_click": "http://47.121.138.43/hermes/install-windows.cmd",
   "install_macos_click": "http://47.121.138.43/hermes/install.command",
-  "install_macos_zip": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260608-mac-1",
+  "install_macos_zip": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260608-mac-2",
   "official_hermes_install_windows": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1",
   "official_windows_desktop_args": "-IncludeDesktop -NonInteractive",
   "official_macos_linux_desktop_args": "--include-desktop",
@@ -30,10 +30,10 @@
   "packages": [
     {
       "hermes": "0.16.x",
-      "version": "2026.06.08.1",
+      "version": "2026.06.08.2",
       "manifest": "packages/0.16.x/zh-CN/manifest.json",
       "package": "packages/0.16.x/zh-CN/zh-cn.min.json",
-      "sha256": "d017b5b8268384458a24a3d8a4dff2b75b752a972bb22b5e2de271472858df3a"
+      "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae"
     },
     {
       "hermes": "0.15.x",

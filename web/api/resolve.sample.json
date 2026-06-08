@@ -1,20 +1,20 @@
 {
   "matched": true,
   "hermes_version": "installer-detected",
-  "xiaoma_version": "2026.06.08.1",
+  "xiaoma_version": "2026.06.08.2",
   "locale": "zh-CN",
   "install_url": "https://useai.live/hermes/install.sh",
   "recommended_command": "(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
-  "resolver_note": "2026.06.08.1 修复 Windows 官方 Hermes 安装脚本 git checkout main 失败后的自动重试流程；继续适配 Hermes 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy。",
+  "resolver_note": "2026.06.08.2 强化安装器容错：避开当前不可用入口，校验脚本版本，并在 macOS/Linux 官方安装失败后自动备份异常源码目录再重试；继续适配 Hermes 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy。",
   "manifest_url": "https://useai.live/hermes/packages/0.16.x/zh-CN/manifest.json",
   "package_url": "https://useai.live/hermes/packages/0.16.x/zh-CN/zh-cn.min.json",
   "compat_packages": [
     {
       "hermes": "0.16.x",
-      "version": "2026.06.08.1",
+      "version": "2026.06.08.2",
       "manifest": "packages/0.16.x/zh-CN/manifest.json",
       "package": "packages/0.16.x/zh-CN/zh-cn.min.json",
-      "sha256": "d017b5b8268384458a24a3d8a4dff2b75b752a972bb22b5e2de271472858df3a"
+      "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae"
     },
     {
       "hermes": "0.15.x",
@@ -47,7 +47,7 @@
   ],
   "legacy_manifest_url": "https://useai.live/hermes/packages/legacy/zh-CN/manifest.json",
   "legacy_package_url": "https://useai.live/hermes/packages/legacy/zh-CN/zh-cn.min.json",
-  "sha256": "d017b5b8268384458a24a3d8a4dff2b75b752a972bb22b5e2de271472858df3a",
+  "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae",
   "legacy_sha256": "a4630150f1cf298f59ec725f6df5b36b60390c6054638ea0761d62fa1495ad2f",
   "requires_user_confirmation": true,
   "authorization": "single install command",
