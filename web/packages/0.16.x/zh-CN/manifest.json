@@ -3,20 +3,20 @@
   "brand": "小马AI版",
   "locale": "zh-CN",
   "hermes_compat": "0.16.x",
-  "version": "2026.06.07.5",
+  "version": "2026.06.08.1",
   "upstream_commit": "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "36b17c4e75b08a5c358405fe28884b129261fae1745d5a608d2c0bf5b8e65272",
-      "bytes": 17378,
-      "purpose": "中文增强包、安装动作、Hermes 技能说明、0.16/0.15/0.14/0.13/legacy 分流、官方简体中文桌面界面保留、启动/TUI/命令/状态页/网关/ACP/审批/OAuth/贴纸/技能同步、目标、推理、默认模型、Copilot ACP 与重启提示补丁、桌面快捷方式和更新包装兼容补丁",
-      "size": 17378
+      "sha256": "d017b5b8268384458a24a3d8a4dff2b75b752a972bb22b5e2de271472858df3a",
+      "bytes": 17640,
+      "purpose": "中文增强包、安装动作、Hermes 技能说明、0.16/0.15/0.14/0.13/legacy 分流、官方简体中文桌面界面保留、启动/TUI/命令/状态页/网关/ACP/审批/OAuth/贴纸/技能同步、目标、推理、默认模型、Copilot ACP 与重启提示补丁、桌面快捷方式和更新包装兼容补丁、Windows 官方安装重试补丁",
+      "size": 17640
     }
   ],
   "promo": {
     "enabled": false,
     "slots": []
   },
-  "generated_at": "2026-06-07T00:00:00+08:00"
+  "generated_at": "2026-06-08T00:00:00+08:00"
 }

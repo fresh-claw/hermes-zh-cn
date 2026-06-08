@@ -11,12 +11,12 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.07.5"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.08.1"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
 if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
-  $pinnedVersion = "v2026.06.07.5"
+  $pinnedVersion = "v2026.06.08.1"
 }
 $downloadTimeoutSec = 60
 if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
@@ -191,6 +191,61 @@ function Find-HermesDesktop {
   return $null
 }
 
+function Select-UniquePaths([string[]]$Items) {
+  $seen = @{}
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($item in $Items) {
+    if ([string]::IsNullOrWhiteSpace($item)) { continue }
+    $clean = $item.Trim().TrimEnd("\")
+    if (-not $seen.ContainsKey($clean)) {
+      $seen[$clean] = $true
+      [void]$result.Add($clean)
+    }
+  }
+  return $result.ToArray()
+}
+
+function Get-HermesAgentSourcePaths {
+  $items = @()
+  $hermesHome = Get-HermesHomePath
+  if (-not [string]::IsNullOrWhiteSpace($hermesHome)) {
+    $items += (Join-Path $hermesHome "hermes-agent")
+  }
+  if (-not [string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
+    $items += (Join-Path $env:LOCALAPPDATA "hermes\hermes-agent")
+  }
+  if (-not [string]::IsNullOrWhiteSpace($env:USERPROFILE)) {
+    $items += (Join-Path $env:USERPROFILE ".hermes\hermes-agent")
+  }
+  return Select-UniquePaths $items
+}
+
+function Move-HermesAgentSourceAside([string]$Reason) {
+  $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+  $moved = $false
+  foreach ($path in (Get-HermesAgentSourcePaths)) {
+    if (-not (Test-Path $path)) { continue }
+    $target = "$path.backup-$stamp"
+    try {
+      Move-Item -Force -Path $path -Destination $target
+      Write-Step "已备份异常官方 Hermes 源码目录：$target"
+      $moved = $true
+    } catch {
+      Write-Step "无法备份官方 Hermes 源码目录：$($_.Exception.Message)"
+    }
+  }
+  if (-not $moved) {
+    Write-Step "未找到可备份的官方 Hermes 源码目录。"
+  }
+}
+
+function Invoke-OfficialInstallerOnce([string]$InstallerPath) {
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $InstallerPath -IncludeDesktop -NonInteractive
+  if ($LASTEXITCODE -ne 0) {
+    throw "官方 Hermes 桌面端安装失败，退出码 $LASTEXITCODE。"
+  }
+}
+
 function New-HermesDesktopShortcut {
   $desktopExe = Find-HermesDesktop
   if (-not $desktopExe) {
@@ -260,11 +315,26 @@ function Invoke-OfficialInstall {
   try {
     Backup-UserConfig -HermesHomePath $hermesHome -BackupDir $configBackup
     Invoke-DownloadWithSources -Urls (Get-OfficialInstallUrls) -OutFile $officialInstaller -Label "官方 Hermes 安装器" | Out-Null
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $officialInstaller -IncludeDesktop -NonInteractive
-    if ($LASTEXITCODE -ne 0) {
-      throw "官方 Hermes 桌面端安装失败，退出码 $LASTEXITCODE。"
+
+    try {
+      Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
+    } catch {
+      $firstError = $_.Exception.Message
+      Write-Step "官方安装未完成：$firstError"
+      Write-Step "正在修复官方 Hermes 源码目录并重试。"
+      Restore-UserConfigIfMissing -HermesHomePath $hermesHome -BackupDir $configBackup
+      Move-HermesAgentSourceAside -Reason $firstError
+      Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
     }
+
     Restore-UserConfigIfMissing -HermesHomePath $hermesHome -BackupDir $configBackup
+
+    if (-not (Find-HermesDesktop)) {
+      Write-Step "官方 Hermes 桌面端未生成，正在清理官方源码目录后再试一次。"
+      Move-HermesAgentSourceAside -Reason "desktop missing"
+      Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
+      Restore-UserConfigIfMissing -HermesHomePath $hermesHome -BackupDir $configBackup
+    }
   } finally {
     Remove-Item -Force $officialInstaller -ErrorAction SilentlyContinue
     Remove-Item -Recurse -Force $configBackup -ErrorAction SilentlyContinue
