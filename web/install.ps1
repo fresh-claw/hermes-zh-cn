@@ -430,17 +430,39 @@ function New-HermesDesktopShortcut {
 }
 
 function Find-Bash {
+  $envBash = $env:HERMES_GIT_BASH_PATH
+  if (-not [string]::IsNullOrWhiteSpace($envBash) -and (Test-Path $envBash)) { return $envBash }
+
+  $userBash = [Environment]::GetEnvironmentVariable("HERMES_GIT_BASH_PATH", "User")
+  if (-not [string]::IsNullOrWhiteSpace($userBash) -and (Test-Path $userBash)) { return $userBash }
+
   $cmd = Get-Command bash -ErrorAction SilentlyContinue
   if ($cmd) { return $cmd.Source }
 
+  $hermesHome = Get-HermesHomePath
   $candidates = @(
+    (Join-Path $hermesHome "git\bin\bash.exe"),
+    (Join-Path $hermesHome "git\usr\bin\bash.exe"),
     (Join-Path $env:LOCALAPPDATA "hermes\git\bin\bash.exe"),
+    (Join-Path $env:LOCALAPPDATA "hermes\git\usr\bin\bash.exe"),
     (Join-Path $env:LOCALAPPDATA "hermes\git\cmd\bash.exe"),
+    (Join-Path $env:LOCALAPPDATA "Programs\Git\bin\bash.exe"),
+    (Join-Path $env:LOCALAPPDATA "Programs\Git\usr\bin\bash.exe"),
     "$env:ProgramFiles\Git\bin\bash.exe",
+    "$env:ProgramFiles\Git\usr\bin\bash.exe",
     "${env:ProgramFiles(x86)}\Git\bin\bash.exe"
   )
   foreach ($item in $candidates) {
     if ($item -and (Test-Path $item)) { return $item }
+  }
+
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  if ($userPath) {
+    foreach ($dir in ($userPath -split ";")) {
+      if ([string]::IsNullOrWhiteSpace($dir)) { continue }
+      $candidate = Join-Path $dir "bash.exe"
+      if (Test-Path $candidate) { return $candidate }
+    }
   }
   return $null
 }

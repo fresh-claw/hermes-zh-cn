@@ -4,7 +4,7 @@
   "latest": "2026.06.12.1",
   "install": "http://47.121.138.43/hermes/install.sh",
   "install_windows": "http://47.121.138.43/hermes/install.ps1",
-  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-1",
+  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-3",
   "install_windows_click": "http://47.121.138.43/hermes/install-windows.cmd",
   "install_macos_click": "http://47.121.138.43/hermes/install.command",
   "install_macos_zip": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1",

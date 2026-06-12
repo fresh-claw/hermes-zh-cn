@@ -9,7 +9,7 @@ Version: 2026.06.12.1
 Language: zh-CN
 Install URL: http://47.121.138.43/hermes/install.sh
 Windows Install URL: http://47.121.138.43/hermes/install.ps1
-Windows EXE Installer: http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-1
+Windows EXE Installer: http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-3
 Windows Click Installer: http://47.121.138.43/hermes/install-windows.cmd
 macOS Zip Installer: http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1
 Platform Manifest: http://47.121.138.43/hermes/platforms.json
@@ -61,7 +61,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
-2. Windows 新手下载 `http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-1` 后运行；高级用户可执行：`irm http://47.121.138.43/hermes/install.ps1 | iex`。
+2. Windows 新手下载 `http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-3` 后运行；高级用户可执行：`irm http://47.121.138.43/hermes/install.ps1 | iex`。
 3. macOS 新手下载 `http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1`，解压后打开 `install.command`。
 4. Linux、WSL2 用户执行：`curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop`。
 5. 安装器检测本机 Hermes。
