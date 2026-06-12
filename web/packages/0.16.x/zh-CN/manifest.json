@@ -3,21 +3,21 @@
   "brand": "小马AI版",
   "locale": "zh-CN",
   "hermes_compat": "0.16.x",
-  "version": "2026.06.08.2",
+  "version": "2026.06.12.1",
   "upstream_commit": "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43",
   "files": [
     {
       "path": "zh-cn.min.json",
-      "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae",
+      "sha256": "5dda3840298e862f2cce4fd7a178b9a19595cbd0d796edccf6d5a794a523863e",
       "bytes": 17640,
-      "purpose": "Hermes 0.16.x 中文增强包，含桌面/TUI 文案、安装器容错强化和 Windows 官方安装重试补丁",
-      "size": 18005
+      "purpose": "Hermes 0.16.x 中文增强包，含桌面/TUI 文案、Windows Node.js 容错、安装器容错和官方安装重试补丁",
+      "size": 18322
     }
   ],
   "promo": {
     "enabled": false,
     "slots": []
   },
-  "generated_at": "2026-06-08T00:00:00+08:00",
-  "description": "小马AI Hermes 0.16.x 中文增强包（安装器容错强化）"
+  "generated_at": "2026-06-12T00:00:00+08:00",
+  "description": "小马AI Hermes 0.16.x 中文增强包（Windows Node.js 容错强化）"
 }

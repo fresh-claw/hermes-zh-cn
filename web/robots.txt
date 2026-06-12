@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Host: useai.live
 
 Sitemap: https://useai.live/hermes/sitemap.xml

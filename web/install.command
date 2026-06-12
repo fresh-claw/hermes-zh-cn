@@ -5,7 +5,7 @@ export XIAOMA_HERMES_ENTRYPOINT="macos-command"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOCAL_INSTALLER="$SCRIPT_DIR/install.sh"
-PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.08.2}"
+PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-v2026.06.12.1}"
 CURL_CONNECT_TIMEOUT="${XIAOMA_HERMES_CONNECT_TIMEOUT:-8}"
 CURL_MAX_TIME="${XIAOMA_HERMES_MAX_TIME:-180}"
 CURL_SPEED_LIMIT="${XIAOMA_HERMES_SPEED_LIMIT:-1024}"
@@ -20,7 +20,7 @@ installer_script_ok() {
   local path="$1"
   [ -f "$path" ] || return 1
   head -n 1 "$path" | grep -Eq '^#!.*bash' || return 1
-  grep -F 'PACKAGE_VERSION="2026.06.08.2"' "$path" >/dev/null 2>&1
+  grep -F 'PACKAGE_VERSION="2026.06.12.1"' "$path" >/dev/null 2>&1
 }
 
 if installer_script_ok "$LOCAL_INSTALLER"; then

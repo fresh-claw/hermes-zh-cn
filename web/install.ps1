@@ -11,12 +11,12 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {
-  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.08.2"
+  $FallbackBaseUrl = "https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@v2026.06.12.1"
 }
 $FallbackBaseUrl = $FallbackBaseUrl.TrimEnd("/")
 $pinnedVersion = $env:XIAOMA_HERMES_PINNED_VERSION
 if ([string]::IsNullOrWhiteSpace($pinnedVersion)) {
-  $pinnedVersion = "v2026.06.08.2"
+  $pinnedVersion = "v2026.06.12.1"
 }
 $downloadTimeoutSec = 60
 if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_DOWNLOAD_TIMEOUT_SEC)) {
@@ -26,6 +26,8 @@ $officialInstallUrl = $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URL
 if ([string]::IsNullOrWhiteSpace($officialInstallUrl)) {
   $officialInstallUrl = "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1"
 }
+$nodeMajorVersion = "22"
+$nodeDownloadTimeoutSec = [Math]::Max(180, $downloadTimeoutSec)
 
 function Write-Step([string]$Message) {
   Write-Host "[Hermes 中文增强] $Message"
@@ -123,6 +125,133 @@ function Get-HermesHomePath {
     return (Join-Path $env:USERPROFILE ".hermes")
   }
   throw "无法确定 Hermes 配置目录，请设置 HERMES_HOME 后重试。"
+}
+
+function Test-NodeVersionOk([string]$Version) {
+  try {
+    $clean = ($Version -replace '^v', '' -replace '-.*$', '')
+    $v = [version]$clean
+  } catch {
+    return $false
+  }
+  if ($v.Major -eq 20 -and $v.Minor -ge 19) { return $true }
+  if ($v.Major -ge 22 -and ($v.Major -gt 22 -or $v.Minor -ge 12)) { return $true }
+  return $false
+}
+
+function Get-WindowsNodeArch {
+  $arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+  if ($arch -eq "arm64") { return "arm64" }
+  if ($arch -eq "x86") { return "x86" }
+  return "x64"
+}
+
+function Test-NodeReady([string]$HermesHomePath) {
+  $managedNode = Join-Path $HermesHomePath "node\node.exe"
+  if (Test-Path $managedNode) {
+    try {
+      $version = & $managedNode --version
+      if (Test-NodeVersionOk $version) {
+        $nodeDir = Join-Path $HermesHomePath "node"
+        $env:Path = "$nodeDir;$env:Path"
+        Write-Step "检测到 Hermes 自带 Node.js $version。"
+        return $true
+      }
+    } catch { }
+  }
+
+  $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+  if ($nodeCmd) {
+    try {
+      $version = & $nodeCmd.Source --version
+      if (Test-NodeVersionOk $version) {
+        Write-Step "检测到可用 Node.js $version。"
+        return $true
+      }
+      Write-Step "检测到 Node.js $version，但版本过旧，将安装 Hermes 自带 Node.js。"
+    } catch { }
+  }
+  return $false
+}
+
+function Get-NodeIndexUrls {
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_NODE_INDEX_URLS)) {
+    return Select-UniqueText ($env:XIAOMA_HERMES_NODE_INDEX_URLS -split ",")
+  }
+  return Select-UniqueText @(
+    "https://cdn.npmmirror.com/binaries/node/index.json",
+    "https://npmmirror.com/mirrors/node/index.json",
+    "https://nodejs.org/dist/index.json"
+  )
+}
+
+function Resolve-NodeDownloadUrls([string]$Arch) {
+  $items = New-Object System.Collections.Generic.List[string]
+  $zipSuffix = "win-$Arch-zip"
+  foreach ($indexUrl in (Get-NodeIndexUrls)) {
+    try {
+      Write-Step "正在查询 Node.js 下载索引：$indexUrl"
+      $raw = (Invoke-WebRequest -UseBasicParsing -Uri $indexUrl -TimeoutSec $downloadTimeoutSec).Content
+      $entries = $raw | ConvertFrom-Json
+      $entry = $entries | Where-Object {
+        $_.version -like "v$nodeMajorVersion.*" -and $_.files -contains $zipSuffix
+      } | Select-Object -First 1
+      if ($entry -and $entry.version) {
+        $base = $indexUrl -replace "/index\.json$", ""
+        $zipName = "node-$($entry.version)-win-$Arch.zip"
+        [void]$items.Add("$base/$($entry.version)/$zipName")
+      }
+    } catch {
+      Write-Step "当前 Node.js 索引不可用，正在切换下一个入口。"
+    }
+  }
+  return (Select-UniqueText $items.ToArray())
+}
+
+function Ensure-WindowsNode([string]$HermesHomePath) {
+  if (Test-NodeReady -HermesHomePath $HermesHomePath) { return $true }
+
+  $arch = Get-WindowsNodeArch
+  $nodeDir = Join-Path $HermesHomePath "node"
+  $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-node-" + [guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
+  try {
+    foreach ($url in (Resolve-NodeDownloadUrls -Arch $arch)) {
+      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($url))
+      try {
+        Write-Step "正在下载 Hermes 自带 Node.js：$url"
+        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec
+        $extractDir = Join-Path $tmpRoot "extract"
+        if (Test-Path $extractDir) { Remove-Item -Recurse -Force $extractDir }
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+        $expanded = Get-ChildItem -Path $extractDir -Directory | Select-Object -First 1
+        if (-not $expanded) { throw "Node.js 压缩包解压后没有目录。" }
+        if (Test-Path $nodeDir) { Remove-Item -Recurse -Force $nodeDir }
+        New-Item -ItemType Directory -Force -Path $HermesHomePath | Out-Null
+        Move-Item -Force -Path $expanded.FullName -Destination $nodeDir
+        $env:Path = "$nodeDir;$env:Path"
+
+        $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+        $userPathItems = if ($userPath) { $userPath -split ";" } else { @() }
+        if ($userPathItems -notcontains $nodeDir) {
+          $userPathItems += $nodeDir
+          [Environment]::SetEnvironmentVariable("Path", ($userPathItems -join ";"), "User")
+        }
+
+        if (Test-NodeReady -HermesHomePath $HermesHomePath) {
+          Write-Step "Hermes 自带 Node.js 已准备好。"
+          return $true
+        }
+      } catch {
+        Write-Step "当前 Node.js 下载入口不可用或安装失败，正在切换下一个入口。"
+      }
+    }
+  } finally {
+    Remove-Item -Recurse -Force $tmpRoot -ErrorAction SilentlyContinue
+  }
+
+  Write-Step "Node.js 自动准备未完成，后续会继续调用官方安装器尝试。"
+  return $false
 }
 
 function Backup-UserConfig([string]$HermesHomePath, [string]$BackupDir) {
@@ -336,6 +465,7 @@ function Invoke-OfficialInstall {
   try {
     Backup-UserConfig -HermesHomePath $hermesHome -BackupDir $configBackup
     Download-OfficialInstaller -OutFile $officialInstaller | Out-Null
+    Ensure-WindowsNode -HermesHomePath $hermesHome | Out-Null
 
     try {
       Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
@@ -351,7 +481,9 @@ function Invoke-OfficialInstall {
     Restore-UserConfigIfMissing -HermesHomePath $hermesHome -BackupDir $configBackup
 
     if (-not (Find-HermesDesktop)) {
-      Write-Step "官方 Hermes 桌面端未生成，正在清理官方源码目录后再试一次。"
+      Write-Step "官方 Hermes 桌面端未生成，正在重新准备 Node.js 并再试一次。"
+      Ensure-WindowsNode -HermesHomePath $hermesHome | Out-Null
+      Write-Step "正在清理官方源码目录后再试一次。"
       Move-HermesAgentSourceAside -Reason "desktop missing"
       Invoke-OfficialInstallerOnce -InstallerPath $officialInstaller
       Restore-UserConfigIfMissing -HermesHomePath $hermesHome -BackupDir $configBackup
@@ -365,7 +497,7 @@ function Invoke-OfficialInstall {
     throw "官方 Hermes 安装后仍未检测到 hermes 命令，请打开新 PowerShell 后重试。"
   }
   if (-not (Find-HermesDesktop)) {
-    throw "官方 Hermes 桌面端未生成，请确认 Node.js 可用后重试。"
+    throw "官方 Hermes 桌面端未生成。安装器已尝试自动准备 Node.js，请把本窗口截图发给小马。"
   }
 }
 
@@ -382,7 +514,7 @@ function Test-BashInstaller([string]$Path) {
   $firstLine = Get-Content -Path $Path -TotalCount 1 -ErrorAction SilentlyContinue
   if (-not ($firstLine -like "#!*bash*" -or $firstLine -like "#!/usr/bin/env bash*")) { return $false }
   $text = Get-Content -Raw -Path $Path -ErrorAction SilentlyContinue
-  return ($text -and $text.Contains('PACKAGE_VERSION="2026.06.08.2"'))
+  return ($text -and $text.Contains('PACKAGE_VERSION="2026.06.12.1"'))
 }
 
 function Download-Installer([string]$OutFile) {

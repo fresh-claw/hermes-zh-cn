@@ -1,20 +1,20 @@
 {
   "matched": true,
   "hermes_version": "installer-detected",
-  "xiaoma_version": "2026.06.08.2",
+  "xiaoma_version": "2026.06.12.1",
   "locale": "zh-CN",
-  "install_url": "https://useai.live/hermes/install.sh",
-  "recommended_command": "(curl -fsSL https://useai.live/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
-  "resolver_note": "2026.06.08.2 强化安装器容错：避开当前不可用入口，校验脚本版本，并在 macOS/Linux 官方安装失败后自动备份异常源码目录再重试；继续适配 Hermes 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy。",
+  "install_url": "http://47.121.138.43/hermes/install.sh",
+  "recommended_command": "(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
+  "resolver_note": "2026.06.12.1 修复 Windows Node.js 获取失败导致官方桌面端无法生成的问题；安装器会优先从国内镜像准备 Hermes 自带 Node.js 22，再运行官方桌面端生成流程；继续适配 Hermes 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy。",
   "manifest_url": "https://useai.live/hermes/packages/0.16.x/zh-CN/manifest.json",
   "package_url": "https://useai.live/hermes/packages/0.16.x/zh-CN/zh-cn.min.json",
   "compat_packages": [
     {
       "hermes": "0.16.x",
-      "version": "2026.06.08.2",
+      "version": "2026.06.12.1",
       "manifest": "packages/0.16.x/zh-CN/manifest.json",
       "package": "packages/0.16.x/zh-CN/zh-cn.min.json",
-      "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae"
+      "sha256": "5dda3840298e862f2cce4fd7a178b9a19595cbd0d796edccf6d5a794a523863e"
     },
     {
       "hermes": "0.15.x",
@@ -47,7 +47,7 @@
   ],
   "legacy_manifest_url": "https://useai.live/hermes/packages/legacy/zh-CN/manifest.json",
   "legacy_package_url": "https://useai.live/hermes/packages/legacy/zh-CN/zh-cn.min.json",
-  "sha256": "a3f2f1990516ec939c5c12d0b173301f7a8b58b282d2f0cfaeca4c593662c0ae",
+  "sha256": "5dda3840298e862f2cce4fd7a178b9a19595cbd0d796edccf6d5a794a523863e",
   "legacy_sha256": "a4630150f1cf298f59ec725f6df5b36b60390c6054638ea0761d62fa1495ad2f",
   "requires_user_confirmation": true,
   "authorization": "single install command",

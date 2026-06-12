@@ -5,13 +5,13 @@
 Name: 小马AI Hermes 中文增强包
 Primary topic: Hermes Desktop 桌面版汉化 / Hermes Agent TUI CLI 汉化补丁
 Canonical: https://useai.live/hermes/
-Version: 2026.06.08.2
+Version: 2026.06.12.1
 Language: zh-CN
 Install URL: http://47.121.138.43/hermes/install.sh
 Windows Install URL: http://47.121.138.43/hermes/install.ps1
-Windows EXE Installer: http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260608-exe-2
+Windows EXE Installer: http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-1
 Windows Click Installer: http://47.121.138.43/hermes/install-windows.cmd
-macOS Zip Installer: http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260608-mac-2
+macOS Zip Installer: http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1
 Platform Manifest: https://useai.live/hermes/platforms.json
 GitHub: https://github.com/fresh-claw/hermes-zh-cn
 Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
@@ -44,13 +44,14 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 当前版本
 
-- 中文包：2026.06.08.2
-- 桌面入口：2026.06.08.2
+- 中文包：2026.06.12.1
+- 桌面入口：2026.06.12.1
 - 官方最新版：Hermes Agent v0.16.0，发布时间 2026-06-05。
 - 官方桌面页：macOS 和 Windows 提供安装包，Linux 仍以终端安装为主。
 - 安装器支持 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy 兼容包。
 - 本次补充 ACP、Teams、API 服务、Hindsight 记忆、/goal、推理设置、默认模型、Copilot ACP、TUI 网关状态和配置过程中文。
 - 2026.05.26.1 补齐主频道提醒、私信配对码、多会话话题、平台连接、网关服务和配对管理等用户可见中文。
+- 2026.06.12.1 修复 Windows Node.js 获取失败导致官方桌面端无法生成的问题；安装器会优先从国内镜像准备 Hermes 自带 Node.js 22。
 - 2026.06.08.2 强化安装器容错：避开当前不可用入口，校验脚本版本，并在 macOS/Linux 官方安装失败后自动备份异常源码目录再重试。
 - 2026.06.08.1 修复 Windows 官方 Hermes 安装脚本 git checkout main 失败后的自动重试流程。
 - 2026.06.07.5 新增 0.16.x 分流，适配 Hermes Agent v0.16.0 Surface Release，并保留官方简体中文桌面界面。
@@ -60,8 +61,8 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 ## 安装流程
 
 1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
-2. Windows 新手下载 `http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260608-exe-2` 后运行；高级用户可执行：`irm http://47.121.138.43/hermes/install.ps1 | iex`。
-3. macOS 新手下载 `http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260608-mac-2`，解压后打开 `install.command`。
+2. Windows 新手下载 `http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-1` 后运行；高级用户可执行：`irm http://47.121.138.43/hermes/install.ps1 | iex`。
+3. macOS 新手下载 `http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1`，解压后打开 `install.command`。
 4. Linux、WSL2 用户执行：`curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop`。
 5. 安装器检测本机 Hermes。
 6. 未检测到 Hermes 时，安装器执行官方安装脚本。
