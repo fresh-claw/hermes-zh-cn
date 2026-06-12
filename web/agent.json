@@ -1,5 +1,5 @@
 {
-  "schema": "https://useai.live/hermes/schema/xiaoma-hermes-agent.v1.json",
+  "schema": "http://47.121.138.43/hermes/schema/xiaoma-hermes-agent.v1.json",
   "name": "小马AI Hermes 中文增强包",
   "brand": "小马AI版",
   "intent": "install_zh_cn",
@@ -33,7 +33,7 @@
     "macos": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1",
     "linux": "http://47.121.138.43/hermes/install.sh"
   },
-  "platforms_manifest": "https://useai.live/hermes/platforms.json",
+  "platforms_manifest": "http://47.121.138.43/hermes/platforms.json",
   "requires_user_confirmation": true,
   "authorization_model": "download installer or single install command",
   "version_detection": {
@@ -192,7 +192,8 @@
   },
   "fallback": {
     "on_version_miss": "legacy package",
-    "on_install_fail": "keep_original_hermes"
+    "on_install_fail": "keep_original_hermes",
+    "command": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop"
   },
   "official_hermes_install": {
     "when": "Windows desktop missing or macOS/Linux Hermes source missing",
