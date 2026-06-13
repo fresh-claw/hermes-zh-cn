@@ -59,6 +59,39 @@ if platforms["upstream"]["agent_version"] != "0.16.0":
 if not (root / "web/install.ps1").exists():
     raise SystemExit("缺少 install.ps1")
 
+combined = "\n".join(
+    (root / path).read_text(encoding="utf-8", errors="ignore")
+    for path in (
+        "web/index.html",
+        "web/details.html",
+        "web/app.js",
+        "web/llms.txt",
+        "web/llms-full.txt",
+        "web/robots.txt",
+        "web/sitemap.xml",
+        "web/latest.json",
+        "web/agent.json",
+    )
+)
+if "useai.live" in combined:
+    raise SystemExit("仍存在旧域名 useai.live")
+if "20260612-exe-3" in combined:
+    raise SystemExit("仍存在旧 Windows 安装器版本号")
+
+install_ps1 = (root / "web/install.ps1").read_text(encoding="utf-8", errors="ignore")
+exe_bytes = (root / "web/Hermes-zh-CN-Setup.exe").read_bytes()
+for marker in (
+    "Ensure-WindowsNode",
+    "node-v22.22.3-win-$Arch.zip",
+    "Ensure-WindowsGitBash",
+    "registry.npmmirror.com/-/binary/git-for-windows/",
+    "MinGit-2.54.0-64-bit.zip",
+):
+    if marker not in install_ps1:
+        raise SystemExit(f"install.ps1 缺少 {marker}")
+    if marker.encode() not in exe_bytes:
+        raise SystemExit(f"Windows EXE 缺少 {marker}")
+
 skill = json.loads((root / "web/packages/0.15.x/zh-CN/zh-cn.min.json").read_text(encoding="utf-8")).get("skill_markdown", "")
 if "name: xiaoma-hermes-zh" not in skill:
     raise SystemExit("skill_markdown 缺少名称")
