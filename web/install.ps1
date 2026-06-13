@@ -205,6 +205,8 @@ function Resolve-NodeDownloadUrls([string]$Arch) {
       Write-Step "当前 Node.js 索引不可用，正在切换下一个入口。"
     }
   }
+  [void]$items.Add("https://cdn.npmmirror.com/binaries/node/v22.22.3/node-v22.22.3-win-$Arch.zip")
+  [void]$items.Add("https://nodejs.org/dist/v22.22.3/node-v22.22.3-win-$Arch.zip")
   return (Select-UniqueText $items.ToArray())
 }
 
@@ -252,6 +254,110 @@ function Ensure-WindowsNode([string]$HermesHomePath) {
 
   Write-Step "Node.js 自动准备未完成，后续会继续调用官方安装器尝试。"
   return $false
+}
+
+function Get-GitForWindowsIndexUrls {
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_GIT_INDEX_URLS)) {
+    return Select-UniqueText ($env:XIAOMA_HERMES_GIT_INDEX_URLS -split ",")
+  }
+  return Select-UniqueText @(
+    "https://registry.npmmirror.com/-/binary/git-for-windows/",
+    "https://mirrors.tuna.tsinghua.edu.cn/github-release/git-for-windows/git/LatestRelease/"
+  )
+}
+
+function Resolve-GitForWindowsDownloadUrls {
+  $items = New-Object System.Collections.Generic.List[string]
+
+  foreach ($indexUrl in (Get-GitForWindowsIndexUrls)) {
+    try {
+      Write-Step "正在查询 Git for Windows 下载索引：$indexUrl"
+      $raw = (Invoke-WebRequest -UseBasicParsing -Uri $indexUrl -TimeoutSec $downloadTimeoutSec).Content
+      if ($indexUrl -like "*/-/binary/git-for-windows/*") {
+        $releases = $raw | ConvertFrom-Json
+        $latest = $releases |
+          Where-Object { $_.name -match "^v\d+\.\d+\.\d+\.windows\.\d+/$" } |
+          Sort-Object -Property @{
+            Expression = { [version](($_.name -replace "^v", "") -replace "\.windows\.\d+/$", "") }
+            Descending = $true
+          }, @{
+            Expression = { [int]([regex]::Match($_.name, "\.windows\.(\d+)/$").Groups[1].Value) }
+            Descending = $true
+          } |
+          Select-Object -First 1
+        if ($latest -and $latest.url) {
+          $releaseFiles = (Invoke-WebRequest -UseBasicParsing -Uri $latest.url -TimeoutSec $downloadTimeoutSec).Content | ConvertFrom-Json
+          $mingit = $releaseFiles |
+            Where-Object { $_.name -match "^MinGit-.*-64-bit\.zip$" -and $_.name -notmatch "busybox" } |
+            Select-Object -First 1
+          if ($mingit -and $mingit.url) {
+            [void]$items.Add($mingit.url)
+          }
+        }
+      } else {
+        $match = [regex]::Match($raw, 'MinGit-[^"<>]*-64-bit\.zip')
+        if ($match.Success) {
+          [void]$items.Add("$($indexUrl.TrimEnd('/'))/$($match.Value)")
+        }
+      }
+    } catch {
+      Write-Step "当前 Git for Windows 索引不可用，正在切换下一个入口。"
+    }
+  }
+
+  [void]$items.Add("https://registry.npmmirror.com/-/binary/git-for-windows/v2.54.0.windows.1/MinGit-2.54.0-64-bit.zip")
+  [void]$items.Add("https://mirrors.tuna.tsinghua.edu.cn/github-release/git-for-windows/git/LatestRelease/MinGit-2.54.0-64-bit.zip")
+  return Select-UniqueText $items.ToArray()
+}
+
+function Ensure-WindowsGitBash([string]$HermesHomePath) {
+  $existing = Find-Bash
+  if ($existing) { return $existing }
+
+  $gitDir = Join-Path $HermesHomePath "git"
+  $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-git-" + [guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
+  try {
+    foreach ($url in (Resolve-GitForWindowsDownloadUrls)) {
+      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($url))
+      try {
+        Write-Step "正在下载 Git Bash 便携组件：$url"
+        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec
+        $extractDir = Join-Path $tmpRoot "extract"
+        if (Test-Path $extractDir) { Remove-Item -Recurse -Force $extractDir }
+        Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+        if (Test-Path $gitDir) { Remove-Item -Recurse -Force $gitDir }
+        New-Item -ItemType Directory -Force -Path $HermesHomePath | Out-Null
+        Move-Item -Force -Path $extractDir -Destination $gitDir
+
+        $bashPath = Join-Path $gitDir "usr\bin\bash.exe"
+        if (-not (Test-Path $bashPath)) {
+          $found = Get-ChildItem -Path $gitDir -Recurse -Filter "bash.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($found) { $bashPath = $found.FullName }
+        }
+        if (-not (Test-Path $bashPath)) {
+          throw "Git Bash 压缩包中未找到 bash.exe。"
+        }
+
+        $gitPathItems = @(
+          (Join-Path $gitDir "cmd"),
+          (Join-Path $gitDir "usr\bin"),
+          (Join-Path $gitDir "bin")
+        )
+        $env:Path = (($gitPathItems + @($env:Path)) -join ";")
+        [Environment]::SetEnvironmentVariable("HERMES_GIT_BASH_PATH", $bashPath, "User")
+
+        Write-Step "Git Bash 便携组件已准备好。"
+        return $bashPath
+      } catch {
+        Write-Step "当前 Git Bash 下载入口不可用或安装失败，正在切换下一个入口。"
+      }
+    }
+  } finally {
+    Remove-Item -Recurse -Force $tmpRoot -ErrorAction SilentlyContinue
+  }
+
+  return $null
 }
 
 function Backup-UserConfig([string]$HermesHomePath, [string]$BackupDir) {
@@ -563,7 +669,11 @@ Invoke-OfficialInstall
 
 $bash = Find-Bash
 if (-not $bash) {
-  throw "未找到 Git Bash。请先安装官方 Hermes，或安装 Git for Windows 后重试。"
+  Write-Step "未找到 Git Bash，正在自动准备便携 Git 组件。"
+  $bash = Ensure-WindowsGitBash -HermesHomePath (Get-HermesHomePath)
+}
+if (-not $bash) {
+  throw "未找到 Git Bash，自动准备也未完成。请把本窗口截图发给小马。"
 }
 
 $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-hermes-" + [guid]::NewGuid().ToString("N"))
