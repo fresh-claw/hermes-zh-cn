@@ -64,5 +64,6 @@
       "sha256": "e01c63d5c00edb21e6c3024089922b53a72c5deb47371a1eb1791160a4d92fcb"
     }
   ],
-  "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh"
+  "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
+  "verify_windows": "http://47.121.138.43/hermes/scripts/verify-windows.ps1"
 }
