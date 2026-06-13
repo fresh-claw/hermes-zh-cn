@@ -89,6 +89,7 @@ install_ps1 = (root / "web/install.ps1").read_text(encoding="utf-8", errors="ign
 install_sh = (root / "web/install.sh").read_text(encoding="utf-8", errors="ignore")
 install_command = (root / "web/install.command").read_text(encoding="utf-8", errors="ignore")
 install_windows_cmd = (root / "web/install-windows.cmd").read_text(encoding="utf-8", errors="ignore")
+verify_windows = (root / "web/scripts/verify-windows.ps1").read_text(encoding="utf-8", errors="ignore")
 exe_bytes = (root / "web/Hermes-zh-CN-Setup.exe").read_bytes()
 for name, text in (
     ("install.ps1", install_ps1),
@@ -98,6 +99,10 @@ for name, text in (
 ):
     if "fresh-claw/hermes-cn@v2026.06.12.1" in text:
         raise SystemExit(f"{name} 仍使用旧固定标签备用地址")
+if "Start-Process -FilePath python" in verify_windows or "python -m http.server" in verify_windows:
+    raise SystemExit("Windows 自检仍依赖 Python HTTP 服务")
+if "Start-LocalFileServer" not in verify_windows:
+    raise SystemExit("Windows 自检缺少 PowerShell 本地文件服务")
 for marker in (
     "Ensure-WindowsNode",
     "node-v22.22.3-win-$Arch.zip",

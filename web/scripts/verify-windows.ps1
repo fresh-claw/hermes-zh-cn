@@ -36,6 +36,85 @@ function Wait-Http([string]$Url) {
   throw "local HTTP server did not become ready"
 }
 
+function Start-LocalFileServer([string]$RootPath, [int]$Port) {
+  $job = Start-Job -ScriptBlock {
+    param([string]$RootPath, [int]$Port)
+
+    $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Parse("127.0.0.1"), $Port)
+    $listener.Start()
+    try {
+      while ($true) {
+        $client = $listener.AcceptTcpClient()
+        try {
+          $stream = $client.GetStream()
+          $reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::ASCII, $false, 1024, $true)
+          $requestLine = $reader.ReadLine()
+          while ($true) {
+            $headerLine = $reader.ReadLine()
+            if ($null -eq $headerLine -or $headerLine -eq "") { break }
+          }
+
+          $method = "GET"
+          $target = "/"
+          if ($requestLine -match "^(GET|HEAD)\s+(\S+)") {
+            $method = $Matches[1]
+            $target = $Matches[2]
+          }
+
+          $pathPart = ($target -split "\?", 2)[0]
+          $relativePath = [System.Uri]::UnescapeDataString($pathPart.TrimStart("/")).Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+          if ([string]::IsNullOrWhiteSpace($relativePath)) { $relativePath = "index.html" }
+
+          $rootFull = [System.IO.Path]::GetFullPath($RootPath)
+          $rootPrefix = $rootFull.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+          $fullPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($rootFull, $relativePath))
+
+          if (-not $fullPath.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $body = [System.Text.Encoding]::UTF8.GetBytes("Forbidden")
+            $header = "HTTP/1.1 403 Forbidden`r`nContent-Length: $($body.Length)`r`nConnection: close`r`n`r`n"
+            $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
+            $stream.Write($headerBytes, 0, $headerBytes.Length)
+            if ($method -ne "HEAD") { $stream.Write($body, 0, $body.Length) }
+          } elseif (Test-Path -LiteralPath $fullPath -PathType Leaf) {
+            $body = [System.IO.File]::ReadAllBytes($fullPath)
+            $header = "HTTP/1.1 200 OK`r`nContent-Type: application/octet-stream`r`nContent-Length: $($body.Length)`r`nConnection: close`r`n`r`n"
+            $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
+            $stream.Write($headerBytes, 0, $headerBytes.Length)
+            if ($method -ne "HEAD") { $stream.Write($body, 0, $body.Length) }
+          } else {
+            $body = [System.Text.Encoding]::UTF8.GetBytes("Not Found")
+            $header = "HTTP/1.1 404 Not Found`r`nContent-Length: $($body.Length)`r`nConnection: close`r`n`r`n"
+            $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
+            $stream.Write($headerBytes, 0, $headerBytes.Length)
+            if ($method -ne "HEAD") { $stream.Write($body, 0, $body.Length) }
+          }
+        } catch {
+        } finally {
+          $client.Close()
+        }
+      }
+    } finally {
+      $listener.Stop()
+    }
+  } -ArgumentList $RootPath, $Port
+
+  try {
+    Wait-Http "http://127.0.0.1:$Port/install.sh"
+    return $job
+  } catch {
+    Stop-Job -Job $job -ErrorAction SilentlyContinue
+    Remove-Job -Job $job -Force -ErrorAction SilentlyContinue
+    throw
+  }
+}
+
+function Stop-LocalFileServer($Job) {
+  if ($Job) {
+    Stop-Job -Job $Job -ErrorAction SilentlyContinue
+    Remove-Job -Job $Job -Force -ErrorAction SilentlyContinue
+  }
+}
+
 function New-FakeNodeExe([string]$Path, [string]$Version) {
   $className = "NodeStub" + ([guid]::NewGuid().ToString("N"))
   $source = @"
@@ -178,8 +257,7 @@ base = f"Hermes Agent v{VERSION} ({RELEASE_DATE})"
     $env:XIAOMA_HERMES_NODE_INDEX_URLS = "http://127.0.0.1:$port/node/index.json"
     $env:XIAOMA_HERMES_OFFICIAL_INSTALL_URLS = "http://127.0.0.1:$port/official-hermes-install.ps1"
 
-    $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "$port", "--bind", "127.0.0.1") -WorkingDirectory $serverRoot -PassThru -WindowStyle Hidden
-    Wait-Http "http://127.0.0.1:$port/install.sh"
+    $server = Start-LocalFileServer -RootPath $serverRoot -Port $port
 
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root "install.ps1") -BaseUrl "http://127.0.0.1:$port"
     if ($LASTEXITCODE -ne 0) {
@@ -196,9 +274,7 @@ base = f"Hermes Agent v{VERSION} ({RELEASE_DATE})"
 
     Write-Host "windows node bootstrap verification passed: $Version"
   } finally {
-    if ($server -and -not $server.HasExited) {
-      Stop-Process -Id $server.Id -Force
-    }
+    Stop-LocalFileServer $server
     $env:Path = $oldPath
     $env:HOME = $oldHome
     $env:HERMES_HOME = $oldHermesHome
@@ -287,9 +363,8 @@ $env:XIAOMA_HERMES_SKIP_WRAPPER = "1"
 $env:XIAOMA_HERMES_QUIET = "1"
 
 $port = 18765
-$server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "$port", "--bind", "127.0.0.1") -WorkingDirectory $Root -PassThru -WindowStyle Hidden
+$server = Start-LocalFileServer -RootPath $Root -Port $port
 try {
-  Wait-Http "http://127.0.0.1:$port/install.sh"
   & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root "install.ps1") -BaseUrl "http://127.0.0.1:$port" -SkipOfficial
   if ($LASTEXITCODE -ne 0) {
     throw "install.ps1 exited with $LASTEXITCODE"
@@ -309,9 +384,7 @@ try {
 
   Write-Host "windows verification passed: $Version"
 } finally {
-  if ($server -and -not $server.HasExited) {
-    Stop-Process -Id $server.Id -Force
-  }
+  Stop-LocalFileServer $server
   Remove-Item -Recurse -Force $temp -ErrorAction SilentlyContinue
 }
 
