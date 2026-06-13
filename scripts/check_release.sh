@@ -71,15 +71,33 @@ combined = "\n".join(
         "web/sitemap.xml",
         "web/latest.json",
         "web/agent.json",
+        "web/install-windows.cmd",
     )
 )
 if "useai.live" in combined:
     raise SystemExit("仍存在旧域名 useai.live")
 if "20260612-exe-3" in combined:
     raise SystemExit("仍存在旧 Windows 安装器版本号")
+if "fresh-claw/hermes-cn@v2026.06.12.1" in combined:
+    raise SystemExit("仍存在旧固定标签备用地址")
+if "20260613-exe-main-1" not in latest["install_windows_exe"]:
+    raise SystemExit("Windows 安装器缓存参数不是当前版本")
+if "20260613-mac-main-1" not in latest["install_macos_zip"]:
+    raise SystemExit("macOS 安装包缓存参数不是当前版本")
 
 install_ps1 = (root / "web/install.ps1").read_text(encoding="utf-8", errors="ignore")
+install_sh = (root / "web/install.sh").read_text(encoding="utf-8", errors="ignore")
+install_command = (root / "web/install.command").read_text(encoding="utf-8", errors="ignore")
+install_windows_cmd = (root / "web/install-windows.cmd").read_text(encoding="utf-8", errors="ignore")
 exe_bytes = (root / "web/Hermes-zh-CN-Setup.exe").read_bytes()
+for name, text in (
+    ("install.ps1", install_ps1),
+    ("install.sh", install_sh),
+    ("install.command", install_command),
+    ("install-windows.cmd", install_windows_cmd),
+):
+    if "fresh-claw/hermes-cn@v2026.06.12.1" in text:
+        raise SystemExit(f"{name} 仍使用旧固定标签备用地址")
 for marker in (
     "Ensure-WindowsNode",
     "node-v22.22.3-win-$Arch.zip",

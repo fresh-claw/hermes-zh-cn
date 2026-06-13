@@ -29,8 +29,8 @@
     "linux": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop"
   },
   "install_downloads": {
-    "windows": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-git-1",
-    "macos": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1",
+    "windows": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-main-1",
+    "macos": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
     "linux": "http://47.121.138.43/hermes/install.sh"
   },
   "platforms_manifest": "http://47.121.138.43/hermes/platforms.json",
@@ -46,9 +46,9 @@
     {
       "type": "choose_platform_entry",
       "visibility": "agent_and_human",
-      "windows_download": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-git-1",
+      "windows_download": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-main-1",
       "windows": "irm http://47.121.138.43/hermes/install.ps1 | iex",
-      "macos_download": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1",
+      "macos_download": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
       "macos_linux": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop",
       "note": "新手优先使用下载入口；高级用户可使用命令。"
     },
