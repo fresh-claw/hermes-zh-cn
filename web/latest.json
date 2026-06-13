@@ -4,7 +4,7 @@
   "latest": "2026.06.12.1",
   "install": "http://47.121.138.43/hermes/install.sh",
   "install_windows": "http://47.121.138.43/hermes/install.ps1",
-  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-1",
+  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-2",
   "install_windows_click": "http://47.121.138.43/hermes/install-windows.cmd",
   "install_macos_click": "http://47.121.138.43/hermes/install.command",
   "install_macos_zip": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
@@ -19,8 +19,8 @@
     "latest_release_name": "Hermes Agent v0.16.0 (2026.6.5)",
     "latest_release_date": "2026-06-05",
     "release_commit": "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43",
-    "main_commit": "210f4e706a19cdc8a9e354084c66392febc7899b",
-    "main_commit_date": "2026-06-07"
+    "main_commit": "8cf9d8689d56dc8ad742a6113b0f502ec464c835",
+    "main_commit_date": "2026-06-13"
   },
   "version_detection": {
     "owner": "installer",
