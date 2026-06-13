@@ -47,6 +47,73 @@ function Select-UniqueText([string[]]$Items) {
   return $result.ToArray()
 }
 
+function Select-UniqueLocalPaths([string[]]$Items) {
+  $seen = @{}
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($item in $Items) {
+    if ([string]::IsNullOrWhiteSpace($item)) { continue }
+    $clean = $item.Trim().TrimEnd("\")
+    if (-not $seen.ContainsKey($clean)) {
+      $seen[$clean] = $true
+      [void]$result.Add($clean)
+    }
+  }
+  return $result.ToArray()
+}
+
+function Get-InstallerAssetRoots {
+  $items = @()
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_ASSET_DIRS)) {
+    $items += ($env:XIAOMA_HERMES_ASSET_DIRS -split "[;,]")
+  }
+  if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_EXE_DIR)) {
+    $items += $env:XIAOMA_HERMES_EXE_DIR
+  }
+  if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $items += $PSScriptRoot
+  }
+  try {
+    $items += (Get-Location).Path
+  } catch { }
+  return Select-UniqueLocalPaths $items
+}
+
+function Get-LocalInstallerAssetPaths([string[]]$Patterns, [string]$ExcludePattern = "") {
+  $items = New-Object System.Collections.Generic.List[string]
+  foreach ($root in (Get-InstallerAssetRoots)) {
+    if ([string]::IsNullOrWhiteSpace($root) -or -not (Test-Path -LiteralPath $root)) { continue }
+    foreach ($pattern in $Patterns) {
+      if ([string]::IsNullOrWhiteSpace($pattern)) { continue }
+      try {
+        $matches = Get-ChildItem -LiteralPath $root -Filter $pattern -File -ErrorAction SilentlyContinue |
+          Where-Object { [string]::IsNullOrWhiteSpace($ExcludePattern) -or $_.Name -notmatch $ExcludePattern } |
+          Sort-Object -Property Name -Descending
+        foreach ($match in $matches) {
+          [void]$items.Add($match.FullName)
+        }
+      } catch { }
+    }
+  }
+  return Select-UniqueLocalPaths $items.ToArray()
+}
+
+function Test-HttpSource([string]$Source) {
+  return ($Source -match "^https?://")
+}
+
+function Copy-OrDownloadInstallerFile([string]$Source, [string]$OutFile, [int]$TimeoutSec, [string]$Label) {
+  if (Test-HttpSource $Source) {
+    Write-Step "正在下载$Label：$Source"
+    Invoke-WebRequest -UseBasicParsing -Uri $Source -OutFile $OutFile -TimeoutSec $TimeoutSec
+  } else {
+    if (-not (Test-Path -LiteralPath $Source)) {
+      throw "$Label 本地文件不存在：$Source"
+    }
+    Write-Step "正在读取本地$Label：$Source"
+    Copy-Item -Force -LiteralPath $Source -Destination $OutFile
+  }
+}
+
 function Get-InstallerBaseUrls {
   if (-not [string]::IsNullOrWhiteSpace($env:XIAOMA_HERMES_BASE_URLS)) {
     return Select-UniqueText ($env:XIAOMA_HERMES_BASE_URLS -split ",")
@@ -187,6 +254,9 @@ function Get-NodeIndexUrls {
 
 function Resolve-NodeDownloadUrls([string]$Arch) {
   $items = New-Object System.Collections.Generic.List[string]
+  foreach ($localPath in (Get-LocalInstallerAssetPaths @("node-v22.22.3-win-$Arch.zip", "node-v*-win-$Arch.zip"))) {
+    [void]$items.Add($localPath)
+  }
   $zipSuffix = "win-$Arch-zip"
   foreach ($indexUrl in (Get-NodeIndexUrls)) {
     try {
@@ -218,11 +288,10 @@ function Ensure-WindowsNode([string]$HermesHomePath) {
   $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-node-" + [guid]::NewGuid().ToString("N"))
   New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
   try {
-    foreach ($url in (Resolve-NodeDownloadUrls -Arch $arch)) {
-      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($url))
+    foreach ($source in (Resolve-NodeDownloadUrls -Arch $arch)) {
+      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($source))
       try {
-        Write-Step "正在下载 Hermes 自带 Node.js：$url"
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec
+        Copy-OrDownloadInstallerFile -Source $source -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec -Label "Hermes 自带 Node.js"
         $extractDir = Join-Path $tmpRoot "extract"
         if (Test-Path $extractDir) { Remove-Item -Recurse -Force $extractDir }
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
@@ -268,6 +337,9 @@ function Get-GitForWindowsIndexUrls {
 
 function Resolve-GitForWindowsDownloadUrls {
   $items = New-Object System.Collections.Generic.List[string]
+  foreach ($localPath in (Get-LocalInstallerAssetPaths @("MinGit-2.54.0-64-bit.zip", "MinGit-*-64-bit.zip") "busybox")) {
+    [void]$items.Add($localPath)
+  }
 
   foreach ($indexUrl in (Get-GitForWindowsIndexUrls)) {
     try {
@@ -318,11 +390,10 @@ function Ensure-WindowsGitBash([string]$HermesHomePath) {
   $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-git-" + [guid]::NewGuid().ToString("N"))
   New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
   try {
-    foreach ($url in (Resolve-GitForWindowsDownloadUrls)) {
-      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($url))
+    foreach ($source in (Resolve-GitForWindowsDownloadUrls)) {
+      $zipPath = Join-Path $tmpRoot ([System.IO.Path]::GetFileName($source))
       try {
-        Write-Step "正在下载 Git Bash 便携组件：$url"
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec
+        Copy-OrDownloadInstallerFile -Source $source -OutFile $zipPath -TimeoutSec $nodeDownloadTimeoutSec -Label "Git Bash 便携组件"
         $extractDir = Join-Path $tmpRoot "extract"
         if (Test-Path $extractDir) { Remove-Item -Recurse -Force $extractDir }
         Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
