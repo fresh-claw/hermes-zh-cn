@@ -45,7 +45,7 @@ def main() -> int:
     for name in FILES:
         local = (WEB / name).read_bytes()
         try:
-            remote = fetch(f"{base}/{name}?verify=20260613-main-fallback", args.timeout)
+            remote = fetch(f"{base}/{name}?verify=20260613-offline-2", args.timeout)
             error = None
         except Exception as exc:
             remote = b""
@@ -71,7 +71,7 @@ def main() -> int:
 
     combined = "\n".join(combined_parts)
     flags = {
-        "has_current_windows_marker": "20260613-exe-main-1" in combined,
+        "has_current_windows_marker": "20260613-exe-offline-2" in combined,
         "has_current_macos_marker": "20260613-mac-main-1" in combined,
         "has_main_fallback": "hermes-cn@main" in combined,
         "has_windows_git_fix": "Ensure-WindowsGitBash" in combined,
