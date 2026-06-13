@@ -80,7 +80,7 @@ if "20260612-exe-3" in combined:
     raise SystemExit("仍存在旧 Windows 安装器版本号")
 if "fresh-claw/hermes-cn@v2026.06.12.1" in combined:
     raise SystemExit("仍存在旧固定标签备用地址")
-if "20260613-exe-offline-2" not in latest["install_windows_exe"]:
+if "20260613-exe-offline-3" not in latest["install_windows_exe"]:
     raise SystemExit("Windows 安装器缓存参数不是当前版本")
 if "20260613-mac-main-1" not in latest["install_macos_zip"]:
     raise SystemExit("macOS 安装包缓存参数不是当前版本")
@@ -108,6 +108,8 @@ for marker in (
     "Get-LocalInstallerAssetPaths",
     "XIAOMA_HERMES_EXE_DIR",
     "Copy-OrDownloadInstallerFile",
+    "Invoke-CurlDownload",
+    "curl.exe",
     "node-v22.22.3-win-$Arch.zip",
     "Ensure-WindowsGitBash",
     "registry.npmmirror.com/-/binary/git-for-windows/",

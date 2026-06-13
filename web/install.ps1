@@ -101,10 +101,34 @@ function Test-HttpSource([string]$Source) {
   return ($Source -match "^https?://")
 }
 
+function Invoke-CurlDownload([string]$Source, [string]$OutFile, [int]$TimeoutSec) {
+  $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+  if (-not $curl) {
+    throw "curl.exe 不可用。"
+  }
+
+  $maxTime = [Math]::Max(60, $TimeoutSec)
+  & $curl.Source -L --fail --connect-timeout 20 --max-time $maxTime --retry 2 --retry-delay 2 -o $OutFile $Source
+  if ($LASTEXITCODE -ne 0) {
+    throw "curl.exe 下载失败，退出码 $LASTEXITCODE。"
+  }
+  if (-not (Test-Path -LiteralPath $OutFile)) {
+    throw "curl.exe 未生成文件。"
+  }
+  if ((Get-Item -LiteralPath $OutFile).Length -le 0) {
+    throw "curl.exe 生成了空文件。"
+  }
+}
+
 function Copy-OrDownloadInstallerFile([string]$Source, [string]$OutFile, [int]$TimeoutSec, [string]$Label) {
   if (Test-HttpSource $Source) {
     Write-Step "正在下载$Label：$Source"
-    Invoke-WebRequest -UseBasicParsing -Uri $Source -OutFile $OutFile -TimeoutSec $TimeoutSec
+    try {
+      Invoke-CurlDownload -Source $Source -OutFile $OutFile -TimeoutSec $TimeoutSec
+    } catch {
+      Write-Step "curl.exe 下载未完成，正在改用 PowerShell 下载。"
+      Invoke-WebRequest -UseBasicParsing -Uri $Source -OutFile $OutFile -TimeoutSec $TimeoutSec
+    }
   } else {
     if (-not (Test-Path -LiteralPath $Source)) {
       throw "$Label 本地文件不存在：$Source"

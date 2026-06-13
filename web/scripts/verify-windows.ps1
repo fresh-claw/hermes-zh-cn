@@ -302,6 +302,8 @@ Assert-True ($installPs1.Contains("Ensure-WindowsNode")) "Windows Node.js prepar
 Assert-True ($installPs1.Contains("Get-LocalInstallerAssetPaths")) "local offline asset lookup missing"
 Assert-True ($installPs1.Contains("XIAOMA_HERMES_EXE_DIR")) "installer directory asset lookup missing"
 Assert-True ($installPs1.Contains("Copy-OrDownloadInstallerFile")) "local-or-remote asset copy missing"
+Assert-True ($installPs1.Contains("Invoke-CurlDownload")) "curl.exe download fallback missing"
+Assert-True ($installPs1.Contains("curl.exe")) "Windows curl downloader missing"
 Assert-True ($installPs1.Contains("cdn.npmmirror.com/binaries/node/index.json")) "Node.js China mirror missing"
 Assert-True ($installPs1.Contains("nodejs.org/dist/index.json")) "Node.js official fallback missing"
 Assert-True ($installPs1.Contains("node-v22.22.3-win-`$Arch.zip")) "Node.js fixed-version fallback missing"
