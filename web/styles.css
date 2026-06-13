@@ -5201,6 +5201,10 @@ html[data-theme="orange"] .install-downloads {
   min-width: 0;
 }
 
+html[data-theme="orange"] .install-downloads-split {
+  grid-template-columns: minmax(0, 1fr) minmax(86px, 0.36fr);
+}
+
 html[data-theme="orange"] .download-button {
   display: inline-flex;
   align-items: center;
@@ -5225,6 +5229,13 @@ html[data-theme="orange"] .download-button {
     inset 0 1px 0 rgba(255, 243, 220, 0.4),
     0 12px 24px rgba(255, 122, 26, 0.12);
   transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+html[data-theme="orange"] .download-button-secondary {
+  background:
+    linear-gradient(180deg, rgba(255, 224, 179, 0.18), rgba(255, 166, 73, 0.1)),
+    rgba(22, 7, 1, 0.34);
+  color: #ffe7bd;
 }
 
 html[data-theme="orange"] .download-button:hover,

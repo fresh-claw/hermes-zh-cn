@@ -14,41 +14,41 @@
       "version": "2026.06.12.1",
       "manifest": "packages/0.16.x/zh-CN/manifest.json",
       "package": "packages/0.16.x/zh-CN/zh-cn.min.json",
-      "sha256": "8ff066a685a070b91023d1e15e1ccf56105cb62800362027e5940cd53b1a22d7"
+      "sha256": "fe4c35304bc839753825cf47870b84a501c44707d9df1b0a4e902f6f4ae39361"
     },
     {
       "hermes": "0.15.x",
       "version": "2026.05.29.1",
       "manifest": "packages/0.15.x/zh-CN/manifest.json",
       "package": "packages/0.15.x/zh-CN/zh-cn.min.json",
-      "sha256": "8a2419a6468b5ca995df9108bda8d51af78ee19893b6329d7afe40c4242d414b"
+      "sha256": "a21661680d05ba89cfafb58631efcd34862dad319b448151d5717f2ba6d057b3"
     },
     {
       "hermes": "0.14.x",
       "version": "2026.05.29.1",
       "manifest": "packages/0.14.x/zh-CN/manifest.json",
       "package": "packages/0.14.x/zh-CN/zh-cn.min.json",
-      "sha256": "08185ad854bdae7d0dad5e7a19cfb2c6d085667cfe510b3c88e71430a6d1a0d1"
+      "sha256": "a658bf1cdc38bfafb0a523ba08325e6535f6b220f8ba5fa9a1e6a4740cd068ae"
     },
     {
       "hermes": "0.13.x",
       "version": "2026.05.29.1",
       "manifest": "packages/0.13.x/zh-CN/manifest.json",
       "package": "packages/0.13.x/zh-CN/zh-cn.min.json",
-      "sha256": "562978d050c161d98dc35a795a068da8584ed0281433f817b7c873222e0a894e"
+      "sha256": "99d9d691aded821f9f18a3030ce591d807309a46bad0657ed77d0a83750bc9a4"
     },
     {
       "hermes": "legacy",
       "version": "2026.05.29.1",
       "manifest": "packages/legacy/zh-CN/manifest.json",
       "package": "packages/legacy/zh-CN/zh-cn.min.json",
-      "sha256": "e01c63d5c00edb21e6c3024089922b53a72c5deb47371a1eb1791160a4d92fcb"
+      "sha256": "bda3ce667a38208e87997bd1aa8a08941f237c3d0c3e8c32626d8091388af342"
     }
   ],
   "legacy_manifest_url": "http://47.121.138.43/hermes/packages/legacy/zh-CN/manifest.json",
   "legacy_package_url": "http://47.121.138.43/hermes/packages/legacy/zh-CN/zh-cn.min.json",
-  "sha256": "8ff066a685a070b91023d1e15e1ccf56105cb62800362027e5940cd53b1a22d7",
-  "legacy_sha256": "e01c63d5c00edb21e6c3024089922b53a72c5deb47371a1eb1791160a4d92fcb",
+  "sha256": "fe4c35304bc839753825cf47870b84a501c44707d9df1b0a4e902f6f4ae39361",
+  "legacy_sha256": "bda3ce667a38208e87997bd1aa8a08941f237c3d0c3e8c32626d8091388af342",
   "requires_user_confirmation": true,
   "authorization": "single install command",
   "fallback": "legacy",

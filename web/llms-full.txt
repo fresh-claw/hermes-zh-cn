@@ -60,7 +60,7 @@ Upstream Hermes Agent: https://github.com/NousResearch/hermes-agent
 
 ## 安装流程
 
-1. 用户发送：“请访问 useai.live/hermes 安装汉化补丁”。
+1. 用户发送：“请访问 47.121.138.43/hermes 安装汉化补丁”。
 2. Windows 新手下载 `http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260612-exe-3` 后运行；高级用户可执行：`irm http://47.121.138.43/hermes/install.ps1 | iex`。
 3. macOS 新手下载 `http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260612-mac-1`，解压后打开 `install.command`。
 4. Linux、WSL2 用户执行：`curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop`。

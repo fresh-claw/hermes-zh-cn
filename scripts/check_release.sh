@@ -12,6 +12,8 @@ python3 -m json.tool "$ROOT/web/latest.json" >/dev/null
 python3 -m json.tool "$ROOT/web/platforms.json" >/dev/null
 python3 -m json.tool "$ROOT/web/api/resolve" >/dev/null
 python3 -m json.tool "$ROOT/web/api/resolve.sample.json" >/dev/null
+python3 -m json.tool "$ROOT/web/packages/0.16.x/zh-CN/manifest.json" >/dev/null
+python3 -m json.tool "$ROOT/web/packages/0.16.x/zh-CN/zh-cn.min.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.15.x/zh-CN/manifest.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.15.x/zh-CN/zh-cn.min.json" >/dev/null
 python3 -m json.tool "$ROOT/web/packages/0.14.x/zh-CN/manifest.json" >/dev/null
@@ -32,7 +34,7 @@ latest = json.loads((root / "web/latest.json").read_text(encoding="utf-8"))
 platforms = json.loads((root / "web/platforms.json").read_text(encoding="utf-8"))
 resolve = json.loads((root / "web/api/resolve.sample.json").read_text(encoding="utf-8"))
 
-compats = ("0.15.x", "0.14.x", "0.13.x", "legacy")
+compats = ("0.16.x", "0.15.x", "0.14.x", "0.13.x", "legacy")
 for idx, compat in enumerate(compats):
     pkg = root / f"web/packages/{compat}/zh-CN/zh-cn.min.json"
     manifest = json.loads((root / f"web/packages/{compat}/zh-CN/manifest.json").read_text(encoding="utf-8"))
@@ -52,8 +54,8 @@ if resolve["legacy_sha256"] != latest["packages"][-1]["sha256"]:
 windows_command = platforms["platforms"][0]["command"]
 if "install.ps1" not in windows_command or "iex" not in windows_command:
     raise SystemExit("Windows 一键命令缺失")
-if platforms["upstream"]["agent_version"] != "0.15.2":
-    raise SystemExit("官方版本记录需为 0.15.2")
+if platforms["upstream"]["agent_version"] != "0.16.0":
+    raise SystemExit("官方版本记录需为 0.16.0")
 if not (root / "web/install.ps1").exists():
     raise SystemExit("缺少 install.ps1")
 
