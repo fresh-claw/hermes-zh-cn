@@ -1,10 +1,21 @@
 param(
-  [string]$Version = "2026.06.12.1"
+  [string]$Version = "2026.06.12.1",
+  [string]$BaseUrl = "http://47.121.138.43/hermes"
 )
 
 $ErrorActionPreference = "Stop"
 
 $Root = Resolve-Path (Join-Path $PSScriptRoot "..")
+$requiredFiles = @("install.ps1", "install.sh", "Hermes-zh-CN-Setup.exe")
+if (($requiredFiles | Where-Object { -not (Test-Path (Join-Path $Root $_)) } | Measure-Object).Count -gt 0) {
+  $downloadRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("xiaoma-hermes-verify-root-" + [guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path $downloadRoot | Out-Null
+  foreach ($name in $requiredFiles) {
+    $url = "$($BaseUrl.TrimEnd('/'))/$name"
+    Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile (Join-Path $downloadRoot $name) -TimeoutSec 60
+  }
+  $Root = Resolve-Path $downloadRoot
+}
 Set-Location $Root
 
 function Assert-True([bool]$Condition, [string]$Message) {
