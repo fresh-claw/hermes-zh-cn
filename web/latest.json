@@ -65,5 +65,6 @@
     }
   ],
   "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
-  "verify_windows": "http://47.121.138.43/hermes/scripts/verify-windows.ps1"
+  "verify_windows": "http://47.121.138.43/hermes/scripts/verify-windows.ps1",
+  "verify_windows_cmd": "http://47.121.138.43/hermes/verify-windows.cmd"
 }
