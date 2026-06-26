@@ -1,0 +1,3 @@
+app:
+  welcome: "欢迎，{name}！"
+  retry: "Retry"

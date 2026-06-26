@@ -1,0 +1,18 @@
+{
+  "zh-CN": {
+    "Start chatting": "开始聊天",
+    "No sessions found.": "没有找到会话。",
+    "Cancel": "取消",
+    "Current": "当前",
+    "Available Tools": "可用工具",
+    "Available Skills": "可用技能"
+  },
+  "ja-JP": {
+    "Start chatting": "チャットを開始",
+    "No sessions found.": "セッションが見つかりません。",
+    "Cancel": "キャンセル",
+    "Current": "現在",
+    "Available Tools": "利用可能なツール",
+    "Available Skills": "利用可能なスキル"
+  }
+}
