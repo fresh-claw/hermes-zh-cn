@@ -1,0 +1,7 @@
+interface:
+  display_name: "零点零三Hermes语言管理"
+  short_description: "一键扫描、本地化、检查并迁移 Hermes 文案"
+  default_prompt: "Use $zero-zero-three-hermes-language-management to run the Hermes localization pipeline for Chinese and keep i18n keys consistent."
+
+policy:
+  allow_implicit_invocation: true

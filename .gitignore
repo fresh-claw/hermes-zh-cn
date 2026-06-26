@@ -1,6 +1,22 @@
 .DS_Store
 node_modules/
 .venv/
+venv/
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
+localization-work/
+localization-candidates.json
+localization-candidates.md
+localization-scan*.json
+localization-delta*.json
+localization-patch-plan*.json
+i18n-migration-plan*.json
+i18n-consistency*.json
+translation-request*.json
+translation-memory.json
+locale-consistency-fixes*.json

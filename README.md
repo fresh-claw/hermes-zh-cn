@@ -70,6 +70,28 @@ curl -fsSL http://47.121.138.43/hermes/install.sh | bash -s -- --include-desktop
 XIAOMA_HERMES_BASE_URL=http://127.0.0.1:4173 bash web/install.sh
 ```
 
+## 零点零三 Hermes 语言管理 Skill
+
+仓库同时提供 `zero-zero-three-hermes-language-management/`，这是一个面向 Hermes / Hermes fork 的自动化本地化 skill。它可以扫描用户可见文案、生成增量翻译计划、导出大模型翻译请求、检查多语言 locale 一致性，并辅助把硬编码文案迁移到 i18n key。
+
+复制到 Hermes / Codex 可发现的 skills 目录后使用：
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R zero-zero-three-hermes-language-management ~/.agents/skills/
+```
+
+在 Hermes 项目根目录运行一键本地化 artifact pipeline：
+
+```bash
+python ~/.agents/skills/zero-zero-three-hermes-language-management/scripts/run_localization_pipeline.py . \
+  --target-locale zh-CN \
+  --mode both \
+  --out-dir localization-work
+```
+
+详细说明见 [零点零三 Hermes 语言管理 Skill](docs/zero-zero-three-hermes-language-management.md)。
+
 ## 多语言说明
 
 网站页面保持中文；其他语言说明仅在 GitHub 仓库提供：
