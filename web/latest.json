@@ -1,7 +1,7 @@
 {
   "locale": "zh-CN",
   "brand": "小马AI版",
-  "latest": "2026.06.12.1",
+  "latest": "2026.08.21.1",
   "install": "http://47.121.138.43/hermes/install.sh",
   "install_windows": "http://47.121.138.43/hermes/install.ps1",
   "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-3",
@@ -15,12 +15,12 @@
   "resolve": "http://47.121.138.43/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
   "upstream": {
-    "latest_release": "v2026.6.5",
-    "latest_release_name": "Hermes Agent v0.16.0 (2026.6.5)",
-    "latest_release_date": "2026-06-05",
-    "release_commit": "3c231eb3979ab9c57d5cd6d02f1d577a3b718b43",
-    "main_commit": "8cf9d8689d56dc8ad742a6113b0f502ec464c835",
-    "main_commit_date": "2026-06-13"
+    "latest_release": "v2026.8.19",
+    "latest_release_name": "Hermes Agent v0.20.5 (2026.8.19)",
+    "latest_release_date": "2026-08-19",
+    "release_commit": "fcbd1076a93841fa88855acce810e342a5b78101",
+    "main_commit": "fcbd1076a93841fa88855acce810e342a5b78101",
+    "main_commit_date": "2026-08-19"
   },
   "version_detection": {
     "owner": "installer",
@@ -28,6 +28,13 @@
     "fallback": "legacy"
   },
   "packages": [
+    {
+      "hermes": "0.20.x",
+      "version": "2026.08.21.1",
+      "manifest": "packages/0.20.x/zh-CN/manifest.json",
+      "package": "packages/0.20.x/zh-CN/zh-cn.min.json",
+      "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6"
+    },
     {
       "hermes": "0.16.x",
       "version": "2026.06.12.1",

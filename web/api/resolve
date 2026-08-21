@@ -1,14 +1,21 @@
 {
   "matched": true,
   "hermes_version": "installer-detected",
-  "xiaoma_version": "2026.06.12.1",
+  "xiaoma_version": "2026.08.21.1",
   "locale": "zh-CN",
   "install_url": "http://47.121.138.43/hermes/install.sh",
   "recommended_command": "(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash",
-  "resolver_note": "2026.06.12.1 修复 Windows Node.js 获取失败导致官方桌面端无法生成的问题；安装器会优先从国内镜像准备 Hermes 自带 Node.js 22，再运行官方桌面端生成流程；继续适配 Hermes 0.16.x、0.15.x、0.14.x、0.13.x 和 legacy。",
-  "manifest_url": "http://47.121.138.43/hermes/packages/0.16.x/zh-CN/manifest.json",
-  "package_url": "http://47.121.138.43/hermes/packages/0.16.x/zh-CN/zh-cn.min.json",
+  "resolver_note": "2026.08.21.1 已适配 Hermes v2026.8.19（0.20.5）；安装器会为 0.20.x 选择独立中文包，并保留 0.16.x、0.15.x、0.14.x、0.13.x 与 legacy 兼容路径。",
+  "manifest_url": "http://47.121.138.43/hermes/packages/0.20.x/zh-CN/manifest.json",
+  "package_url": "http://47.121.138.43/hermes/packages/0.20.x/zh-CN/zh-cn.min.json",
   "compat_packages": [
+    {
+      "hermes": "0.20.x",
+      "version": "2026.08.21.1",
+      "manifest": "packages/0.20.x/zh-CN/manifest.json",
+      "package": "packages/0.20.x/zh-CN/zh-cn.min.json",
+      "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6"
+    },
     {
       "hermes": "0.16.x",
       "version": "2026.06.12.1",
@@ -47,7 +54,7 @@
   ],
   "legacy_manifest_url": "http://47.121.138.43/hermes/packages/legacy/zh-CN/manifest.json",
   "legacy_package_url": "http://47.121.138.43/hermes/packages/legacy/zh-CN/zh-cn.min.json",
-  "sha256": "fe4c35304bc839753825cf47870b84a501c44707d9df1b0a4e902f6f4ae39361",
+  "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6",
   "legacy_sha256": "bda3ce667a38208e87997bd1aa8a08941f237c3d0c3e8c32626d8091388af342",
   "requires_user_confirmation": true,
   "authorization": "single install command",

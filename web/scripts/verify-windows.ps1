@@ -1,5 +1,5 @@
 param(
-  [string]$Version = "2026.06.12.1",
+  [string]$Version = "2026.08.21.1",
   [string]$BaseUrl = "http://47.121.138.43/hermes"
 )
 
@@ -211,7 +211,7 @@ if ([string]::IsNullOrWhiteSpace($hermesHome)) {
 $cmdDir = Join-Path $hermesHome "hermes-agent\venv\Scripts"
 $desktopDir = Join-Path $hermesHome "hermes-agent\apps\desktop\release\win-unpacked"
 New-Item -ItemType Directory -Force -Path $cmdDir, $desktopDir | Out-Null
-Set-Content -Path (Join-Path $cmdDir "hermes.cmd") -Encoding ASCII -Value "@echo Hermes Agent v0.16.0"
+Set-Content -Path (Join-Path $cmdDir "hermes.cmd") -Encoding ASCII -Value "@echo Hermes Agent v0.20.5"
 Set-Content -Path (Join-Path $desktopDir "Hermes.exe") -Encoding ASCII -Value "fake desktop"
 '@
   Set-Content -Path (Join-Path $serverRoot "official-hermes-install.ps1") -Encoding UTF8 -Value $officialStub
@@ -219,7 +219,7 @@ Set-Content -Path (Join-Path $desktopDir "Hermes.exe") -Encoding ASCII -Value "f
   $fakeHermes = Join-Path $bin "hermes"
   Set-Content -Path $fakeHermes -Encoding UTF8 -Value @'
 #!/usr/bin/env bash
-printf 'Hermes Agent v0.16.0\n'
+printf 'Hermes Agent v0.20.5\n'
 '@
   $fakePython3 = Join-Path $bin "python3"
   Set-Content -Path $fakePython3 -Encoding UTF8 -Value @'
@@ -227,7 +227,7 @@ printf 'Hermes Agent v0.16.0\n'
 python "$@"
 '@
   Set-Content -Path (Join-Path $sourceRoot "hermes_cli/banner.py") -Encoding UTF8 -Value @'
-VERSION="0.16.0"
+VERSION="0.20.5"
 RELEASE_DATE="2026-06-05"
 base = f"Hermes Agent v{VERSION} ({RELEASE_DATE})"
 '@
@@ -331,10 +331,10 @@ New-FakeBashExe -Path (Join-Path $fakeBashDir "bash.exe") -Version $Version
 $fakeHermes = Join-Path $bin "hermes"
 Set-Content -Path $fakeHermes -Encoding UTF8 -Value @'
 #!/usr/bin/env bash
-printf 'Hermes Agent v0.16.0\n'
+printf 'Hermes Agent v0.20.5\n'
 '@
 $fakeHermesCmd = Join-Path $bin "hermes.cmd"
-Set-Content -Path $fakeHermesCmd -Encoding ASCII -Value "@echo Hermes Agent v0.16.0"
+Set-Content -Path $fakeHermesCmd -Encoding ASCII -Value "@echo Hermes Agent v0.20.5"
 
 $fakePython3 = Join-Path $bin "python3"
 Set-Content -Path $fakePython3 -Encoding UTF8 -Value @'
@@ -344,7 +344,7 @@ python "$@"
 
 $bannerPath = Join-Path $sourceRoot "hermes_cli/banner.py"
 Set-Content -Path $bannerPath -Encoding UTF8 -Value @'
-VERSION="0.16.0"
+VERSION="0.20.5"
 RELEASE_DATE="2026-06-05"
 base = f"Hermes Agent v{VERSION} ({RELEASE_DATE})"
 '@

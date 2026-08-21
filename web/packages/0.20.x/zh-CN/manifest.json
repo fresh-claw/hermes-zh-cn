@@ -1,0 +1,13 @@
+{
+  "name": "xiaoma-hermes-zh-cn",
+  "brand": "小马AI版",
+  "locale": "zh-CN",
+  "hermes_compat": "0.20.x",
+  "version": "2026.08.21.1",
+  "upstream_tag": "v2026.8.19",
+  "upstream_commit": "fcbd1076a93841fa88855acce810e342a5b78101",
+  "files": [{"path": "zh-cn.min.json", "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6", "purpose": "Hermes 0.20.x 中文增强包", "size": 1890}],
+  "promo": {"enabled": false, "slots": []},
+  "generated_at": "2026-08-21T00:00:00+08:00",
+  "description": "小马AI Hermes 0.20.x 中文增强包"
+}

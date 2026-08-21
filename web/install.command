@@ -20,7 +20,7 @@ installer_script_ok() {
   local path="$1"
   [ -f "$path" ] || return 1
   head -n 1 "$path" | grep -Eq '^#!.*bash' || return 1
-  grep -F 'PACKAGE_VERSION="2026.06.12.1"' "$path" >/dev/null 2>&1
+  grep -F 'PACKAGE_VERSION="2026.08.21.1"' "$path" >/dev/null 2>&1
 }
 
 if installer_script_ok "$LOCAL_INSTALLER"; then

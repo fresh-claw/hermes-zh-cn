@@ -737,7 +737,7 @@ function Test-BashInstaller([string]$Path) {
   $firstLine = Get-Content -Path $Path -TotalCount 1 -ErrorAction SilentlyContinue
   if (-not ($firstLine -like "#!*bash*" -or $firstLine -like "#!/usr/bin/env bash*")) { return $false }
   $text = Get-Content -Raw -Path $Path -ErrorAction SilentlyContinue
-  return ($text -and $text.Contains('PACKAGE_VERSION="2026.06.12.1"'))
+  return ($text -and $text.Contains('PACKAGE_VERSION="2026.08.21.1"'))
 }
 
 function Download-Installer([string]$OutFile) {

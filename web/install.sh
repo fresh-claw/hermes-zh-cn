@@ -3,7 +3,7 @@ set -euo pipefail
 
 BASE_URL="${XIAOMA_HERMES_BASE_URL:-http://47.121.138.43/hermes}"
 BASE_URL="${BASE_URL%/}"
-PACKAGE_VERSION="2026.06.12.1"
+PACKAGE_VERSION="2026.08.21.1"
 PINNED_VERSION="${XIAOMA_HERMES_PINNED_VERSION:-main}"
 OFFICIAL_HERMES_INSTALL_URL="${XIAOMA_HERMES_OFFICIAL_INSTALL_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 INSTALL_HOME="${XIAOMA_HERMES_HOME:-$HOME/.xiaoma-hermes}"
@@ -572,6 +572,9 @@ package_dir_for_version() {
   local payload_root="$1"
   local version="$2"
   case "$version" in
+    0.20.*)
+      printf '%s\n' "$payload_root/packages/0.20.x/zh-CN"
+      ;;
     0.16.*)
       printf '%s\n' "$payload_root/packages/0.16.x/zh-CN"
       ;;
@@ -593,6 +596,7 @@ package_dir_for_version() {
 compat_for_version() {
   local version="$1"
   case "$version" in
+    0.20.*) printf '0.20.x' ;;
     0.16.*) printf '0.16.x' ;;
     0.15.*) printf '0.15.x' ;;
     0.14.*) printf '0.14.x' ;;
