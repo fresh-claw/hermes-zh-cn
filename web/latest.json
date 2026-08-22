@@ -2,17 +2,17 @@
   "locale": "zh-CN",
   "brand": "小马AI版",
   "latest": "2026.08.21.1",
-  "install": "http://47.121.138.43/hermes/install.sh",
-  "install_windows": "http://47.121.138.43/hermes/install.ps1",
-  "install_windows_exe": "http://47.121.138.43/hermes/Hermes-zh-CN-Setup.exe?v=20260613-exe-offline-3",
-  "install_windows_click": "http://47.121.138.43/hermes/install-windows.cmd",
-  "install_macos_click": "http://47.121.138.43/hermes/install.command",
-  "install_macos_zip": "http://47.121.138.43/hermes/hermes-macos-installer.zip?v=20260613-mac-main-1",
+  "install": "https://useai.live/hermes/install.sh",
+  "install_windows": "https://useai.live/hermes/install.ps1",
+  "install_windows_exe": "https://useai.live/hermes/Hermes-zh-CN-Setup.exe?v=20260822-exe-0.20.5-1",
+  "install_windows_click": "https://useai.live/hermes/install-windows.cmd",
+  "install_macos_click": "https://useai.live/hermes/install.command",
+  "install_macos_zip": "https://useai.live/hermes/hermes-macos-installer.zip?v=20260822-mac-0.20.5-1",
   "official_hermes_install_windows": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1",
   "official_windows_desktop_args": "-IncludeDesktop -NonInteractive",
   "official_macos_linux_desktop_args": "--include-desktop",
-  "platforms": "http://47.121.138.43/hermes/platforms.json",
-  "resolve": "http://47.121.138.43/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
+  "platforms": "https://useai.live/hermes/platforms.json",
+  "resolve": "https://useai.live/hermes/api/resolve?hermes_version={{version}}&platform={{platform}}&locale=zh-CN",
   "github": "https://github.com/fresh-claw/hermes-zh-cn",
   "upstream": {
     "latest_release": "v2026.8.19",
@@ -33,7 +33,7 @@
       "version": "2026.08.21.1",
       "manifest": "packages/0.20.x/zh-CN/manifest.json",
       "package": "packages/0.20.x/zh-CN/zh-cn.min.json",
-      "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6"
+      "sha256": "7badd58ffa098d80565687c8e7da001f7702543cd0f4755f5e1fa97ea6ea044c"
     },
     {
       "hermes": "0.16.x",
@@ -72,6 +72,6 @@
     }
   ],
   "official_hermes_install": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh",
-  "verify_windows": "http://47.121.138.43/hermes/scripts/verify-windows.ps1",
-  "verify_windows_cmd": "http://47.121.138.43/hermes/verify-windows.cmd"
+  "verify_windows": "https://useai.live/hermes/scripts/verify-windows.ps1",
+  "verify_windows_cmd": "https://useai.live/hermes/verify-windows.cmd"
 }

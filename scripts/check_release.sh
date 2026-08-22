@@ -78,15 +78,17 @@ combined = "\n".join(
         "web/install-windows.cmd",
     )
 )
-if "useai.live" in combined:
-    raise SystemExit("仍存在旧域名 useai.live")
+if "https://useai.live/hermes" not in combined:
+    raise SystemExit("发布域名未切换到 useai.live/hermes")
+if "47.121.138.43/hermes" in combined:
+    raise SystemExit("仍存在旧发布域名")
 if "20260612-exe-3" in combined:
     raise SystemExit("仍存在旧 Windows 安装器版本号")
 if "fresh-claw/hermes-cn@v2026.06.12.1" in combined:
     raise SystemExit("仍存在旧固定标签备用地址")
-if "20260613-exe-offline-3" not in latest["install_windows_exe"]:
+if "20260822-exe-0.20.5-1" not in latest["install_windows_exe"]:
     raise SystemExit("Windows 安装器缓存参数不是当前版本")
-if "20260613-mac-main-1" not in latest["install_macos_zip"]:
+if "20260822-mac-0.20.5-1" not in latest["install_macos_zip"]:
     raise SystemExit("macOS 安装包缓存参数不是当前版本")
 
 install_ps1 = (root / "web/install.ps1").read_text(encoding="utf-8", errors="ignore")

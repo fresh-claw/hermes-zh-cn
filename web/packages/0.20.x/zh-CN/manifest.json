@@ -6,7 +6,7 @@
   "version": "2026.08.21.1",
   "upstream_tag": "v2026.8.19",
   "upstream_commit": "fcbd1076a93841fa88855acce810e342a5b78101",
-  "files": [{"path": "zh-cn.min.json", "sha256": "be844c5402beebc9942533eace8eab56076fa95031739596ce88bc84b14fb5f6", "purpose": "Hermes 0.20.x 中文增强包", "size": 1890}],
+  "files": [{"path": "zh-cn.min.json", "sha256": "7badd58ffa098d80565687c8e7da001f7702543cd0f4755f5e1fa97ea6ea044c", "purpose": "Hermes 0.20.x 中文增强包", "size": 1888}],
   "promo": {"enabled": false, "slots": []},
   "generated_at": "2026-08-21T00:00:00+08:00",
   "description": "小马AI Hermes 0.20.x 中文增强包"

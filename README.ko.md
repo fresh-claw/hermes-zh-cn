@@ -10,11 +10,7 @@
 请访问 useai.live/hermes 安装汉化补丁
 ```
 
-Hermes는 공개 페이지를 읽고 설치 안내를 찾은 뒤 다음 설치 프로그램을 실행할 수 있습니다.
-
-```bash
-(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
-```
+Hermes는 공개 페이지를 읽고 페이지의 설치 안내를 따를 수 있습니다. 모든 설치 방법과 문제 해결은 [useai.live/hermes](https://useai.live/hermes/)에서 확인하세요.
 
 ## 기능
 

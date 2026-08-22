@@ -27,14 +27,31 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def comparable(name: str, data: bytes) -> bytes:
+    if name == "index.html":
+        cloudflare = data.find(b'<script type="module" src="https://static.cloudflareinsights.com/')
+        if cloudflare >= 0:
+            closing_body = data.lower().rfind(b"</body>")
+            if closing_body > cloudflare:
+                data = data[:cloudflare] + data[closing_body:]
+        end = data.lower().find(b"</html>")
+        if end >= 0:
+            return data[: end + len(b"</html>")]
+    return data
+
+
 def fetch(url: str, timeout: int) -> bytes:
-    with urllib.request.urlopen(url, timeout=timeout) as response:
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (release verification; +https://useai.live/hermes)"},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.read()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base-url", default="http://47.121.138.43/hermes")
+    parser.add_argument("--base-url", default="https://useai.live/hermes")
     parser.add_argument("--timeout", type=int, default=20)
     args = parser.parse_args()
     base = args.base_url.rstrip("/")
@@ -53,7 +70,7 @@ def main() -> int:
 
         local_sha = digest(local)
         remote_sha = digest(remote) if remote else ""
-        match = bool(remote) and local_sha == remote_sha
+        match = bool(remote) and comparable(name, local) == comparable(name, remote)
         ok = ok and match
         if name.endswith((".html", ".json", ".ps1", ".sh", ".cmd", ".txt")):
             combined_parts.append(remote.decode("utf-8", errors="ignore"))
@@ -71,8 +88,8 @@ def main() -> int:
 
     combined = "\n".join(combined_parts)
     flags = {
-        "has_current_windows_marker": "20260613-exe-offline-3" in combined,
-        "has_current_macos_marker": "20260613-mac-main-1" in combined,
+        "has_current_windows_marker": "20260822-exe-0.20.5-1" in combined,
+        "has_current_macos_marker": "20260822-mac-0.20.5-1" in combined,
         "has_main_fallback": "hermes-cn@main" in combined,
         "has_windows_git_fix": "Ensure-WindowsGitBash" in combined,
         "has_node_fixed_fallback": "node-v22.22.3-win-$Arch.zip" in combined,

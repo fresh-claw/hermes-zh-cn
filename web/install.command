@@ -47,7 +47,7 @@ installer_sources() {
     done
     return
   fi
-  append_source "${XIAOMA_HERMES_BASE_URL:-http://47.121.138.43/hermes}"
+  append_source "${XIAOMA_HERMES_BASE_URL:-https://useai.live/hermes}"
   append_source "${XIAOMA_HERMES_FALLBACK_BASE_URL:-https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}}"
   append_source "https://fastly.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"
   append_source "https://gcore.jsdelivr.net/gh/fresh-claw/hermes-cn@${PINNED_VERSION}"

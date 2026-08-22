@@ -1,6 +1,6 @@
 param(
   [string]$Version = "2026.08.21.1",
-  [string]$BaseUrl = "http://47.121.138.43/hermes"
+  [string]$BaseUrl = "https://useai.live/hermes"
 )
 
 $ErrorActionPreference = "Stop"

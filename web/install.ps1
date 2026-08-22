@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-  $BaseUrl = "http://47.121.138.43/hermes"
+  $BaseUrl = "https://useai.live/hermes"
 }
 $BaseUrl = $BaseUrl.TrimEnd("/")
 if ([string]::IsNullOrWhiteSpace($FallbackBaseUrl)) {

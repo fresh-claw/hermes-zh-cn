@@ -10,11 +10,7 @@ Users can send this sentence to Hermes:
 请访问 useai.live/hermes 安装汉化补丁
 ```
 
-Hermes can read the public page, find the installation instruction, and run the installer:
-
-```bash
-(curl -fsSL http://47.121.138.43/hermes/install.sh || curl -fsSL https://cdn.jsdelivr.net/gh/fresh-claw/hermes-cn@main/install.sh) | bash
-```
+Hermes can read the public page and follow its installation guidance. For all installation options and troubleshooting, visit [useai.live/hermes](https://useai.live/hermes/).
 
 ## What It Does
 

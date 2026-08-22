@@ -1,7 +1,7 @@
 @echo off
 setlocal
 title Hermes 中文增强 Windows 验证
-set "BASE_URL=http://47.121.138.43/hermes"
+set "BASE_URL=https://useai.live/hermes"
 set "SCRIPT=%TEMP%\xiaoma-hermes-verify-windows.ps1"
 
 echo Hermes 中文增强 Windows 验证
